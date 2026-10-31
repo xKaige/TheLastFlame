@@ -1,6 +1,11 @@
 {
   "tamano_grupo": 4,
-  "candidatos": 8,
+  "candidatos": 5,
+  "hogar": {
+    "costo_recluta": 6,
+    "plantel_inicial": 3,
+    "plantel_max": 8
+  },
   "pociones_iniciales": 2,
   "niveles": [
     1,

@@ -12,10 +12,10 @@ for (const f of ['clases', 'habilidades', 'modelos', 'enemigos', 'mazmorra', 'di
   D[f] = JSON.parse(x.responseText);
 }
 const CLAVE = 'expedicion.estado';
-const X = { ceniza: 0, caidos: [], corridas: 0, grupo: [], cands: [], sel: [], ganada: 0 };
+const X = { ceniza: 0, caidos: [], corridas: 0, plantel: [], candidatos: [], leyendas: [], grupo: [], sel: [], ganada: 0 };
 try { Object.assign(X, JSON.parse(STORE.get(CLAVE) || '{}')); } catch (e) { /* sin progreso */ }
-X.caidos = X.caidos.filter(c => D.modelos[c.modelo] && D.clases[c.clase]);   // caídos de modelos que ya no existen
-const guardarX = () => STORE.set(CLAVE, JSON.stringify({ ceniza: X.ceniza, caidos: X.caidos, corridas: X.corridas }));
+for (const k of ['caidos', 'plantel', 'candidatos']) X[k] = X[k].filter(c => D.modelos[c.modelo] && D.clases[c.clase]);   // personajes de modelos que ya no existen
+const guardarX = () => STORE.set(CLAVE, JSON.stringify({ ceniza: X.ceniza, caidos: X.caidos, corridas: X.corridas, plantel: X.plantel, candidatos: X.candidatos, leyendas: X.leyendas }));
 const azarX = () => Math.random();
 const baseX = { draw, update, onAction, updateHUD, enterLevel, afterStep };
 
@@ -189,49 +189,134 @@ window.openTitleMenu = () => {
   showScreen(null); setPalette('castle'); setMusic('intro');
   S.mode = 'title';
   openMenu({ back: false, cls: 'compact', items: [
-    { label: 'Reunir el grupo', sub: `${X.ceniza} de Ceniza · ${X.caidos.length} caído${X.caidos.length === 1 ? '' : 's'} · ${X.corridas} expedicion${X.corridas === 1 ? '' : 'es'}`, fn: abrirReunion },
-    { label: 'Los caídos', sub: 'Quienes quedaron en la cripta.', fn: abrirCaidos, off: !X.caidos.length },
-    { label: 'Borrar progreso', sub: 'Ceniza y caídos de tus expediciones.', fn: () => confirmMenu('¿Borrar la Ceniza y los caídos?', () => { X.ceniza = 0; X.caidos = []; X.corridas = 0; guardarX(); openTitleMenu(); }) },
+    { label: 'Ir al Hogar', sub: `${X.ceniza} de Ceniza · ${X.plantel.length} en el plantel · ${X.corridas} expedicion${X.corridas === 1 ? '' : 'es'}`, fn: abrirHogar },
+    { label: 'Borrar progreso', sub: 'Ceniza, plantel, caídos y leyendas.', fn: () => confirmMenu('¿Borrar todo el progreso?', () => { Object.assign(X, { ceniza: 0, caidos: [], corridas: 0, plantel: [], candidatos: [], leyendas: [], sel: [] }); guardarX(); openTitleMenu(); }) },
   ] }, 'title');
 };
 
-function abrirCaidos() {
-  openMenu({ title: 'Los caídos', cls: 'altar', items: X.caidos.map(c => ({
-    label: `${c.nombre} <small>· ${D.clases[c.clase].nombre}, ${D.modelos[c.modelo].titulo}</small>`,
-    sub: `Cayó en el nivel ${c.cayo}. Puede volver a aparecer en la reunión.`, fn: () => {} })) });
+// ---------- El Hogar ----------
+// El último fuego de Vel'Ombra: acá se contrata, se arma el grupo y se baja a la cripta.
+const REGLAS_HOGAR = D.mazmorra.hogar, MAX_GRUPO = D.mazmorra.tamano_grupo;
+const HOGAR = { img: Object.assign(new Image(), { src: 'interfaz/hogar/hogar.png' }), fuego: { x: 242, y: 214 }, c: null };
+function fondoHogar() {
+  if (!HOGAR.c && HOGAR.img.complete && HOGAR.img.naturalWidth) {
+    const spr = spriteDesdeImagen(HOGAR.img, 480), { x: fx, y: fy } = HOGAR.fuego;
+    // la luz sale de la fogata y se pierde hacia los bordes
+    for (let y = 0; y < 270; y++) for (let x = 0; x < 480; x++) {
+      const d = Math.hypot((x - fx) / 1.5, y - fy);
+      spr.lum[y * 480 + x] *= 0.3 + 1.1 * Math.pow(Math.max(0, 1 - d / 190), 1.3);
+    }
+    HOGAR.c = [spriteCanvas(spr, 480, 'crypt', 0.92), spriteCanvas(spr, 480, 'crypt', 1.12)];
+  }
+  return HOGAR.c;
+}
+function dibujarHogar(c) {
+  const f = fondoHogar(), { x, y } = HOGAR.fuego;
+  c.fillStyle = '#000'; c.fillRect(0, 0, 480, 270);
+  if (f) {
+    c.drawImage(f[0], 0, 0, 480, 270, 0, 0, 480, 270);
+    c.globalAlpha = 0.5 + 0.35 * Math.sin(T * 7) * Math.sin(T * 2.3);
+    c.drawImage(f[1], 0, 0, 480, 270, 0, 0, 480, 270);
+    c.globalAlpha = 1;
+  }
+  drawFlame(c, x, y, 80, 82, T, 0.95, 'fuegoX');
+  drawFlame(c, x, y + 2, 46, 46, T + 2.7, 0.95, 'fuegoX');
+  for (let n = 0; n < 7; n++) {
+    const u = (T * (0.3 + n * 0.05) + n * 0.31) % 1;
+    c.fillStyle = RAMPS.fuegoX[n % 2 ? 4 : 5];
+    c.fillRect(x + Math.round(Math.sin(u * 6 + n) * 12), y - 30 - Math.round(u * 90), 1, 1);
+  }
+  // el grupo que va a bajar
+  for (let i = 0; i < MAX_GRUPO; i++) {
+    const p = X.sel[i], px = 250 + i * 54, py = 226;
+    c.fillStyle = '#000'; c.fillRect(px - 1, py - 1, 40, 40);
+    c.fillStyle = p ? RAMPS.crypt[5] : RAMPS.crypt[2]; c.fillRect(px - 1, py - 1, 40, 1); c.fillRect(px - 1, py + 38, 40, 1); c.fillRect(px - 1, py - 1, 1, 40); c.fillRect(px + 38, py - 1, 1, 40);
+    if (p) c.drawImage(retratoX(p.modelo, 38, 'crypt'), px, py);
+  }
 }
 
-// ---------- Reunión del grupo ----------
-function abrirReunion() {
-  X.cands = [...NUCLEO.sortearCaidos(D, X.caidos, azarX), ...NUCLEO.sortearCandidatos(D, azarX)];
-  X.sel = [];
-  const max = D.mazmorra.tamano_grupo;
-  const m = { title: 'Reunir el grupo', cls: 'altar', items: [] };
+function recambiarCandidatos() { X.candidatos = [...NUCLEO.sortearCaidos(D, X.caidos, azarX), ...NUCLEO.sortearCandidatos(D, azarX)]; }
+function prepararHogar() {
+  if (!X.corridas && !X.plantel.length) X.plantel = NUCLEO.sortearCandidatos(D, azarX).slice(0, REGLAS_HOGAR.plantel_inicial);
+  if (!X.candidatos.length) recambiarCandidatos();
+  X.sel = X.sel.filter(p => X.plantel.includes(p));
+  guardarX();
+}
+// Sin nadie en el plantel y sin Ceniza, siempre hay un voluntario gratis: la partida nunca queda trabada
+const costoRecluta = p => (p.condicion ? p.condicion.ceniza || 0 : !X.plantel.length && X.ceniza < REGLAS_HOGAR.costo_recluta ? 0 : REGLAS_HOGAR.costo_recluta);
+const fichaDe = p => `<img class="xr" src="${retratoX(p.modelo, 40, 'crypt').toDataURL()}" alt="">`;
+const datosDe = p => `${p.nombre} <small>· ${D.clases[p.clase].nombre} nv ${p.nivel}, ${D.modelos[p.modelo].titulo}${p.caido ? ' · caído' : ''}${p.marcado ? ' · marcado' : ''}</small>`;
+const detalleDe = p => `${D.modelos[p.modelo].rasgo}. Vida ${p.vidaMax} · Ataque ${p.ataque} · Velocidad ${p.velocidad}. ${D.clases[p.clase].rol}.`;
+
+function abrirHogar() {
+  closeAllMenus();
+  S.mode = 'title'; setPalette('crypt');
+  prepararHogar();
+  const m = { title: 'El Hogar', cls: 'altar hogar', back: false, items: [] };
   m.refresh = () => {
-    m.text = `Elige ${max} portadores: ${X.sel.length}/${max}. Ceniza: ${X.ceniza - costoSel()}.`;
-    m.items = X.cands.map(p => {
-      const on = X.sel.includes(p), c = p.condicion, caro = c && c.ceniza > X.ceniza - costoSel() && !on;
-      return {
-        label: `<img class="xr" src="${retratoX(p.modelo, 40, 'castle').toDataURL()}" alt="">${on ? '◆' : '◇'} ${p.nombre} <small>· ${D.clases[p.clase].nombre}, ${D.modelos[p.modelo].titulo}${p.caido ? ' · caído' : ''}</small>`,
-        sub: c ? c.texto : `${D.modelos[p.modelo].rasgo}. Vida ${p.vidaMax} · Ataque ${p.ataque} · Velocidad ${p.velocidad}. ${D.clases[p.clase].rol}.`,
-        off: caro || (!on && X.sel.length >= max),
-        fn: () => { if (on) X.sel.splice(X.sel.indexOf(p), 1); else X.sel.push(p); m.refresh(); renderMenu(); },
-      };
+    m.text = `Ceniza: <b>${X.ceniza}</b>`;
+    const n = X.sel.length;
+    m.items = [
+      { label: 'Descender ✠', sub: n ? `Bajan ${n}. Una sola antorcha para todos.` : 'Elegí al menos un portador.', off: !n, fn: partir },
+      { label: `El grupo <small>· ${n} de ${MAX_GRUPO}</small>`, sub: 'Quiénes bajan en esta expedición.', fn: () => abrirGrupo(m) },
+      { label: 'Reclutar', sub: `${X.plantel.length} de ${REGLAS_HOGAR.plantel_max} en el plantel.`, fn: () => abrirReclutas(m) },
+      { label: 'Los caídos', sub: 'Quienes quedaron en la cripta.', off: !X.caidos.length, fn: () => abrirLista('Los caídos', X.caidos, c => `Cayó en el nivel ${c.cayo}. Puede volver a aparecer entre los reclutas.`) },
+      { label: 'Las leyendas', sub: 'Quienes volvieron con la Llama.', off: !X.leyendas.length, fn: () => abrirLista('Las leyendas', X.leyendas, c => `Sobrevivió a la expedición ${c.corrida}.`) },
+      { label: 'Volver al título', fn: openTitleMenu },
+    ];
+  };
+  m.refresh();
+  openMenu(m, 'hogar');
+}
+
+function abrirGrupo(hogar) {
+  const m = { title: 'El grupo', cls: 'altar hogar', items: [], onClose: hogar.refresh };
+  m.refresh = () => {
+    m.text = `Elegí hasta ${MAX_GRUPO}: ${X.sel.length} de ${MAX_GRUPO}.`;
+    m.items = X.plantel.map(p => {
+      const on = X.sel.includes(p);
+      return { label: `${fichaDe(p)}${on ? '◆' : '◇'} ${datosDe(p)}`, sub: detalleDe(p), off: !on && X.sel.length >= MAX_GRUPO,
+        fn: () => { if (on) X.sel.splice(X.sel.indexOf(p), 1); else X.sel.push(p); m.refresh(); renderMenu(); } };
     });
-    m.items.push({ label: 'Descender ✠', sub: X.sel.length < max ? `Faltan ${max - X.sel.length}.` : 'Una sola antorcha para todos.', off: X.sel.length < max, fn: partir });
+    if (!m.items.length) m.items.push({ label: 'No hay nadie en el plantel', sub: 'Reclutá a alguien primero.', off: true, fn: () => {} });
   };
   m.refresh();
   openMenu(m);
 }
-const costoSel = () => X.sel.reduce((n, p) => n + ((p.condicion && p.condicion.ceniza) || 0), 0);
 
-function partir() {
-  for (const p of X.sel) if (p.caido) {
-    X.ceniza -= NUCLEO.aplicarCondicion(p);
+function abrirReclutas(hogar) {
+  const m = { title: 'Reclutar', cls: 'altar hogar', items: [], onClose: hogar.refresh };
+  m.refresh = () => {
+    m.text = `Ceniza: <b>${X.ceniza}</b>`;
+    m.items = X.candidatos.map(p => {
+      const costo = costoRecluta(p), lleno = X.plantel.length >= REGLAS_HOGAR.plantel_max;
+      return { label: `${fichaDe(p)}${datosDe(p)} <small>· ${costo ? `${costo} de Ceniza` : 'gratis'}</small>`, sub: p.condicion ? p.condicion.texto : detalleDe(p), off: costo > X.ceniza || lleno,
+        fn: () => { contratar(p, costo); m.sel = 0; m.refresh(); renderMenu(); } };
+    });
+    if (!m.items.length) m.items.push({ label: 'No queda nadie', sub: 'Vendrán más después de la próxima expedición.', off: true, fn: () => {} });
+  };
+  m.refresh();
+  openMenu(m);
+}
+
+function contratar(p, costo) {
+  if (p.caido) {
+    NUCLEO.aplicarCondicion(p);
     X.caidos = X.caidos.filter(c => c.id !== p.id);
     delete p.caido; delete p.condicion;
   }
-  X.grupo = X.sel.slice();
+  X.ceniza -= costo;
+  X.candidatos.splice(X.candidatos.indexOf(p), 1);
+  X.plantel.push(p);
+  guardarX(); sfx('level');
+}
+
+function abrirLista(titulo, lista, nota) {
+  openMenu({ title: titulo, cls: 'altar hogar', items: lista.map(c => ({ label: `${c.nombre} <small>· ${D.clases[c.clase].nombre}, ${D.modelos[c.modelo].titulo}</small>`, sub: nota(c), fn: () => {} })) });
+}
+
+function partir() {
+  X.grupo = X.sel.slice(); X.sel = [];
   for (const p of X.grupo) { p.vida = p.vidaMax; delete p.cayo; }
   X.corridas++; X.ganada = 0; guardarX();
   const l = X.grupo[0];
@@ -248,7 +333,7 @@ function partir() {
   logLines.length = 0;
   log('El grupo baja con una sola antorcha.', 'em');
   updateHUD();
-  charla('inicio');
+  charla(X.grupo.length === MAX_GRUPO ? 'inicio' : 'inicio_pocos');
 }
 
 // ---------- Mazmorra (la del juego base) ----------
@@ -409,6 +494,7 @@ function registrarCaidos() {
   for (const p of X.grupo) if (p.vida <= 0 && !p.cayo) {
     p.cayo = S.level; nuevo = true;
     X.caidos.push({ ...p, vida: p.vidaMax, exp: 0 });
+    X.plantel = X.plantel.filter(q => q.id !== p.id);
   }
   if (nuevo) guardarX();
   return nuevo;
@@ -477,7 +563,7 @@ function efecto(o) {
     else {
       const ms = Object.keys(D.modelos), cs = Object.keys(D.clases);
       const p = NUCLEO.crearPersonaje(D, ms[Math.floor(azarX() * ms.length)], cs[Math.floor(azarX() * cs.length)], azarX);
-      X.grupo.push(p); log(`${p.nombre} se suma al grupo.`, 'good');
+      X.grupo.push(p); X.plantel.push(p); log(`${p.nombre} se suma al grupo.`, 'good');
     }
   }
   updateHUD();
@@ -813,12 +899,17 @@ function salirDelBotin() {
 }
 
 function finExpedicion(gano) {
-  if (gano) X.ganada = 1;
+  if (gano) {
+    X.ganada = 1;
+    // quienes recuperan la Llama se retiran: quedan como leyendas del Hogar
+    for (const p of NUCLEO.vivos(X.grupo)) { X.leyendas.push({ nombre: p.nombre, clase: p.clase, modelo: p.modelo, corrida: X.corridas }); X.plantel = X.plantel.filter(q => q.id !== p.id); }
+  }
+  recambiarCandidatos();
   guardarX();
   charla(gano ? 'victoria' : 'derrota', () => {
     const vivos = NUCLEO.vivos(X.grupo).length;
-    openMenu({ title: gano ? 'Expedición cumplida' : 'El grupo cayó', back: false, text: `Sobrevivieron ${vivos} de ${X.grupo.length}. Ceniza acumulada: ${X.ceniza}. Quienes cayeron pueden volver a aparecer en la reunión.`,
-      items: [{ label: 'Volver a la superficie', fn: openTitleMenu }] }, 'game');
+    openMenu({ title: gano ? 'Expedición cumplida' : 'El grupo cayó', back: false, text: `Sobrevivieron ${vivos} de ${X.grupo.length}. Ceniza acumulada: ${X.ceniza}. Quienes cayeron pueden volver a aparecer entre los reclutas.`,
+      items: [{ label: 'Volver al Hogar', fn: abrirHogar }] }, 'game');
   });
 }
 
@@ -1120,6 +1211,7 @@ window.update = dt => {
   if (S.mode === 'xbat' && Bt) { Bt.t += dt; Bt.ini += dt; for (const u of Bt.b.unidades) u.golpeado = Math.max(0, (u.golpeado || 0) - dt); actualizarFx(dt); }
 };
 window.draw = () => {
+  if (S.mode === 'menu' && S.menuBg === 'hogar') { Object.assign($('stage').dataset, { mode: 'menu', bg: 'hogar' }); dibujarHogar(ctx); return; }
   marcoDelPiso();
   if (S.mode === 'xbat' && Bt) { $('stage').dataset.mode = 'battle'; $('stage').dataset.bg = ''; dibujarBatalla(ctx); return; }
   // el base marca la antorcha baja con un recuadro en su panel, que acá no existe

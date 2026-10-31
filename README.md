@@ -35,6 +35,12 @@ Sin servidor no funciona con doble clic en `index.html`: el juego lee archivos J
 Parte del motor viene del juego anterior y `js/juego.js` reemplaza lo que hace falta: varias funciones de esos
 archivos quedaron sin uso y se pueden limpiar con el tiempo.
 
+## El ciclo de juego
+
+En el Hogar se recluta con Ceniza y se arma un grupo de 1 a 4. Quien cae en la expedición sale del plantel y puede
+volver más adelante entre los reclutas, con condiciones. Quienes recuperan la Llama se retiran como leyendas.
+Los valores están en `hogar` dentro de `datos/mazmorra.json`.
+
 ## La regla del estilo
 
 Todo se dibuja como brillo en gris, se le aplica la luz y recién al final pasa a los **6 tonos** de la paleta del piso

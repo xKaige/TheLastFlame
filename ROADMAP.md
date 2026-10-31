@@ -10,6 +10,8 @@ Steam sigue en pausa hasta que el juego esté pulido; sus notas están en `juego
 
 ## Falta para que sea un juego completo
 
+- **Retirarse:** volver al Hogar a mitad de una expedición con los vivos.
+- **Consumo de antorcha por persona:** que llevar a 4 cueste más luz.
 - **Continuar:** hoy una expedición a medias no se retoma; sólo se guardan la Ceniza y los caídos.
 - **Equipo y botín** para el grupo.
 - **Eventos propios:** se quitaron los del juego anterior y sólo queda el peregrino.

@@ -79,3 +79,11 @@
 .fnum.est-veneno { color: #b6e36a; }
 .fnum.est-quemadura { color: #fbbf5a; }
 .fnum.est-estallido { color: #e0605a; font-size: 14px; }
+
+/* El Hogar: el menú queda a la izquierda y deja ver la fogata y la entrada a la cripta */
+#stage[data-bg=hogar] #hud, #stage[data-bg=hogar] #log, #stage[data-bg=hogar] #xEsq, #stage[data-bg=hogar] #title { display: none; }
+#menu.bg-hogar.altar { left: 10px; top: 10px; width: 214px; padding: 5px 8px 4px; background: rgba(0, 0, 0, 0.82); }
+#menu.bg-hogar .mtitle { font-size: 14px; line-height: 16px; margin-bottom: 2px; }
+#menu.bg-hogar .mtext { text-align: center; }
+#menu.bg-hogar .ml small { font-size: 7.5px; }
+#stage:has(#menu.bg-hogar:not(.hidden)) #title { display: none; }

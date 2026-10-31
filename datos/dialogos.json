@@ -1,5 +1,6 @@
 {
   "inicio": { "quien": "sombra", "caras": ["base", "risa"], "lineas": ["Cuatro lucecitas bajando juntas. Qué ternura.", "Una sola antorcha para todos. Van a pelearse por ella antes de llegar abajo."] },
+  "inicio_pocos": { "quien": "sombra", "caras": ["base", "risa"], "lineas": ["Tan pocas lucecitas. Valentía, o nadie más quiso venir.", "Mejor para ustedes: la antorcha se reparte entre menos."] },
   "rescate": { "quien": "narrador", "lineas": ["Alguien respira detrás del osario: un portador que bajó solo y todavía conserva su chispa."],
     "opciones": [
       { "texto": "Sumarlo al grupo", "efecto": "reclutar" },
