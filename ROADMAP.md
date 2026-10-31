@@ -10,14 +10,12 @@ Steam sigue en pausa hasta que el juego esté pulido; sus notas están en `juego
 
 ## Falta para que sea un juego completo
 
-- **Retirarse:** volver al Hogar a mitad de una expedición con los vivos.
-- **Consumo de antorcha por persona:** que llevar a 4 cueste más luz.
 - **Continuar:** hoy una expedición a medias no se retoma; sólo se guardan la Ceniza y los caídos.
 - **Equipo y botín** para el grupo.
 - **Eventos propios:** se quitaron los del juego anterior y sólo queda el peregrino.
 - **Inventario y opciones** adaptados al grupo.
-- **Más mazmorra:** hoy son dos niveles y la guarida, con 8 habilidades y 5 enemigos.
-- **Historia de la Llama** contada con diálogos, y sus finales.
+- **Más variedad:** hoy son 8 habilidades y 10 enemigos; faltan escenarios de batalla propios para Los Salones y El Fondo.
+- **Más historia:** diálogos entre personajes del grupo, y Aldemar y La Sombra con más escenas.
 - **Inglés:** el juego nuevo está sólo en español.
 
 ## Arte

@@ -37,8 +37,10 @@ archivos quedaron sin uso y se pueden limpiar con el tiempo.
 
 ## El ciclo de juego
 
-En el Hogar se recluta con Ceniza y se arma un grupo de 1 a 4. Quien cae en la expedición sale del plantel y puede
-volver más adelante entre los reclutas, con condiciones. Quienes recuperan la Llama se retiran como leyendas.
+En el Hogar se recluta con Ceniza y se arma un grupo de 1 a 4. Cuantos más bajan, más rápido se consume la antorcha.
+La mazmorra son tres pisos de tres niveles cada uno, con un santuario entre piso y piso donde se descansa o se vuelve
+al Hogar con los vivos. Quien cae sale del plantel y puede volver más adelante entre los reclutas, con condiciones.
+Quienes recuperan la Llama se retiran como leyendas. Los textos están en `datos/dialogos.json` y `datos/historia.json`.
 Los valores están en `hogar` dentro de `datos/mazmorra.json`.
 
 ## La regla del estilo

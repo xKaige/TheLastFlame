@@ -63,11 +63,11 @@ const NUCLEO = (() => {
 
   // ---------- Batalla ----------
   function iniciarBatalla(D, grupo, ids) {
-    const letras = {};
+    const letras = {}, fuerza = D.mazmorra.grupo.fuerza_enemiga[Math.min(vivos(grupo).length, 4) - 1];
     const enemigos = ids.map((id, i) => {
       const d = D.enemigos[id], n = ids.filter(x => x === id).length;
       letras[id] = (letras[id] || 0) + 1;
-      return { enemigo: true, tipo: id, i, nombre: d.nombre + (n > 1 ? ` ${'ABCD'[letras[id] - 1]}` : ''), sprite: d.sprite, imagen: d.imagen || null, vida: d.vida, vidaMax: d.vida,
+      return { enemigo: true, tipo: id, i, nombre: d.nombre + (n > 1 ? ` ${'ABCD'[letras[id] - 1]}` : ''), sprite: d.sprite, imagen: d.imagen || null, vida: Math.round(d.vida * fuerza), vidaMax: Math.round(d.vida * fuerza),
         golpe: d.ataque, defensa: d.defensa, velocidad: d.velocidad, critico: 0.05, esquiva: 0, exp: d.exp, jefe: !!d.jefe, especial: d.especial || null, robaImpetu: !!d.roba_impetu, turnos: 0, estados: [] };
     });
     const aliados = vivos(grupo);

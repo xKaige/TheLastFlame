@@ -1,0 +1,105 @@
+{
+  "modelos": {
+    "viuda": {
+      "motivo": "Su pareja bajó con la última antorcha y nunca volvió.",
+      "baja": "Si encuentro su antorcha, quiero apagarla yo.",
+      "piso": "Acá abajo huele a su abrigo. No puede ser.",
+      "fondo": "Ya no busco a nadie. Vine a terminar lo que empezó.",
+      "muerte": "{nombre} vino a buscar a alguien. Se lo presenté."
+    },
+    "desertor": {
+      "motivo": "Abandonó su puesto la noche en que cayó la muralla.",
+      "baja": "Esta vez no pienso correr. Probablemente.",
+      "piso": "Todavía se ve la escalera. Lo digo nada más.",
+      "fondo": "Toda la vida corrí hacia arriba. Qué raro quedarse.",
+      "muerte": "{nombre} corrió toda su vida. Conmigo por fin descansa."
+    },
+    "cantora": {
+      "motivo": "Busca la canción que encendió la Llama Primera.",
+      "baja": "Escuchen. La cripta está en otra tonalidad.",
+      "piso": "Algo acá abajo tararea. Y sabe la letra.",
+      "fondo": "Era esta nota. Siempre fue esta nota.",
+      "muerte": "{nombre} cantaba tan lindo. Ahora la cripta tiene coro."
+    },
+    "minero": {
+      "motivo": "Su gente cavó estos túneles y nadie volvió a subir.",
+      "baja": "Esta piedra la picó mi abuelo. Sé por dónde se cae.",
+      "piso": "Estos túneles no los cavó ningún minero.",
+      "fondo": "Cavamos demasiado hondo. Esto lo arreglo yo.",
+      "muerte": "{nombre} volvió con su gente. Están todos en el osario."
+    },
+    "ladrona": {
+      "motivo": "Dicen que el cuenco de la Llama vale un reino.",
+      "baja": "Yo vine por el cuenco. El resto es su problema.",
+      "piso": "Muchas cerraduras para algo que nadie quiere robar.",
+      "fondo": "Pesa más de lo que pensé. Y no es por el oro.",
+      "muerte": "{nombre} quiso robarme. Me quedé con sus dedos."
+    },
+    "penitente": {
+      "motivo": "Lleva una culpa que no cuenta y cree que el fuego se la quita.",
+      "baja": "Lo que me pase acá abajo, me lo merezco.",
+      "piso": "La Sombra sabe lo que hice. Puedo oírla sonreír.",
+      "fondo": "No vine a ser perdonado. Vine a ser útil.",
+      "muerte": "{nombre} pidió castigo. Soy generosa."
+    },
+    "guardabosque": {
+      "motivo": "Su bosque se muere sin luz, árbol por árbol.",
+      "baja": "Esto es un bosque de piedra. Se rastrea igual.",
+      "piso": "Hay raíces hasta acá. Vienen de muy arriba.",
+      "fondo": "Si esto prende, mis árboles lo van a sentir.",
+      "muerte": "{nombre} seguía rastros. El último terminaba en mí."
+    },
+    "novicia": {
+      "motivo": "Su orden juró cuidar la Llama. Quedó sola.",
+      "baja": "Hice un voto. Lo voy a cumplir aunque sea sin fe.",
+      "piso": "Ninguna oración llega hasta acá. Las probé todas.",
+      "fondo": "Era esto lo que juramos cuidar. Es tan chiquita.",
+      "muerte": "{nombre} rezó hasta el final. Escuché cada palabra."
+    },
+    "buhonero": {
+      "motivo": "Le debe algo a alguien que ya no está vivo.",
+      "baja": "Todo se paga. Lo mío, acá abajo.",
+      "piso": "Cien por ciento de interés. Eso cobra esta cripta.",
+      "fondo": "Considero esta deuda saldada.",
+      "muerte": "{nombre} vino a pagar. Le acepté la vida a cuenta."
+    },
+    "exiliado": {
+      "motivo": "Vel'Ombra lo echó. Quiere volver con la Llama en la mano.",
+      "baja": "Que me vean subir con esto. Que me miren a la cara.",
+      "piso": "Me echaron a la oscuridad. Y resulta que era cierta.",
+      "fondo": "No sé si se la quiero devolver.",
+      "muerte": "{nombre} quería volver a casa. Ya llegó."
+    }
+  },
+  "finales": {
+    "luz": {
+      "label": "Subir con la Llama", "sub": "Llevarla de vuelta a Vel'Ombra.",
+      "escenas": [
+        ["{nombre} no la deja ahí abajo. La cubre con la mano y empieza a subir.", "Piso por piso, la cripta los ve pasar: los osarios, los salones, las cavernas sin nombre.", "Las sombras se apartan del camino. Ninguna se atreve a tocarla."],
+        ["Arriba, Vel'Ombra sigue a oscuras, como hace siglos.", "{nombre} levanta la antorcha. Y el cielo, detrás de la montaña, empieza a aclarar.", "Por primera vez en siglos, alguien ve amanecer.", { "big": "La Llama Perdura" }]
+      ]
+    },
+    "trono": {
+      "label": "Ocupar el trono vacío", "sub": "Alguien tiene que quedarse.",
+      "escenas": [
+        ["Al fondo de la cámara hay un trono. Está vacío.", "La oscuridad no soporta un trono vacío. Ya busca quién lo ocupe.", { "q": "Sentate. Ya caminaste demasiado. La oscuridad es tibia." }],
+        ["{nombre} mira la antorcha por última vez.", "Y la apaga con sus propios dedos.", "Los demás no van a entenderlo nunca. Alguien tenía que hacerlo."],
+        ["{nombre} se sienta donde él se sentaba. La oscuridad lo reconoce.", "Ahora espera en el fondo del pozo, como esperó la primera.", "Y cuando una luz baje por la escalera, va a saber exactamente qué decirle:", { "q": "Otra lucecita bajando a mi cripta..." }, { "big": "El Nuevo Habitante" }]
+      ]
+    },
+    "relicario": {
+      "label": "Ofrecer a los caídos", "sub": "Devolverle a la Llama las chispas perdidas.",
+      "escenas": [
+        ["{nombre} nombra a quienes no llegaron, uno por uno, y deja caer sus chispas en el cuenco.", "Cada una cargaba una deuda. Juntas, recuerdan el fuego del que salieron.", "La Llama Primera vuelve a encenderse."],
+        ["Lo que se apaga no es la luz: es la maldición que la encerraba ahí abajo.", "Las chimeneas de Vel'Ombra vuelven a echar humo tibio. Las sombras se acortan.", { "big": "La Ofrenda" }]
+      ]
+    },
+    "leyenda": {
+      "label": "Volver sin perder a nadie", "sub": "Todos los que bajaron, suben.",
+      "escenas": [
+        ["Bajaron con una sola antorcha. Y volvieron todos.", "Nadie los esperaba arriba. Nadie creía que fuera posible."],
+        ["Años después, en las aldeas de la ladera, los viejos juntan a los chicos alrededor del fuego.", "Cuentan de un grupo que bajó a la Cripta de Vel'Ombra sin dejar a nadie atrás.", "Sus nombres se dicen en voz baja, como una plegaria.", { "big": "{nombres}" }]
+      ]
+    }
+  }
+}

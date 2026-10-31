@@ -26,24 +26,33 @@ function pelear(grupo, ids) {
   return { r, turnos };
 }
 
-const veces = +process.argv[2] || 500, tot = { gana: 0, turnos: 0, peleas: 0, jefe: 0, turnosJefe: 0, muertos: 0 };
-for (let v = 0; v < veces; v++) {
-  const grupo = MEZCLA.map(c => N.crearPersonaje(D, Object.keys(D.modelos)[Math.floor(azar() * 10)], c, azar));
-  let vivo = true;
-  for (const nivel of D.mazmorra.niveles) {
-    const pool = D.mazmorra.grupos_por_nivel[nivel];
-    for (let k = 0; k < 4 && vivo; k++) {
-      const { r, turnos } = pelear(grupo, pool[Math.floor(azar() * pool.length)]);
-      tot.peleas++; tot.turnos += turnos; vivo = r === 'victoria';
-      for (const u of N.vivos(grupo)) { N.ganarExp(D, u, 4); u.vida = Math.min(u.vidaMax, u.vida + Math.round(u.vidaMax * D.mazmorra.descanso)); }
+const veces = +process.argv[2] || 500, G = D.mazmorra;
+for (const tam of [4, 3, 2, 1]) {
+  const tot = { gana: 0, turnos: 0, peleas: 0, muertos: 0, piso: [0, 0, 0, 0], jefes: [0, 0, 0] };
+  for (let v = 0; v < veces; v++) {
+    const grupo = MEZCLA.slice(0, tam).map(c => N.crearPersonaje(D, Object.keys(D.modelos)[Math.floor(azar() * 10)], c, azar));
+    let vivo = true;
+    const descanso = (k) => { for (const u of N.vivos(grupo)) u.vida = Math.min(u.vidaMax, u.vida + Math.round(u.vidaMax * k)); };
+    for (let piso = 1; piso <= 3 && vivo; piso++) {
+      tot.piso[piso]++;
+      const pool = G.grupos_por_piso[piso];
+      for (let k = 0; k < 6 && vivo; k++) {
+        const { r, turnos } = pelear(grupo, pool[Math.floor(azar() * pool.length)]);
+        tot.peleas++; tot.turnos += turnos; vivo = r === 'victoria';
+        const exp = 8;
+        for (const u of N.vivos(grupo)) N.ganarExp(D, u, exp);
+        descanso(G.descanso);
+        if (k % 2 === 1) descanso(0.25);          // pociones del grupo
+      }
+      if (vivo) {
+        descanso(0.3);
+        const { r } = pelear(grupo, G.jefes[piso]);
+        vivo = r === 'victoria';
+        if (vivo) { tot.jefes[piso - 1]++; for (const u of N.vivos(grupo)) N.ganarExp(D, u, D.enemigos[G.jefes[piso].find(i => D.enemigos[i].jefe)].exp); descanso(G.santuario.cura); }
+      }
     }
+    if (vivo) tot.gana++;
+    tot.muertos += grupo.filter(u => u.vida <= 0).length;
   }
-  if (vivo) {
-    const { r, turnos } = pelear(grupo, D.mazmorra.jefe);
-    tot.jefe++; tot.turnosJefe += turnos;
-    if (r === 'victoria') tot.gana++;
-  }
-  tot.muertos += grupo.filter(u => u.vida <= 0).length;
+  console.log(`grupo de ${tam}:`, { ganadas: (tot.gana / veces * 100).toFixed(0) + '%', jefes: tot.jefes.map(j => (j / veces * 100).toFixed(0) + '%').join(' '), turnos_por_pelea: (tot.turnos / tot.peleas).toFixed(1), muertos: (tot.muertos / veces).toFixed(1) });
 }
-console.log({ expediciones: veces, ganadas: (tot.gana / veces * 100).toFixed(0) + '%', llegan_al_jefe: (tot.jefe / veces * 100).toFixed(0) + '%',
-  turnos_por_pelea: (tot.turnos / tot.peleas).toFixed(1), turnos_jefe: (tot.turnosJefe / Math.max(1, tot.jefe)).toFixed(1), muertos_por_expedicion: (tot.muertos / veces).toFixed(1) });

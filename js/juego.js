@@ -6,16 +6,16 @@
 
 // ---------- Datos y estado ----------
 const D = {};
-for (const f of ['clases', 'habilidades', 'modelos', 'enemigos', 'mazmorra', 'dialogos']) {
+for (const f of ['clases', 'habilidades', 'modelos', 'enemigos', 'mazmorra', 'dialogos', 'historia']) {
   const x = new XMLHttpRequest();
   x.open('GET', `datos/${f}.json`, false); x.send();
   D[f] = JSON.parse(x.responseText);
 }
 const CLAVE = 'expedicion.estado';
-const X = { ceniza: 0, caidos: [], corridas: 0, plantel: [], candidatos: [], leyendas: [], grupo: [], sel: [], ganada: 0 };
+const X = { ceniza: 0, caidos: [], corridas: 0, plantel: [], candidatos: [], leyendas: [], memoria: { hondo: 1, reveladas: [], ultimoCaido: null, habitante: null, finales: {} }, perdidos: [], grupo: [], sel: [], ganada: 0 };
 try { Object.assign(X, JSON.parse(STORE.get(CLAVE) || '{}')); } catch (e) { /* sin progreso */ }
 for (const k of ['caidos', 'plantel', 'candidatos']) X[k] = X[k].filter(c => D.modelos[c.modelo] && D.clases[c.clase]);   // personajes de modelos que ya no existen
-const guardarX = () => STORE.set(CLAVE, JSON.stringify({ ceniza: X.ceniza, caidos: X.caidos, corridas: X.corridas, plantel: X.plantel, candidatos: X.candidatos, leyendas: X.leyendas }));
+const guardarX = () => STORE.set(CLAVE, JSON.stringify({ ceniza: X.ceniza, caidos: X.caidos, corridas: X.corridas, plantel: X.plantel, candidatos: X.candidatos, leyendas: X.leyendas, memoria: X.memoria }));
 const azarX = () => Math.random();
 const baseX = { draw, update, onAction, updateHUD, enterLevel, afterStep };
 
@@ -190,7 +190,7 @@ window.openTitleMenu = () => {
   S.mode = 'title';
   openMenu({ back: false, cls: 'compact', items: [
     { label: 'Ir al Hogar', sub: `${X.ceniza} de Ceniza · ${X.plantel.length} en el plantel · ${X.corridas} expedicion${X.corridas === 1 ? '' : 'es'}`, fn: abrirHogar },
-    { label: 'Borrar progreso', sub: 'Ceniza, plantel, caídos y leyendas.', fn: () => confirmMenu('¿Borrar todo el progreso?', () => { Object.assign(X, { ceniza: 0, caidos: [], corridas: 0, plantel: [], candidatos: [], leyendas: [], sel: [] }); guardarX(); openTitleMenu(); }) },
+    { label: 'Borrar progreso', sub: 'Ceniza, plantel, caídos y leyendas.', fn: () => confirmMenu('¿Borrar todo el progreso?', () => { Object.assign(X, { ceniza: 0, caidos: [], corridas: 0, plantel: [], candidatos: [], leyendas: [], sel: [], memoria: { hondo: 1, reveladas: [], ultimoCaido: null, habitante: null, finales: {} } }); guardarX(); openTitleMenu(); }) },
   ] }, 'title');
 };
 
@@ -295,7 +295,7 @@ function prepararHogar() {
 const costoRecluta = p => (p.condicion ? p.condicion.ceniza || 0 : !X.plantel.length && X.ceniza < REGLAS_HOGAR.costo_recluta ? 0 : REGLAS_HOGAR.costo_recluta);
 const fichaDe = p => `<img class="xr" src="${retratoX(p.modelo, 40, 'crypt').toDataURL()}" alt="">`;
 const datosDe = p => `${p.nombre} <small>· ${D.clases[p.clase].nombre} nv ${p.nivel}, ${D.modelos[p.modelo].titulo}${p.caido ? ' · caído' : ''}${p.marcado ? ' · marcado' : ''}</small>`;
-const detalleDe = p => `${D.modelos[p.modelo].rasgo}. Vida ${p.vidaMax} · Ataque ${p.ataque} · Velocidad ${p.velocidad}. ${D.clases[p.clase].rol}.`;
+const detalleDe = p => `${D.historia.modelos[p.modelo].motivo} ${D.modelos[p.modelo].rasgo}. Vida ${p.vidaMax} · Ataque ${p.ataque} · Velocidad ${p.velocidad}. ${D.clases[p.clase].rol}.`;
 
 function abrirHogar() {
   closeAllMenus();
@@ -365,7 +365,7 @@ function abrirLista(titulo, lista, nota) {
 }
 
 function partir() {
-  X.grupo = X.sel.slice(); X.sel = [];
+  X.grupo = X.sel.slice(); X.sel = []; X.perdidos = [];
   for (const p of X.grupo) { p.vida = p.vidaMax; delete p.cayo; }
   X.corridas++; X.ganada = 0; guardarX();
   const l = X.grupo[0];
@@ -382,21 +382,27 @@ function partir() {
   logLines.length = 0;
   log('El grupo baja con una sola antorcha.', 'em');
   updateHUD();
-  charla(X.grupo.length === MAX_GRUPO ? 'inicio' : 'inicio_pocos');
+  const recuerdo = [], M = X.memoria;
+  if (M.ultimoCaido) recuerdo.push({ quien: 'sombra', caras: ['risa'], lineas: [D.historia.modelos[M.ultimoCaido.modelo].muerte.replace('{nombre}', M.ultimoCaido.nombre)] });
+  const marcado = X.grupo.find(p => p.marcado);
+  if (marcado) recuerdo.push(conNombre('marcado', marcado.nombre));
+  if (M.habitante) recuerdo.push(conNombre('habitante_nuevo', M.habitante));
+  M.ultimoCaido = null; guardarX();
+  encadenar([X.grupo.length === MAX_GRUPO ? 'inicio' : 'inicio_pocos', ...recuerdo, dichoDeAlguien('baja')]);
 }
 
 // ---------- Mazmorra (la del juego base) ----------
 window.enterLevel = (floor, level) => {
-  // la expedición es corta: dos niveles y la guarida
-  if (floor === 1 && !D.mazmorra.niveles.includes(level)) level = D.mazmorra.niveles.find(n => n > level);
+  // cada piso son dos niveles y la guarida, con un santuario entre piso y piso
+  if (level > 0 && !D.mazmorra.niveles.includes(level)) level = D.mazmorra.niveles.find(n => n > level);
   aplicarTexturas();
   baseX.enterLevel(floor, level);
   const w = W_();
-  w.ents = w.ents.filter(e => e.type !== 'event' && e.type !== 'reliquary');
+  w.ents = w.ents.filter(e => !['event', 'reliquary', 'merchant'].includes(e.type));
   decorarMuros(w, level);
   colgarDelTecho(w, level);
   ponerEnElPiso(w, level);
-  if (level === 2) {
+  if (floor === 1 && level === 3) {
     const q = w.ents.find(e => e.type === 'prop');
     if (q) Object.assign(q, { type: 'event', ev: 'peregrino', done: false, rescate: true });
   }
@@ -432,8 +438,11 @@ window.openInv = () => openMenu({ title: 'El grupo', cls: 'altar', items: X.grup
   sub: `${D.modelos[p.modelo].titulo}. Vida ${Math.max(0, p.vida)}/${p.vidaMax} · Ataque ${p.ataque} · Defensa ${p.defensa} · Velocidad ${p.velocidad}.`, fn: () => {} })) }, 'game');
 
 // La oscuridad le pega a todo el grupo, no al P del juego base
+const ANTORCHA_BASE = BAL.fuelPerStep;
+const porGrupo = lista => D.mazmorra.grupo[lista][Math.max(1, Math.min(NUCLEO.vivos(X.grupo).length, 4)) - 1];
 window.afterStep = () => {
   P.hp = P.maxhp;
+  BAL.fuelPerStep = ANTORCHA_BASE * porGrupo('antorcha');     // cada chispa vive de la misma luz
   baseX.afterStep();
   if (P.fuel === 0 && S.steps % 3 === 0 && S.mode === 'explore') {
     for (const u of NUCLEO.vivos(X.grupo)) u.vida--;
@@ -459,9 +468,9 @@ window.updateHUD = () => {
     ? `<div class="obj">${nombre} <b>${n}</b></div>`
     : `<div class="obj"><i style="background-image:url(${casilleroX(img)})"></i><b>${n}</b></div>`;
   const i = D.mazmorra.niveles.indexOf(S.level), total = D.mazmorra.niveles.length;
-  const nivel = { hondo: `<small>${i === total - 1 ? 'El fondo' : ['Primer', 'Segundo', 'Tercer'][i] + ' descenso'}</small>`, romano: ` · ${['I', 'II', 'III', 'IV'][i]}`,
+  const nivel = !S.level ? '<small>Santuario</small>' : { hondo: `<small>${i === total - 1 ? 'La guarida' : ['Primer', 'Segundo'][i] + ' descenso'}</small>`, romano: ` · ${['I', 'II', 'III'][i]}`,
     rombos: `<small>${'◆'.repeat(i + 1)}${'◇'.repeat(total - i - 1)}</small>` }[HUD_X.nivel];
-  $('xEsq').innerHTML = `<div class="zona">La Cripta${nivel}</div>` +
+  $('xEsq').innerHTML = `<div class="zona">${D.mazmorra.pisos[S.floor - 1].nombre}${nivel}</div>` +
     `<div class="fila ${HUD_X.objetos}">${objeto('pocion', 'Pociones', P.potions)}${objeto('aceite', 'Aceite', P.oil)}${objeto('antorcha', 'Antorcha', Math.ceil(P.fuel))}</div>` +
     (heridos ? `<div class="alerta">${heridos} en peligro · ${glyph('inv')}</div>` : '');
 };
@@ -543,6 +552,7 @@ function registrarCaidos() {
   for (const p of X.grupo) if (p.vida <= 0 && !p.cayo) {
     p.cayo = S.level; nuevo = true;
     X.caidos.push({ ...p, vida: p.vidaMax, exp: 0 });
+    X.perdidos.push(p); X.memoria.ultimoCaido = { nombre: p.nombre, modelo: p.modelo };
     X.plantel = X.plantel.filter(q => q.id !== p.id);
   }
   if (nuevo) guardarX();
@@ -560,7 +570,7 @@ window.renderLog = () => {
 };
 
 // ---------- Diálogos ----------
-const QUIEN = { sombra: ['shade', 'shade', 'La Sombra'], rey: ['boneKing', 'blood', 'El Rey del Osario'], narrador: [null, null, ''] };
+const QUIEN = { sombra: ['shade', 'shade', 'La Sombra'], rey: ['boneKing', 'blood', 'El Rey del Osario'], habitante: [null, null, 'El Que Habita la Oscuridad'], narrador: [null, null, ''] };
 let CH = null;
 // La cara de quien habla flota sobre el diálogo; cada línea puede elegir su gesto ("caras" en dialogos.json)
 const CARAS = { sombra: { base: 'sombra', risa: 'sombra_risa', enojo: 'sombra_enojo' } };
@@ -573,6 +583,13 @@ function caraDe(nombre) {
   return k.c[S.env];
 }
 function dibujarCara(c) {
+  if (CH && CH.n.p) {
+    const r = retratoX(CH.n.p.modelo, 64, S.env), x = CARA.x - 32, y = 122;
+    c.globalAlpha = clamp((T - CH.desde) / 0.3, 0, 1);
+    c.fillStyle = RAMPS[S.env][4]; c.fillRect(x - 1, y - 1, 66, 66);
+    c.drawImage(r, x, y); c.globalAlpha = 1;
+    return;
+  }
   const g = CH && CARAS[CH.n.quien];
   if (!g) return;
   const img = caraDe(g[(CH.n.caras && CH.n.caras[CH.i]) || 'base'] || g.base);
@@ -582,14 +599,39 @@ function dibujarCara(c) {
   c.globalAlpha = 1;
 }
 function charla(id, luego) {
-  const n = D.dialogos[id];
+  const n = typeof id === 'string' ? D.dialogos[id] : id;
   CH = { n, i: 0, luego, sel: 0, desde: T, vuelve: S.mode === 'xbat' ? 'xbat' : 'explore' };
   S.mode = 'xcharla';
   $('xCharla').classList.remove('hidden');
   pintarCharla();
 }
+// Varios diálogos seguidos; los que no corresponden llegan vacíos y se saltean
+function encadenar(lista, fin) {
+  const resto = lista.filter(Boolean), uno = resto.shift();
+  if (!uno) { if (fin) fin(); return; }
+  charla(uno, () => encadenar(resto, fin));
+}
+const conNombre = (id, nombre) => ({ ...D.dialogos[id], lineas: D.dialogos[id].lineas.map(l => l.replace('{nombre}', nombre)) });
+// Una línea dicha por alguien del grupo, al azar entre los vivos
+function dichoDeAlguien(clave) {
+  const v = NUCLEO.vivos(X.grupo), p = v[Math.floor(azarX() * v.length)];
+  return p && { quien: 'personaje', p, lineas: [D.historia.modelos[p.modelo][clave]] };
+}
+// La historia de La Sombra se cuenta de a poco, una vez por partida guardada
+function revelar(n) {
+  if (X.memoria.reveladas.includes(n)) return null;
+  X.memoria.reveladas.push(n); guardarX();
+  return `revelacion_${n}`;
+}
+// El motor pide diálogos al cambiar de piso: se reemplazan por los del grupo
+window.showDialog = (lineas, quien, cara, listo) => {
+  const piso = lineas === LINES.floor2 ? 2 : lineas === LINES.floor3 ? 3 : 0;
+  if (!piso) { if (listo) listo(); return; }
+  X.memoria.hondo = Math.max(X.memoria.hondo, piso); guardarX();
+  encadenar([`piso_${piso}`, revelar(piso), dichoDeAlguien('piso')], listo);
+};
 function pintarCharla() {
-  const { n, i, sel } = CH, q = QUIEN[n.quien], ops = i >= n.lineas.length - 1 && n.opciones ? n.opciones.filter(o => o.requiere !== 'pocion' || P.potions > 0) : null;
+  const { n, i, sel } = CH, q = n.p ? [0, 0, n.p.nombre] : QUIEN[n.quien], ops = i >= n.lineas.length - 1 && n.opciones ? n.opciones.filter(o => o.requiere !== 'pocion' || P.potions > 0) : null;
   CH.ops = ops;
   $('xCharla').innerHTML = `<div class="cb">${q[2] ? `<div class="cq">${q[2]}</div>` : ''}<div class="ct">${n.lineas[i]}</div>` +
     (ops ? ops.map((o, k) => `<div class="co${k === sel ? ' sel' : ''}">${o.texto}</div>`).join('') : '<div class="cs">Enter</div>') + '</div>';
@@ -626,9 +668,9 @@ let Bt = null;
 window.startCombat = (e, emboscada) => {
   if (Bt || S.mode !== 'explore') return;
   const jefe = e.def.boss, tipo = jefe ? 'jefe' : emboscada ? 'emboscada' : 'comun';
-  const ids = jefe ? D.mazmorra.jefe : (p => p[Math.floor(azarX() * p.length)])(D.mazmorra.grupos_por_nivel[S.level] || D.mazmorra.grupos_por_nivel[1]);
+  const ids = jefe ? D.mazmorra.jefes[S.floor] : (p => p[Math.floor(azarX() * p.length)])(D.mazmorra.grupos_por_piso[S.floor]);
   const go = () => iniciarTransicion(e, ids, tipo);
-  if (jefe) charla('jefe', go); else go();
+  if (jefe) { setMusic(S.floor === LAST_FLOOR ? 'final' : 'boss'); charla(`jefe_${S.floor}`, go); } else go();
 };
 
 // ---------- Transición a la pelea ----------
@@ -672,6 +714,7 @@ function dibujarCierre(c) {
 }
 
 // Fondo pintado de cada zona; si no cargó, el procedural
+// por ahora todos los pisos pelean en el mismo escenario, pasado por la paleta de cada uno
 const FONDOS = { crypt: Object.assign(new Image(), { src: 'interfaz/batalla/cripta.png' }) };
 const ANTORCHAS = { crypt: [[25, 77], [454, 77]] };
 // Dibujos propios de enemigos (campo "imagen" de enemigos.json); los demás usan el sprite del juego base
@@ -679,7 +722,7 @@ const IMG_ENEMIGOS = {};
 for (const d of Object.values(D.enemigos)) if (d.imagen) IMG_ENEMIGOS[d.imagen] = Object.assign(new Image(), { src: `interfaz/enemigos/${d.imagen}.png` });
 
 function fondoBatalla() {
-  const f = FONDOS[S.env], n = 480 * 270, g = new Float32Array(n).fill(0.14);
+  const f = FONDOS[S.env] || FONDOS.crypt, n = 480 * 270, g = new Float32Array(n).fill(0.14);
   if (!f || !f.complete || !f.naturalWidth) return g;
   const c = document.createElement('canvas'); c.width = 480; c.height = 270;
   const x = c.getContext('2d', { willReadFrequently: true }); x.drawImage(f, 0, 0, 480, 270);
@@ -715,7 +758,7 @@ function iniciarPelea(ent, ids, entrada = 0.95) {
   S.mode = 'xbat';
   $('battle').classList.remove('hidden');
   $('bMenu').classList.add('hidden');
-  if (ent.def.boss) setMusic('boss');
+  if (ent.def.boss) setMusic(S.floor === LAST_FLOOR ? 'final' : 'boss');
   sfx('fire');
   pintarBatalla();
   later(Math.round(entrada * 1000) + 100, () => { banner(''); siguiente(); });
@@ -899,11 +942,13 @@ function ejecutar(o, t) {
 }
 
 function terminarPelea(gano) {
-  const { b, ent } = Bt, nuevo = registrarCaidos();
+  const { b, ent } = Bt;
+  registrarCaidos();
   if (!gano) { cerrarPelea(); return finExpedicion(false); }
   W_().ents.splice(W_().ents.indexOf(ent), 1);
+  if (ent.def.boss && S.floor < LAST_FLOOR) { W_().map[ent.y * MW + ent.x] = 2; W_().explored[ent.y * MW + ent.x] = 1; }   // se abre la bajada
   const exp = b.enemigos.reduce((n, e) => n + e.exp, 0);
-  X.ceniza += ent.def.boss ? D.mazmorra.ceniza.por_jefe : D.mazmorra.ceniza.por_grupo;
+  X.ceniza += Math.round((ent.def.boss ? D.mazmorra.ceniza.por_jefe : D.mazmorra.ceniza.por_grupo) * porGrupo('ceniza'));
   for (const u of NUCLEO.vivos(X.grupo)) {
     // lo que se anima en pantalla sale de los valores de antes del reparto
     u.reparto = { exp: u.exp, nivel: u.nivel, falta: exp, subio: 0 };
@@ -912,7 +957,7 @@ function terminarPelea(gano) {
   }
   guardarX();
   b.actual = null;
-  Object.assign(Bt, { fase: 'botin', listo: false, nuevo, msg: `Victoria · +${exp} de experiencia`, velXp: Math.max(exp / 1.3, 6) });
+  Object.assign(Bt, { fase: 'botin', listo: false, msg: `Victoria · +${exp} de experiencia`, velXp: Math.max(exp / 1.3, 6) });
   sfx('level');
   pintarBatalla();
 }
@@ -939,13 +984,72 @@ function actualizarBotin(dt) {
 }
 
 function salirDelBotin() {
-  const { ent, nuevo } = Bt, jefe = ent.def.boss;
+  const { ent } = Bt, jefe = ent.def.boss, piso = S.floor, caido = X.memoria.ultimoCaido;
   for (const u of X.grupo) delete u.reparto;
   cerrarPelea();
   updateHUD();
-  if (jefe) return finExpedicion(true);
-  if (nuevo) charla('muerte');
+  if (jefe) setMusic(floorMusic());
+  const muerte = caido && { quien: 'sombra', caras: ['risa'], lineas: [D.historia.modelos[caido.modelo].muerte.replace('{nombre}', caido.nombre)] };
+  X.memoria.ultimoCaido = null;
+  if (jefe && piso === LAST_FLOOR) return encadenar([muerte, 'jefe_3_muerto', revelar(4)], elegirPortador);
+  encadenar([muerte, caido ? revelar(1) : null, jefe ? `jefe_${piso}_muerto` : null]);
 }
+
+// ---------- El santuario ----------
+window.useBonfire = b => {
+  const items = [
+    { label: 'Descansar', sub: b.used ? 'Sólo quedan brasas.' : 'Cura al grupo y renueva la antorcha, una sola vez.', off: b.used, fn: () => {
+      b.used = true; P.fuel = 100;
+      for (const u of NUCLEO.vivos(X.grupo)) u.vida = Math.min(u.vidaMax, u.vida + Math.round(u.vidaMax * D.mazmorra.santuario.cura));
+      closeMenu(); sfx('oil'); log('El grupo descansa junto al fuego.', 'em'); updateHUD();
+    } },
+    { label: 'Volver al Hogar', sub: 'Los vivos conservan su nivel. La expedición termina acá.', fn: retirarse },
+    { label: 'Seguir', fn: closeMenu },
+  ];
+  openMenu({ title: 'La fogata', cls: 'altar', text: 'Acá no llega nada vivo.', items }, 'game');
+};
+function retirarse() {
+  closeAllMenus(); S.mode = 'explore';
+  charla('retirada', () => { recambiarCandidatos(); guardarX(); abrirHogar(); });
+}
+
+// ---------- El fondo: quién sostiene la antorcha y qué hace con la Llama ----------
+function elegirPortador() {
+  const v = NUCLEO.vivos(X.grupo);
+  if (v.length === 1) return elegirFinal(v[0]);
+  openMenu({ title: 'La antorcha', cls: 'altar', back: false, text: '¿Quién la sostiene al llegar al cuenco?',
+    items: v.map(p => ({ label: `${fichaDe(p)}${datosDe(p)}`, sub: D.historia.modelos[p.modelo].fondo, fn: () => { closeAllMenus(); S.mode = 'explore'; elegirFinal(p); } })) }, 'game');
+}
+function elegirFinal(p) {
+  charla({ quien: 'personaje', p, lineas: [D.historia.modelos[p.modelo].fondo] }, () => {
+    const F = D.historia.finales, puede = { relicario: X.perdidos.length > 0, leyenda: !X.perdidos.length };
+    openMenu({ title: 'La Llama', cls: 'altar', back: false, text: 'El cuenco espera lo que decidan.',
+      items: Object.entries(F).map(([id, f]) => ({ label: `${X.memoria.finales[id] ? '✦ ' : ''}${f.label}`, sub: f.sub, off: puede[id] === false, fn: () => {
+        closeAllMenus(); setPalette(S.env);
+        const a = D.clases[p.clase].arte;
+        playEnding(id, () => cerrarFinal(id, p), { cls: a, race: D.modelos[p.modelo].raza, look: kitLook(a), name: p.nombre });
+      } })) }, 'game');
+  });
+}
+function cerrarFinal(id, p) {
+  X.memoria.finales[id] = 1;
+  if (id === 'trono') { X.memoria.habitante = p.nombre; p.vida = 0; X.plantel = X.plantel.filter(q => q !== p); }
+  S.mode = 'explore';
+  finExpedicion(true);
+}
+// Los finales reusan el arte y los efectos del motor, con el texto del grupo
+const ARTE_FINAL = {
+  luz: [{ art: 'escalera', ramp: 'crypt', pan: [0, 290, 0, 0], climb: true, sfx: 'stairs' }, { art: 'amanecer', ramp: 'castle', pan: [80, 0, 0, 0], dawn: true }],
+  trono: [{ art: 'trono', ramp: 'blood', pan: [0, 0, 0, 0], sfx: 'whisper' }, { art: 'camara', ramp: 'engrave', pan: [0, 0, 0, 0], hero: [null, 150, 150], heroSnuff: 1 }, { art: 'trono', ramp: 'blood', pan: [0, 0, 0, 0], hero: [null, 170, 240, true], sfx: 'encounter' }],
+  relicario: [{ art: 'llama', ramp: 'castle', pan: [0, 150, 0, 150], flame: [240, 393, 96, 150], flameK: [0.25, 1], orbs: true, sfx: 'oil' }, { art: 'reino', ramp: 'castle', pan: [0, 0, 80, 0] }],
+  leyenda: [{ art: 'escalera', ramp: 'crypt', pan: [0, 290, 0, 0], climb: true, sfx: 'stairs' }, { art: 'hoguera', ramp: 'castle', pan: [0, 0, 0, 0], flame: [240, 182, 48, 80], sfx: 'fire' }],
+};
+window.endingScenes = (id, who) => {
+  const nombres = X.grupo.filter(p => p.vida > 0).map(p => p.nombre).join(' · ');
+  const poner = l => (typeof l === 'string' ? l.replaceAll('{nombre}', who.name).replaceAll('{nombres}', nombres) : Object.fromEntries(Object.entries(l).map(([k, v]) => [k, poner(v)])));
+  const intro = endingIntro().map(e => ({ ...e, lines: e.lines.map(l => (typeof l === 'string' ? l.replace('Tu antorcha', `La antorcha de ${who.name}`) : l)) }));
+  return [...intro, ...ARTE_FINAL[id].map((e, i) => ({ ...e, lines: D.historia.finales[id].escenas[i].map(poner) }))];
+};
 
 function finExpedicion(gano) {
   if (gano) {
@@ -1211,7 +1315,7 @@ function dibujarBatalla(c) {
   const ex = Math.round((azarX() - 0.5) * tm), ey = Math.round((azarX() - 0.5) * tm);
   dibujarEscena(c, ex, ey);
   // lo que da luz o informa va por encima de la oscuridad: llamas, brasas, vida y marca de turno
-  for (const [x, y] of ANTORCHAS[S.env] || []) drawFlame(c, x, y, 18, 26, Bt.t, 0.75 * clamp(Bt.ini / (Bt.entrada * 0.5), 0, 1), 'fuegoX');
+  for (const [x, y] of ANTORCHAS[S.env] || ANTORCHAS.crypt) drawFlame(c, x, y, 18, 26, Bt.t, 0.75 * clamp(Bt.ini / (Bt.entrada * 0.5), 0, 1), 'fuegoX');
   dibujarParticulas(c);
   for (const e of b.enemigos) {
     if (e.vida <= 0 || aparicion(e) < 1) continue;

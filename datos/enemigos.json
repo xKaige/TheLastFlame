@@ -55,10 +55,10 @@
   "reyOsario": {
     "nombre": "El Rey del Osario",
     "sprite": "boneKing",
-    "vida": 240,
+    "vida": 210,
     "ataque": [
-      14,
-      20
+      12,
+      18
     ],
     "defensa": 3,
     "velocidad": 10,
@@ -73,5 +73,96 @@
       ]
     },
     "imagen": "rey_osario"
+  },
+  "necrofago": {
+    "nombre": "Necrófago",
+    "sprite": "ghoul",
+    "vida": 48,
+    "ataque": [
+      9,
+      14
+    ],
+    "defensa": 2,
+    "velocidad": 9,
+    "exp": 7
+  },
+  "sombra": {
+    "nombre": "Sombra Susurrante",
+    "sprite": "shade",
+    "vida": 34,
+    "ataque": [
+      8,
+      12
+    ],
+    "defensa": 2,
+    "velocidad": 13,
+    "exp": 7,
+    "roba_impetu": true
+  },
+  "acechador": {
+    "nombre": "El Acechador",
+    "sprite": "lurker",
+    "vida": 42,
+    "ataque": [
+      10,
+      15
+    ],
+    "defensa": 1,
+    "velocidad": 12,
+    "exp": 8
+  },
+  "caballero": {
+    "nombre": "Caballero Hueco",
+    "sprite": "knight",
+    "vida": 68,
+    "ataque": [
+      11,
+      17
+    ],
+    "defensa": 4,
+    "velocidad": 7,
+    "exp": 10
+  },
+  "cazador": {
+    "nombre": "El Cazador Gris",
+    "sprite": "hunter",
+    "vida": 320,
+    "ataque": [
+      14,
+      20
+    ],
+    "defensa": 4,
+    "velocidad": 11,
+    "exp": 50,
+    "jefe": true,
+    "especial": {
+      "cada": 3,
+      "nombre": "salta desde la penumbra sobre todo el grupo",
+      "dano": [
+        10,
+        14
+      ]
+    }
+  },
+  "habitante": {
+    "nombre": "El Que Habita la Oscuridad",
+    "sprite": "boss",
+    "vida": 500,
+    "ataque": [
+      16,
+      23
+    ],
+    "defensa": 4,
+    "velocidad": 11,
+    "exp": 0,
+    "jefe": true,
+    "especial": {
+      "cada": 3,
+      "nombre": "abraza al grupo con la oscuridad",
+      "dano": [
+        12,
+        17
+      ]
+    }
   }
 }

@@ -1,14 +1,219 @@
 {
-  "inicio": { "quien": "sombra", "caras": ["base", "risa"], "lineas": ["Cuatro lucecitas bajando juntas. Qué ternura.", "Una sola antorcha para todos. Van a pelearse por ella antes de llegar abajo."] },
-  "inicio_pocos": { "quien": "sombra", "caras": ["base", "risa"], "lineas": ["Tan pocas lucecitas. Valentía, o nadie más quiso venir.", "Mejor para ustedes: la antorcha se reparte entre menos."] },
-  "rescate": { "quien": "narrador", "lineas": ["Alguien respira detrás del osario: un portador que bajó solo y todavía conserva su chispa."],
+  "inicio": {
+    "quien": "sombra",
+    "caras": [
+      "base",
+      "risa"
+    ],
+    "lineas": [
+      "Cuatro lucecitas bajando juntas. Qué ternura.",
+      "Una sola antorcha para todos. Van a pelearse por ella antes de llegar abajo."
+    ]
+  },
+  "inicio_pocos": {
+    "quien": "sombra",
+    "caras": [
+      "base",
+      "risa"
+    ],
+    "lineas": [
+      "Tan pocas lucecitas. Valentía, o nadie más quiso venir.",
+      "Mejor para ustedes: la antorcha se reparte entre menos."
+    ]
+  },
+  "rescate": {
+    "quien": "narrador",
+    "lineas": [
+      "Alguien respira detrás del osario: un portador que bajó solo y todavía conserva su chispa."
+    ],
     "opciones": [
-      { "texto": "Sumarlo al grupo", "efecto": "reclutar" },
-      { "texto": "Darle una poción y dejarlo ir (+6 de Ceniza)", "efecto": "ceniza", "valor": 6, "requiere": "pocion" },
-      { "texto": "Seguir de largo", "efecto": null }
-    ] },
-  "jefe": { "quien": "rey", "lineas": ["¿Vienen a devolverme la Llama?", "Entonces arrodíllense. Nadie sale de mi osario."] },
-  "muerte": { "quien": "sombra", "caras": ["risa"], "lineas": ["Una chispa menos. Se quedó en mi cripta. Quizás vuelvan a verla."] },
-  "victoria": { "quien": "sombra", "caras": ["enojo"], "lineas": ["Ganaron un piso. Todavía falta el fondo, y la antorcha no se llena sola."] },
-  "derrota": { "quien": "sombra", "caras": ["risa"], "lineas": ["Ya está. Ahora todo es tibio."] }
+      {
+        "texto": "Sumarlo al grupo",
+        "efecto": "reclutar"
+      },
+      {
+        "texto": "Darle una poción y dejarlo ir (+6 de Ceniza)",
+        "efecto": "ceniza",
+        "valor": 6,
+        "requiere": "pocion"
+      },
+      {
+        "texto": "Seguir de largo",
+        "efecto": null
+      }
+    ]
+  },
+  "muerte": {
+    "quien": "sombra",
+    "caras": [
+      "risa"
+    ],
+    "lineas": [
+      "Una chispa menos. Se quedó en mi cripta. Quizás vuelvan a verla."
+    ]
+  },
+  "victoria": {
+    "quien": "sombra",
+    "caras": [
+      "base"
+    ],
+    "lineas": [
+      "Recuperaron la Llama. Cuídenla. Yo no pude."
+    ]
+  },
+  "derrota": {
+    "quien": "sombra",
+    "caras": [
+      "risa"
+    ],
+    "lineas": [
+      "Ya está. Ahora todo es tibio."
+    ]
+  },
+  "jefe_1": {
+    "quien": "rey",
+    "lineas": [
+      "¿Vienen a devolverme la Llama?",
+      "Entonces arrodíllense. Nadie sale de mi osario."
+    ]
+  },
+  "jefe_1_muerto": {
+    "quien": "sombra",
+    "caras": [
+      "risa",
+      "base"
+    ],
+    "lineas": [
+      "Vaya. Le rompieron la corona.",
+      "Bajo el trono hay una escalera. Sigan, lucecitas."
+    ]
+  },
+  "jefe_2": {
+    "quien": "sombra",
+    "caras": [
+      "base",
+      "risa"
+    ],
+    "lineas": [
+      "Hace tres pisos que huele su llama.",
+      "Él guio al rey hasta el fuego. Saluden al Cazador Gris."
+    ]
+  },
+  "jefe_2_muerto": {
+    "quien": "sombra",
+    "caras": [
+      "enojo",
+      "base"
+    ],
+    "lineas": [
+      "El primero en morir, otra vez.",
+      "Ya no queda nadie entre ustedes y el fondo. Nadie, salvo él."
+    ]
+  },
+  "jefe_3": {
+    "quien": "habitante",
+    "lineas": [
+      "No duermo. Hace siglos que no duermo.",
+      "Fui Aldemar. Cuidaba la Llama.",
+      "Traigan esa luz. Me lastima los ojos."
+    ]
+  },
+  "jefe_3_muerto": {
+    "quien": "habitante",
+    "lineas": [
+      "Por fin... oscuro...",
+      "Gracias."
+    ]
+  },
+  "piso_2": {
+    "quien": "sombra",
+    "caras": [
+      "base",
+      "risa"
+    ],
+    "lineas": [
+      "Más hondo. Bien.",
+      "Acá abajo los muros recuerdan nombres. Pronto van a recordar los suyos."
+    ]
+  },
+  "piso_3": {
+    "quien": "sombra",
+    "caras": [
+      "base",
+      "enojo"
+    ],
+    "lineas": [
+      "Llegaron al fondo del pozo.",
+      "Pocos llegan. Él los está escuchando."
+    ]
+  },
+  "revelacion_1": {
+    "quien": "sombra",
+    "caras": [
+      "base"
+    ],
+    "lineas": [
+      "No se pongan así. Yo también bajé una vez, con una antorcha igual a esa."
+    ]
+  },
+  "revelacion_2": {
+    "quien": "sombra",
+    "caras": [
+      "base"
+    ],
+    "lineas": [
+      "Conozco cada escalón. Los conté bajando, cuando todavía contaba cosas."
+    ]
+  },
+  "revelacion_3": {
+    "quien": "sombra",
+    "caras": [
+      "base",
+      "enojo"
+    ],
+    "lineas": [
+      "Yo llegué hasta acá. Fui la primera.",
+      "Le ofrecí la Llama a Aldemar para que dejara de sufrir. Mirá lo que hizo con ella."
+    ]
+  },
+  "revelacion_4": {
+    "quien": "sombra",
+    "caras": [
+      "base",
+      "enojo",
+      "base"
+    ],
+    "lineas": [
+      "Ahora saben quién soy. La que lo dejó solo con el fuego.",
+      "Todo lo que me burlé de ustedes me lo decía a mí.",
+      "Elijan mejor que yo."
+    ]
+  },
+  "retirada": {
+    "quien": "sombra",
+    "caras": [
+      "risa"
+    ],
+    "lineas": [
+      "Vuelvan al Hogar, lucecitas. La cripta no se va a ningún lado."
+    ]
+  },
+  "marcado": {
+    "quien": "sombra",
+    "caras": [
+      "risa"
+    ],
+    "lineas": [
+      "{nombre} ya estuvo conmigo. Pregúntenle qué le quedó de la vuelta."
+    ]
+  },
+  "habitante_nuevo": {
+    "quien": "sombra",
+    "caras": [
+      "base"
+    ],
+    "lineas": [
+      "{nombre} sigue sentado en el fondo. Si llegan, salúdenlo de mi parte."
+    ]
+  }
 }
