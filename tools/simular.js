@@ -30,7 +30,7 @@ const veces = +process.argv[2] || 500, G = D.mazmorra;
 for (const tam of [4, 3, 2, 1]) {
   const tot = { gana: 0, turnos: 0, peleas: 0, muertos: 0, piso: [0, 0, 0, 0], jefes: [0, 0, 0], turnos1: 0, peleas1: 0 };
   for (let v = 0; v < veces; v++) {
-    const grupo = MEZCLA.slice(0, tam).map(c => N.crearPersonaje(D, Object.keys(D.modelos)[Math.floor(azar() * 10)], c, azar));
+    const grupo = MEZCLA.slice(0, tam).map(c => { const ms = Object.keys(D.modelos).filter(m => D.modelos[m].clase === c); return N.crearPersonaje(D, ms[Math.floor(azar() * ms.length)], azar); });
     let vivo = true;
     const descanso = (k) => { for (const u of N.vivos(grupo)) u.vida = Math.min(u.vidaMax, u.vida + Math.round(u.vidaMax * k)); };
     for (let piso = 1; piso <= 3 && vivo; piso++) {

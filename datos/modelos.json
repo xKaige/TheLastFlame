@@ -1,6 +1,7 @@
 {
   "viuda": {
     "titulo": "La Viuda",
+    "clase": "guerrero",
     "raza": "humano",
     "nombres": [
       "Isolde",
@@ -15,6 +16,7 @@
   },
   "desertor": {
     "titulo": "El Desertor",
+    "clase": "guerrero",
     "raza": "humano",
     "nombres": [
       "Garrick",
@@ -29,6 +31,7 @@
   },
   "cantora": {
     "titulo": "La Cantora",
+    "clase": "sanador",
     "raza": "elfo",
     "nombres": [
       "Sabela",
@@ -43,6 +46,7 @@
   },
   "minero": {
     "titulo": "El Minero",
+    "clase": "guerrero",
     "raza": "humano",
     "nombres": [
       "Dagna",
@@ -58,6 +62,7 @@
   },
   "ladrona": {
     "titulo": "La Ladrona",
+    "clase": "picaro",
     "raza": "humano",
     "nombres": [
       "Pip",
@@ -72,6 +77,7 @@
   },
   "penitente": {
     "titulo": "El Penitente",
+    "clase": "mago",
     "raza": "humano",
     "nombres": [
       "Aldric",
@@ -87,6 +93,7 @@
   },
   "guardabosque": {
     "titulo": "La Guardabosque",
+    "clase": "picaro",
     "raza": "elfo",
     "nombres": [
       "Fenna",
@@ -102,6 +109,7 @@
   },
   "novicia": {
     "titulo": "La Novicia",
+    "clase": "sanador",
     "raza": "humano",
     "nombres": [
       "Caelan",
@@ -116,6 +124,7 @@
   },
   "buhonero": {
     "titulo": "El Buhonero",
+    "clase": "sanador",
     "raza": "humano",
     "nombres": [
       "Wim",
@@ -130,6 +139,7 @@
   },
   "exiliado": {
     "titulo": "El Exiliado",
+    "clase": "mago",
     "raza": "elfo",
     "nombres": [
       "Sorel",

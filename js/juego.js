@@ -25,7 +25,8 @@ localizeAllIn(D.historia.finales, ['label', 'sub']);
 const CLAVE = 'expedicion.estado';
 const X = { ceniza: 0, caidos: [], corridas: 0, plantel: [], candidatos: [], leyendas: [], grimorio: [], mochila: [], memoria: { hondo: 1, reveladas: [], ultimoCaido: null, habitante: null, finales: {} }, perdidos: [], grupo: [], sel: [], ganada: 0 };
 try { Object.assign(X, JSON.parse(STORE.get(CLAVE) || '{}')); } catch (e) { /* sin progreso */ }
-for (const k of ['caidos', 'plantel', 'candidatos']) X[k] = X[k].filter(c => D.modelos[c.modelo] && D.clases[c.clase]).map(c => NUCLEO.asegurarPersonaje(D, c));   // personajes de modelos que ya no existen
+for (const k of ['caidos', 'plantel', 'candidatos']) X[k] = X[k].filter(c => D.modelos[c.modelo] && D.clases[c.clase]).map(c => NUCLEO.ajustarModelo(D, NUCLEO.asegurarPersonaje(D, c)));   // personajes de modelos que ya no existen
+X.leyendas = X.leyendas.filter(c => D.modelos[c.modelo] && D.clases[c.clase]).map(c => NUCLEO.ajustarModelo(D, c));
 const guardarX = () => STORE.set(CLAVE, JSON.stringify({ grimorio: X.grimorio, mochila: X.mochila, ceniza: X.ceniza, caidos: X.caidos, corridas: X.corridas, plantel: X.plantel, candidatos: X.candidatos, leyendas: X.leyendas, memoria: X.memoria }));
 const azarX = () => Math.random();
 // Capa fina sobre el canvas de 480x270: textos, retratos e ilustraciones no se pixelan al agrandar la ventana.
@@ -840,8 +841,8 @@ function efecto(o) {
   if (o.efecto === 'reclutar') {
     if (NUCLEO.vivos(X.grupo).length >= D.mazmorra.tamano_grupo) { X.ceniza += 4; log('El grupo está completo: te da su Ceniza y sigue solo (+4).', 'good'); }
     else {
-      const ms = Object.keys(D.modelos), cs = Object.keys(D.clases);
-      const p = NUCLEO.crearPersonaje(D, ms[Math.floor(azarX() * ms.length)], cs[Math.floor(azarX() * cs.length)], azarX);
+      const ms = Object.keys(D.modelos);
+      const p = NUCLEO.crearPersonaje(D, ms[Math.floor(azarX() * ms.length)], azarX);
       X.grupo.push(p); X.plantel.push(p); log(tr('{0} se suma al grupo.', p.nombre), 'good');
     }
   }

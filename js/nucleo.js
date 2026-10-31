@@ -11,9 +11,9 @@ const NUCLEO = (() => {
   const vivos = lista => lista.filter(u => u.vida > 0);
 
   // ---------- Personajes ----------
-  // Un personaje es un modelo (quién es) + una clase (qué hace)
-  function crearPersonaje(D, modeloId, claseId, azar, nombre) {
-    const m = D.modelos[modeloId], c = D.clases[claseId], b = m.bonos;
+  // Un personaje es un modelo (quién es); cada modelo tiene su clase (qué hace), así el retrato siempre la muestra
+  function crearPersonaje(D, modeloId, azar, nombre) {
+    const m = D.modelos[modeloId], claseId = m.clase, c = D.clases[claseId], b = m.bonos;
     const vida = c.vida + (b.vida || 0);
     return asegurarPersonaje(D, {
       id: `${modeloId}-${claseId}-${Math.floor(azar() * 1e6)}`, modelo: modeloId, clase: claseId, nombre: nombre || elegir(azar, m.nombres),
@@ -32,6 +32,14 @@ const NUCLEO = (() => {
     p.habilidades = D.clases[p.clase].habilidades.slice();
     p.equipo = { arma: null, armadura: null, accesorio: null };
     p.magia = 0;
+    return p;
+  }
+
+  // Los personajes guardados de cuando la clase se sorteaba aparte conservan su clase y cambian de retrato
+  function ajustarModelo(D, p) {
+    if (D.modelos[p.modelo].clase === p.clase) return p;
+    const propios = Object.keys(D.modelos).filter(m => D.modelos[m].clase === p.clase);
+    p.modelo = propios[p.nombre.length % propios.length];
     return p;
   }
 
@@ -67,12 +75,10 @@ const NUCLEO = (() => {
 
   // Candidatos de la reunión: al menos uno de cada clase, sin repetir modelo si alcanza
   function sortearCandidatos(D, azar) {
-    const modelos = Object.keys(D.modelos).sort(() => azar() - 0.5), clases = Object.keys(D.clases), out = [];
-    for (let i = 0; i < D.mazmorra.candidatos; i++) {
-      const clase = i < clases.length ? clases[i] : elegir(azar, clases);
-      out.push(crearPersonaje(D, modelos[i % modelos.length], clase, azar));
-    }
-    return out.sort(() => azar() - 0.5);
+    const modelos = Object.keys(D.modelos).sort(() => azar() - 0.5), out = [];
+    for (const clase of Object.keys(D.clases)) out.push(...modelos.splice(modelos.findIndex(m => D.modelos[m].clase === clase), 1));
+    out.push(...modelos.slice(0, D.mazmorra.candidatos - out.length));
+    return out.map(m => crearPersonaje(D, m, azar)).sort(() => azar() - 0.5);
   }
 
   // Caídos de partidas anteriores que pueden volver, cada uno con una condición
@@ -285,7 +291,7 @@ const NUCLEO = (() => {
     return eventos;
   }
 
-  return { IMP_TOPE, vivos, crearPersonaje, asegurarPersonaje, atributosDe, recalcular, subirAtributo, cumpleRequisito, sortearCandidatos, sortearCaidos, aplicarCondicion, ganarExp, iniciarBatalla, haTerminado, vistaPrevia, proximoTurno, opciones, atacar, defender, usarHabilidad, turnoEnemigo };
+  return { IMP_TOPE, vivos, crearPersonaje, asegurarPersonaje, ajustarModelo, atributosDe, recalcular, subirAtributo, cumpleRequisito, sortearCandidatos, sortearCaidos, aplicarCondicion, ganarExp, iniciarBatalla, haTerminado, vistaPrevia, proximoTurno, opciones, atacar, defender, usarHabilidad, turnoEnemigo };
 })();
 
 if (typeof module !== 'undefined') module.exports = NUCLEO;
