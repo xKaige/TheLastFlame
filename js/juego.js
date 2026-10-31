@@ -218,7 +218,7 @@ function crearFuego(w, h, tope, ancho) {
   for (let y = 0; y < h * 2; y++) for (let x = 0; x < w; x++) ruido[y * w + x] = vnoise(x * 0.11, y * 0.09, 6) * 0.7 + vnoise(x * 0.27, y * 0.2, 8) * 0.3;
   return { w, h, tope, ancho, c, g, img, ruido, out: new Uint32Array(img.data.buffer), calor: new Float32Array(w * h), nuevo: new Float32Array(w * h), t: 0, ultimo: -1 };
 }
-const FOGATA = crearFuego(96, 84, 100, 36);
+const FOGATA = crearFuego(96, 116, 100, 36);
 function avanzarFuego(f) {
   const { w, h, tope, ancho, ruido } = f, ca = f.calor, nu = f.nuevo;
   f.t += 1 / 30;
@@ -230,7 +230,9 @@ function avanzarFuego(f) {
   for (let y = 0; y < h - 2; y++) for (let x = 1; x < w - 1; x++) {
     const a = y + 1, v = (ca[a * w + x - 1] + ca[a * w + x] * 2 + ca[a * w + x + 1] + ca[(y + 2) * w + x]) / 5;
     const frio = ruido[((y + sube) % (h * 2)) * w + x];
-    nu[y * w + x] = Math.max(0, v - (0.25 + frio * frio * 4.2));
+    // cerca del tope del lienzo se apaga del todo, para que ninguna lengua llegue a cortarse
+    const techo = y < 36 ? 0.8 + 0.2 * (y / 36) : 1;
+    nu[y * w + x] = Math.max(0, v * techo - (0.25 + frio * frio * 4.2));
   }
   for (let i = 0; i < w * (h - 2); i++) ca[i] = nu[i];
 }
