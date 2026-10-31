@@ -493,13 +493,15 @@ function snuffK(at = 0) {
 
 function drawCine(ctx) {
   const sc = CINE.scenes[CINE.si];
+  // las ilustraciones grandes van en la capa fina, sin pasar por los 480x270 del canvas
+  if (sc.nitida) ctx = capaNitida();
   const R = RAMPS[sc.ramp];
   const art = CINE.art[sc.art];
   const p = clamp(CINE.t / sc.total, 0, 1);
   const e = p * p * (3 - 2 * p);
   const ox = -Math.round(lerp(sc.pan[0], sc.pan[2], e)), oy = -Math.round(lerp(sc.pan[1], sc.pan[3], e));
   ctx.fillStyle = R[0]; ctx.fillRect(0, 0, W, H);
-  ctx.drawImage(art, ox, oy);
+  if (sc.nitida) ctx.drawImage(art, ox, oy, W, H); else ctx.drawImage(art, ox, oy);
   const t = CINE.t;
   if (sc.flame) drawFlame(ctx, sc.flame[0] + ox, sc.flame[1] + oy, sc.flame[2], sc.flame[3], t, sc.flameK ? lerp(sc.flameK[0], sc.flameK[1], clamp((p - 0.45) / 0.4, 0, 1)) : 1, sc.ramp);
   if (sc.snuff) {
@@ -552,6 +554,13 @@ function drawCine(ctx) {
   }
   if (sc.dibujar) sc.dibujar(ctx, t);
   if (typeof drawEndingFx === 'function') drawEndingFx(ctx, sc, R, ox, oy, t, e);
+  if (sc.nitida) {
+    const g = ctx.createLinearGradient(0, 186, 0, 240);
+    g.addColorStop(0, 'rgba(2, 1, 4, 0)'); g.addColorStop(1, 'rgba(2, 1, 4, 0.85)');
+    ctx.fillStyle = g; ctx.fillRect(0, 186, W, 84);
+    ctx.fillStyle = `rgba(2, 1, 4, ${CINE.fade})`; ctx.fillRect(0, 0, W, H);
+    return;
+  }
   // banda inferior para el texto, en degradé tramado para que no corte la escena
   for (let k = 0; k < 8; k++) ditherFill(ctx, 0, 186 + k * 6, W, 6, 0.08 + k * 0.09, R[0]);
   ditherFill(ctx, 0, 234, W, 36, 0.8, R[0]);

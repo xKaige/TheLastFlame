@@ -252,15 +252,16 @@ window.openTitleMenu = () => {
 const ARTE_INTRO = {};
 for (const n of ['velombra', 'escalera', 'velombra_apagada', 'boca']) ARTE_INTRO[n] = Object.assign(new Image(), { src: `interfaz/intro/${n}.png` });
 const ESCENAS_INTRO = [
-  { art: 'velombra', ramp: 'crypt', pan: [0, 0, 0, 0], sfx: 'fire', dibujar: (c, t) => drawFlame(c, 310, 97, 16, 24, t, 1, 'fuegoX') },
-  { art: 'escalera', ramp: 'crypt', pan: [0, 0, 0, 0], sfx: 'stairs', dibujar: (c, t) => drawFlame(c, 298, 134, 12, 20, t, 1, 'fuegoX') },
+  { art: 'velombra', nitida: true, ramp: 'crypt', pan: [0, 0, 0, 0], sfx: 'fire', dibujar: (c, t) => drawFlame(c, 310, 97, 16, 24, t, 1, 'fuegoX') },
+  { art: 'escalera', nitida: true, ramp: 'crypt', pan: [0, 0, 0, 0], sfx: 'stairs', dibujar: (c, t) => drawFlame(c, 298, 134, 12, 20, t, 1, 'fuegoX') },
   { art: 'apagon', ramp: 'castle', pan: [0, 0, 0, 0], snuff: true },
-  { art: 'velombra_apagada', ramp: 'crypt', pan: [0, 0, 0, 0] },
-  { art: 'boca', ramp: 'crypt', pan: [0, 0, 0, 0], sfx: 'whisper', dibujar: (c, t) => {
-    const cara = caraDe('sombra');
-    if (!cara) return;
+  { art: 'velombra_apagada', nitida: true, ramp: 'crypt', pan: [0, 0, 0, 0] },
+  { art: 'boca', nitida: true, ramp: 'crypt', pan: [0, 0, 0, 0], sfx: 'whisper', dibujar: (c, t) => {
+    const k = IMG_CARAS.sombra;
+    if (!k.img.naturalWidth) return;
+    const cara = k.fina || (k.fina = spriteCanvas(spriteDesdeImagen(k.img, k.img.naturalWidth), k.img.naturalWidth, 'crypt', 1));
     c.globalAlpha = clamp((t - 1.5) / 3, 0, 1) * (0.85 + Math.sin(t * 1.3) * 0.15);
-    c.drawImage(cara, 240 - CARA.lado / 2, 28); c.globalAlpha = 1;
+    c.drawImage(cara, 240 - CARA.lado / 2, 28, CARA.lado, CARA.lado); c.globalAlpha = 1;
   } },
   { art: 'hogar', ramp: 'crypt', pan: [0, 0, 0, 0], sfx: 'oil', sinFundido: true, dibujar: c => dibujarHogar(c) },
 ];
