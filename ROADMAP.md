@@ -3,6 +3,11 @@
 El camino del juego es la expedición de grupo. El plan del juego anterior está en `juego_viejo/ROADMAP.md`.
 Steam sigue en pausa hasta que el juego esté pulido; sus notas están en `juego_viejo/STEAM.md`.
 
+## Orden de trabajo
+
+Por partes: primero la base y el piso 1 (La Cripta) terminado. Después se remodela el piso 2, y recién entonces el resto.
+Lo próximo son los menús y la tipografía.
+
 ## Pendiente de elegir
 
 - Cómo se muestran los objetos (F8) y el nivel (F9). Al decidir se borran esas dos teclas.
