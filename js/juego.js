@@ -17,14 +17,24 @@ try { Object.assign(X, JSON.parse(STORE.get(CLAVE) || '{}')); } catch (e) { /* s
 for (const k of ['caidos', 'plantel', 'candidatos']) X[k] = X[k].filter(c => D.modelos[c.modelo] && D.clases[c.clase]);   // personajes de modelos que ya no existen
 const guardarX = () => STORE.set(CLAVE, JSON.stringify({ ceniza: X.ceniza, caidos: X.caidos, corridas: X.corridas, plantel: X.plantel, candidatos: X.candidatos, leyendas: X.leyendas, memoria: X.memoria }));
 const azarX = () => Math.random();
-// Capa fina sobre el canvas de 480x270: textos y retratos no se pixelan al agrandar la ventana.
-// Se dibuja con las mismas coordenadas que el canvas; sus 4 veces de resolución las pone la escala.
+// Capa fina sobre el canvas de 480x270: textos, retratos e ilustraciones no se pixelan al agrandar la ventana.
+// Se dibuja con las mismas coordenadas que el canvas, y su tamaño real es el de la ventana en pantalla:
+// cada píxel de la capa es un píxel del monitor, así nada se reescala después.
 const LADO_RETRATO = 128;
-const NITIDO = { g: null, sucio: false };
+const NITIDO = { g: null, sucio: false, ancho: 0 };
 function capaNitida() {
-  if (!NITIDO.g) { NITIDO.g = $('nitido').getContext('2d'); NITIDO.g.scale(4, 4); }
+  ajustarCapa();
   NITIDO.sucio = true;
   return NITIDO.g;
+}
+function ajustarCapa() {
+  const lienzo = $('nitido'), ancho = Math.max(480, Math.round($('stage').getBoundingClientRect().width * (window.devicePixelRatio || 1)));
+  if (!NITIDO.g) NITIDO.g = lienzo.getContext('2d');
+  if (ancho === NITIDO.ancho) return;
+  NITIDO.ancho = ancho;
+  lienzo.width = ancho; lienzo.height = Math.round(ancho * 270 / 480);
+  NITIDO.g.setTransform(ancho / 480, 0, 0, ancho / 480, 0, 0);
+  NITIDO.g.imageSmoothingQuality = 'high';
 }
 function limpiarCapa() {
   if (NITIDO.sucio) NITIDO.g.clearRect(0, 0, 480, 270);
@@ -256,12 +266,12 @@ const LLAMA = { x: 186, w: 112, arriba: 1, abajo: 112 };
 const LLAMA_TEMPLO = { x: 298, w: 28, arriba: 78, abajo: 97 };
 const LLAMA_ANTORCHA = { x: 293, w: 18, arriba: 109, abajo: 128 };
 function ondular(c, img, t, fuerza, zona = LLAMA) {
-  const { x, w, arriba, abajo } = zona, alto = abajo - arriba, paso = 0.25, f = fuerza * alto / 110;
+  const { x, w, arriba, abajo } = zona, alto = abajo - arriba, paso = 0.25, f = fuerza * alto / 110, e = img.naturalWidth / 480;
   for (let y = arriba; y < abajo; y += paso) {
     const k = Math.pow((abajo - y) / alto, 1.3), r = (y - arriba) * 110 / alto;
     const d = (Math.sin(r * 0.11 - t * 6.5) * 2.6 + Math.sin(r * 0.27 - t * 10.5) * 1.1) * k * f;
     const sube = (Math.sin(t * 7.3) * 0.5 + 0.5) * 5 * k * f;
-    c.drawImage(img, x * 4, Math.round((y + sube) * 4), w * 4, 1, x + d, y, w, paso + 0.02);
+    c.drawImage(img, x * e, (y + sube) * e, w * e, paso * e, x + d, y, w, paso + 0.02);
   }
 }
 
