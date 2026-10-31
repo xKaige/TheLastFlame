@@ -75,7 +75,141 @@
     },
     "imagen": "rey_osario",
     "tam_batalla": 150,
-    "escala_mapa": 1.6
+    "escala_mapa": 1.6,
+    "animacion": {
+      "base": 118,
+      "cintura": 58,
+      "pies": 103,
+      "partes": [
+        {
+          "nombre": "cabeza",
+          "rects": [
+            [
+              50,
+              0,
+              70,
+              18
+            ]
+          ],
+          "pivote": [
+            60,
+            18
+          ]
+        },
+        {
+          "nombre": "arma",
+          "rects": [
+            [
+              0,
+              0,
+              41,
+              60
+            ],
+            [
+              29,
+              60,
+              37,
+              102
+            ]
+          ],
+          "pivote": [
+            43,
+            46
+          ]
+        },
+        {
+          "nombre": "garra",
+          "rects": [
+            [
+              88,
+              15,
+              112,
+              50
+            ]
+          ],
+          "pivote": [
+            86,
+            43
+          ]
+        }
+      ],
+      "ataque": [
+        {
+          "arma": {
+            "giro": 0.14
+          },
+          "garra": {
+            "giro": -0.12
+          },
+          "cabeza": {
+            "y": -0.6
+          },
+          "pecho": 0.6
+        },
+        {
+          "arma": {
+            "giro": 0.3
+          },
+          "garra": {
+            "giro": -0.22
+          },
+          "cabeza": {
+            "y": -1
+          },
+          "pecho": 1
+        },
+        {
+          "arma": {
+            "giro": 0.42
+          },
+          "garra": {
+            "giro": -0.3
+          },
+          "cabeza": {
+            "y": -1.2
+          },
+          "pecho": 1.2
+        },
+        {
+          "arma": {
+            "giro": -0.34
+          },
+          "garra": {
+            "giro": 0.2
+          },
+          "cabeza": {
+            "y": 1
+          },
+          "pecho": -1,
+          "capa": -2
+        },
+        {
+          "arma": {
+            "giro": -0.5
+          },
+          "garra": {
+            "giro": 0.26
+          },
+          "cabeza": {
+            "y": 1.2
+          },
+          "pecho": -1.2,
+          "capa": -3
+        },
+        {
+          "arma": {
+            "giro": -0.22
+          },
+          "garra": {
+            "giro": 0.1
+          },
+          "cabeza": {
+            "y": 0
+          },
+          "capa": -1.5
+        }
+      ]
+    }
   },
   "necrofago": {
     "nombre": "Necrófago",

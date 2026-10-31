@@ -905,7 +905,7 @@ function grisDeEnemigo(e) {
 function iniciarPelea(ent, ids, entrada = 0.95) {
   const b = NUCLEO.iniciarBatalla(D, X.grupo, ids);
   const fx = ids.length === 1 ? [240] : ids.length === 2 ? [190, 290] : ids.some(id => D.enemigos[id].tam_batalla) ? [92, 240, 388] : FX3;   // un jefe grande necesita lugar
-  for (const e of b.enemigos) { e.x = fx[e.i]; const propia = IMG_ENEMIGOS[e.imagen], lista = propia && propia.complete && propia.naturalWidth; const tam = lista ? D.enemigos[e.tipo].tam_batalla || propia.naturalWidth : e.jefe ? FTAM + 14 : FTAM; e.tam = tam; e.img = lista ? propia : spriteCanvas(SPRITES[e.sprite].p, tam, S.env, 1); e.golpeado = 0; e.luz = luzDeEnemigo(e); e.gris = grisDeEnemigo(e); e.icono = spriteCanvas(e.gris, e.tam, S.env, 1); }
+  for (const e of b.enemigos) { e.x = fx[e.i]; const propia = IMG_ENEMIGOS[e.imagen], lista = propia && propia.complete && propia.naturalWidth; const tam = lista ? D.enemigos[e.tipo].tam_batalla || propia.naturalWidth : e.jefe ? FTAM + 14 : FTAM; e.tam = tam; e.img = lista ? propia : spriteCanvas(SPRITES[e.sprite].p, tam, S.env, 1); e.golpeado = 0; e.luz = luzDeEnemigo(e); e.gris = grisDeEnemigo(e); e.icono = spriteCanvas(e.gris, e.tam, S.env, 1); prepararPoses(e); }
   for (const u of b.aliados) u.golpeado = 0;
   Bt = { b, ent, fase: 'espera', sel: 0, tsel: 0, ops: [], msg: 'Te cierran el paso.', t: 0, gris: fondoBatalla(), fx: [], fxHab: [], part: [], temblor: 0, destello: 0, golpe: 'tajo', ini: 0, entrada };
   S.mode = 'xbat';
@@ -926,6 +926,7 @@ function siguiente() {
   if (u.vida <= 0) return later(500, siguiente);
   if (u.enemigo) {
     Bt.fase = 'espera'; Bt.msg = ''; pintarBatalla();
+    iniciarAtaqueAnimado(u);
     later(600, () => { if (Bt) { mostrar(NUCLEO.turnoEnemigo(Bt.b, u, azarX)); later(450, () => { if (Bt) Bt.fase = 'cambio'; }); later(800, siguiente); } });
   } else {
     Bt.ops = [{ id: 'atk', nombre: 'Atacar', descripcion: D.clases[u.clase].doble_golpe ? 'Dos golpes: el segundo, más flojo. +1 Ímpetu.' : 'Golpe común. +1 Ímpetu.', objetivo: 'enemigo' },
@@ -1359,6 +1360,7 @@ function dibujarEscena(c, ex, ey) {
   for (const e of Bt.b.enemigos) {
     if (e.vida <= 0 && !e.muriendo) continue;
     const sale = aparicion(e);
+    posar(e);
     if (sale > 0) ponerEnemigo(e, Math.round(e.x + ex + (e.retro || 0) * (e.dir || 1) - e.tam / 2), FBASE - e.tam + ey + Math.round((1 - sale) * 12));
   }
   const f = clamp(flick, 0.7, 1.05), alcance = (110 + 170 * P.fuel / 100) * (0.94 + f * 0.06), lat = 120 * (0.86 + f * 0.14);
