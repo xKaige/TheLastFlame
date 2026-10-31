@@ -9,7 +9,8 @@ const dentro = (rects, x, y) => rects.some(([a, b, c, d]) => x >= a && y >= b &&
 
 // Busca qué parte del dibujo original cae en cada punto, aplicando al revés lo que hizo cada pieza
 function armarPose(g, an, mov) {
-  const t = g.size, k = t / an.base, lum = new Float32Array(t * t), a = new Uint8Array(t * t);
+  // cada pose es más grande que el dibujo: lo que se mueve puede salirse de él sin cortarse
+  const t = g.size, m = Math.ceil(t * 0.3), T = t + m * 2, k = t / an.base, lum = new Float32Array(T * T), a = new Uint8Array(T * T);
   const copiar = (i, sx, sy) => {
     const X = Math.round(sx * k), Y = Math.round(sy * k);
     if (X < 0 || Y < 0 || X >= t || Y >= t) return false;
@@ -19,12 +20,12 @@ function armarPose(g, an, mov) {
     return true;
   };
   const todo = mov.todo || {};
-  for (let y = 0; y < t; y++) for (let x = 0; x < t; x++) {
-    const px = x / k - (todo.x || 0), py = y / k - (todo.y || 0), i = y * t + x;
+  for (let y = 0; y < T; y++) for (let x = 0; x < T; x++) {
+    const px = (x - m) / k - (todo.x || 0), py = (y - m) / k - (todo.y || 0), i = y * T + x;
     let listo = false;
     for (const p of an.partes) {
-      const m = mov[p.nombre] || {}, c = Math.cos(-(m.giro || 0)), s = Math.sin(-(m.giro || 0));
-      const dx = px - p.pivote[0] - (m.x || 0), dy = py - p.pivote[1] - (m.y || 0);
+      const q = mov[p.nombre] || {}, c = Math.cos(-(q.giro || 0)), s = Math.sin(-(q.giro || 0));
+      const dx = px - p.pivote[0] - (q.x || 0), dy = py - p.pivote[1] - (q.y || 0);
       const sx = p.pivote[0] + dx * c - dy * s, sy = p.pivote[1] + dx * s + dy * c;
       if (dentro(p.rects, sx, sy) && copiar(i, sx, sy)) { listo = true; break; }
     }
@@ -37,33 +38,34 @@ function armarPose(g, an, mov) {
     // lo que una pieza del cuerpo deja al descubierto sigue siendo cuerpo: se ve el dibujo original
     else if (pieza.tapar) copiar(i, sx, sy);
   }
-  cerrarUniones(g, a, lum, k, t, todo);
-  quitarSueltos(a, t);
-  const afuera = zonaDeAfuera(a, t), borde = new Uint8Array(t * t);
-  for (let y = 0; y < t; y++) for (let x = 0; x < t; x++) {
+  cerrarUniones(g, a, lum, k, T, m, todo);
+  quitarSueltos(a, T);
+  const afuera = zonaDeAfuera(a, T), borde = new Uint8Array(T * T);
+  for (let y = 0; y < T; y++) for (let x = 0; x < T; x++) {
+    const i = y * T + x;
     // un hueco cerrado por dentro no es silueta: se rellena con el dibujo original, sin contorno
-    if (!a[y * t + x] && !afuera[y * t + x]) {
-      const i = y * t + x, X = Math.round(x - (todo.x || 0) * k), Y = Math.round(y - (todo.y || 0) * k), o = clamp(Y, 0, t - 1) * t + clamp(X, 0, t - 1);
+    if (!a[i] && !afuera[i]) {
+      const X = Math.round(x - m - (todo.x || 0) * k), Y = Math.round(y - m - (todo.y || 0) * k), o = clamp(Y, 0, t - 1) * t + clamp(X, 0, t - 1);
       if (g.a[o]) { a[i] = 1; lum[i] = g.lum[o]; }
       continue;
     }
-    if (a[y * t + x]) continue;
-    if ((x && a[y * t + x - 1]) || (x < t - 1 && a[y * t + x + 1]) || (y && a[(y - 1) * t + x]) || (y < t - 1 && a[(y + 1) * t + x])) borde[y * t + x] = 1;
+    if (a[i]) continue;
+    if ((x && a[i - 1]) || (x < T - 1 && a[i + 1]) || (y && a[i - T]) || (y < T - 1 && a[i + T])) borde[i] = 1;
   }
-  return { size: t, lum, a, borde };
+  return { size: T, margen: m, lum, a, borde };
 }
 
 // Al mover una pieza queda una rendija entre ella y el cuerpo, que el contorno pintaría de negro.
 // Un hueco angosto, con dibujo a los dos lados, se rellena con el dibujo original.
-function cerrarUniones(g, a, lum, k, t, todo) {
-  const ancho = Math.ceil(3 * k), hay = (x, y) => x >= 0 && y >= 0 && x < t && y < t && a[y * t + x] === 1;
+function cerrarUniones(g, a, lum, k, T, m, todo) {
+  const t = g.size, ancho = Math.ceil(3 * k), hay = (x, y) => x >= 0 && y >= 0 && x < T && y < T && a[y * T + x] === 1;
   const cerca = (x, y, dx, dy) => { for (let n = 1; n <= ancho; n++) if (hay(x + dx * n, y + dy * n)) return true; return false; };
   for (let vuelta = 0; vuelta < 2; vuelta++) {
     const nuevos = [];
-    for (let y = 0; y < t; y++) for (let x = 0; x < t; x++) {
-      if (a[y * t + x] || !((cerca(x, y, 1, 0) && cerca(x, y, -1, 0)) || (cerca(x, y, 0, 1) && cerca(x, y, 0, -1)))) continue;
-      const X = Math.round(x - (todo.x || 0) * k), Y = Math.round(y - (todo.y || 0) * k);
-      if (X >= 0 && Y >= 0 && X < t && Y < t && g.a[Y * t + X]) nuevos.push([y * t + x, g.lum[Y * t + X]]);
+    for (let y = 0; y < T; y++) for (let x = 0; x < T; x++) {
+      if (a[y * T + x] || !((cerca(x, y, 1, 0) && cerca(x, y, -1, 0)) || (cerca(x, y, 0, 1) && cerca(x, y, 0, -1)))) continue;
+      const X = Math.round(x - m - (todo.x || 0) * k), Y = Math.round(y - m - (todo.y || 0) * k);
+      if (X >= 0 && Y >= 0 && X < t && Y < t && g.a[Y * t + X]) nuevos.push([y * T + x, g.lum[Y * t + X]]);
     }
     for (const [i, l] of nuevos) { a[i] = 1; lum[i] = l; }
   }
@@ -102,6 +104,7 @@ function quitarSueltos(a, t) {
 function prepararPoses(e) {
   const an = D.enemigos[e.tipo].animacion, clave = `${e.tipo}:${e.tam}`;
   if (!an || e.gris.size !== e.tam) return;
+  topeVisible(e);      // se mide sobre el dibujo: las poses tienen margen
   if (!POSES_LISTAS[clave]) {
     const r = an.reposo, reposo = [];
     for (let i = 0; i < POSES.reposo; i++) {

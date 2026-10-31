@@ -1362,10 +1362,11 @@ function luzDeEnemigo(e) {
 
 function ponerEnemigo(e, x0, y0) {
   const { lum, w, h } = LUZ, g = e.gris, t = g.size, muere = e.vida <= 0, corte = muere ? Math.round(t * (1 - e.muriendo / 0.6)) : 0;
+  x0 -= g.margen || 0; y0 -= g.margen || 0;      // las poses animadas son más grandes que el dibujo
   const extra = e.golpeado > 0.2 ? 0.5 : 0;
   // sombra en el piso
   for (let y = FBASE - 4; y <= FBASE + 3; y++) for (let x = e.x - 30; x <= e.x + 30; x++) {
-    const a = (x - e.x) / (t * 0.34), b = (y - FBASE + 1) / 4;
+    const a = (x - e.x) / (e.tam * 0.34), b = (y - FBASE + 1) / 4;
     if (a * a + b * b < 1) lum[y * w + x] *= 0.5;
   }
   for (let y = corte; y < t; y++) {
