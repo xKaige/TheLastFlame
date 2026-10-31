@@ -262,7 +262,7 @@ window.openTitleMenu = () => {
 const ARTE_INTRO = {};
 for (const n of ['velombra', 'escalera', 'rey_llama', 'rey_apagada', 'velombra_apagada', 'boca']) ARTE_INTRO[n] = Object.assign(new Image(), { src: `interfaz/intro/${n}.png` });
 // El fuego del dibujo se mueve por filas: abajo queda quieto, sobre el cuenco, y arriba ondula más
-const LLAMA = { x: 186, w: 112, arriba: 1, abajo: 112 };
+const LLAMA = { x: 224, w: 74, arriba: 1, abajo: 112 };     // no llega a la mano ni a la cara del rey
 const LLAMA_TEMPLO = { x: 298, w: 28, arriba: 78, abajo: 97 };
 const LLAMA_ANTORCHA = { x: 293, w: 18, arriba: 109, abajo: 128 };
 function ondular(c, img, t, fuerza, zona = LLAMA) {
