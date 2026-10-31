@@ -1442,7 +1442,7 @@ function dibujarVidaEnemigo(c, e) {
 // ---------- Línea de turnos ----------
 // Corre de derecha a izquierda: quien juega ocupa el lugar de Turno y los demás esperan en fila, una vez
 // cada uno. Al gastar el turno, su retrato pasa por debajo de la fila y vuelve al fondo.
-const LINEA = { turno: 34, primero: 56, paso: 16, y: 6, tam: 13 };     // a la izquierda: arriba al centro va el nombre de un jefe grande
+const LINEA = { turno: 42, primero: 64, paso: 16, y: 6, tam: 13 };     // a la izquierda: arriba al centro va el nombre de un jefe grande
 function ordenLinea() {
   const b = Bt.b, act = b.actual && b.actual.vida > 0 && Bt.fase !== 'cambio' ? b.actual : null;
   return { act, fila: b.unidades.filter(u => u.vida > 0 && u !== act).sort((x, y) => x.reloj - y.reloj) };
