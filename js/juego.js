@@ -839,7 +839,7 @@ function efecto(o) {
 
 // ---------- Batalla ----------
 // tarjetas flotantes: separadas entre sí y del borde inferior
-const MENU_Y = 183;
+const MENU_Y = 191;
 const CX = [10, 128, 246, 364], CY = 216, CW = 106, FX3 = [145, 240, 335], FBASE = 168, FTAM = 74;
 let Bt = null;
 window.startCombat = (e, emboscada) => {
@@ -990,6 +990,13 @@ function mostrarEvento(e) {
   if (e.tipo === 'muerte') {
     Bt.msg = q.enemigo ? `${q.nombre} cae.` : `${q.nombre} cae. Su chispa se apaga.`;
     if (q.enemigo) { q.muriendo = 0.6; chispas(q.x, FBASE - q.tam * 0.45, 24, [RAMPS[S.env][2], RAMPS[S.env][3], RAMPS[S.env][4]], -18); }
+  }
+  if (e.tipo === 'fase') { Bt.msg = `${q.nombre} se enfurece y se cubre de escudos.`; Bt.temblor = 6; Bt.destello = 0.5; sfx('encounter'); chispas(q.x, FBASE - q.tam * 0.5, 30, VIDA_ESCUDO, -24); }
+  if (e.tipo === 'escudo') {
+    q.golpeado = 0.2; sfx(e.quedan ? 'miss' : 'chest');
+    chispas(q.x, FBASE - q.tam * 0.45, e.quedan ? 10 : 34, VIDA_ESCUDO, -30);
+    Bt.msg = e.quedan ? `Quedan ${e.quedan} escudos.` : `Se rompen los escudos de ${q.nombre}.`;
+    if (!e.quedan) Bt.temblor = 5;
   }
   if (e.tipo === 'texto' && e.clave === 'aturdido') Bt.msg = `${q.nombre} no ve nada.`;
   if (e.tipo === 'texto' && e.clave === 'pierde_turno') Bt.msg = `${q.nombre} pierde el turno.`;
@@ -1450,8 +1457,28 @@ function actualizarBarra(u, dt) {
   u.fantasma = u.fantasma > u.vida ? Math.max(Math.max(0, u.vida), u.fantasma - u.vidaMax * dt * 0.9) : Math.max(0, u.vida);
 }
 
+const VIDA_ESCUDO = ['#16304f', '#2f6fb5', '#6fb6ee'];
+function dibujarEscudo(c, x, y) {
+  c.fillStyle = '#0a1420'; c.fillRect(x - 1, y - 1, 9, 8); c.fillRect(x, y + 7, 7, 1); c.fillRect(x + 2, y + 8, 3, 1);
+  c.fillStyle = VIDA_ESCUDO[1]; c.fillRect(x, y, 7, 6); c.fillRect(x + 1, y + 6, 5, 1); c.fillRect(x + 3, y + 7, 1, 1);
+  c.fillStyle = VIDA_ESCUDO[2]; c.fillRect(x, y, 7, 1); c.fillRect(x, y, 1, 5); c.fillRect(x + 3, y + 2, 1, 3);
+}
+
+// Los ojos encendidos del enemigo furioso, sobre el dibujo
+function dibujarOjos(c, e) {
+  const an = D.enemigos[e.tipo].animacion, ojos = D.enemigos[e.tipo].ojos;
+  if (!e.enfurecido || !ojos || e.vida <= 0) return;
+  const k = e.tam / an.base, x0 = e.x - e.tam / 2, y0 = FBASE - e.tam, f = 0.75 + Math.sin(Bt.t * 9) * 0.25;
+  for (const [ox, oy] of ojos) {
+    const x = Math.round(x0 + ox * k), y = Math.round(y0 + oy * k);
+    c.fillStyle = `rgba(255, 40, 20, ${0.25 * f})`; c.fillRect(x - 3, y - 3, 8, 7);
+    c.fillStyle = '#ff2a14'; c.fillRect(x, y, 3, 2);
+    c.fillStyle = '#ffd0b0'; c.fillRect(x + 1, y, 1, 1);
+  }
+}
+
 function dibujarVidaEnemigo(c, e) {
-  const est = e.estados.find(v => v.tipo !== 'sangrado'), col = est ? COLOR_ESTADO[est.tipo] : MARCO.vida;
+  const est = e.estados.find(v => v.tipo !== 'sangrado'), col = e.escudos ? VIDA_ESCUDO : est ? COLOR_ESTADO[est.tipo] : MARCO.vida;
   const x = e.x - 22 + (e.sacude ? Math.round(Math.sin(Bt.t * 70) * 1.5) : 0), y = FBASE + 3, w = 42;
   const vida = Math.round(w * Math.max(0, e.vida) / e.vidaMax), resto = Math.round(w * Math.max(0, e.fantasma ?? e.vida) / e.vidaMax);
   c.fillStyle = MARCO.fondo; c.fillRect(x, y, w + 2, 4);
@@ -1459,9 +1486,10 @@ function dibujarVidaEnemigo(c, e) {
   c.fillStyle = col[1]; c.fillRect(x + 1, y + 1, vida, 2);
   c.fillStyle = col[2]; c.fillRect(x + 1, y + 1, vida, 1);
   if (e.sacude > 0.15) { c.fillStyle = RAMPS[S.env][5]; c.fillRect(x + 1, y + 1, vida, 2); }
+  for (let n = 0; n < e.escudos; n++) dibujarEscudo(c, e.x - e.escudos * 5 + n * 10 + 1, FBASE + 9);
   // estados debajo: parpadean cuando les queda el último turno
   e.estados.forEach((v, n) => {
-    const ix = e.x - 4 - (e.estados.length - 1) * 5 + n * 10, iy = FBASE + 9;
+    const ix = e.x - 4 - (e.estados.length - 1) * 5 + n * 10, iy = FBASE + (e.escudos ? 19 : 9);
     if (v.turnos === 1 && Math.sin(Bt.t * 12) < 0) return;
     dibujarIcono(c, v.tipo, ix, iy);
     if (v.tipo === 'sangrado') { c.fillStyle = COLOR_ESTADO.sangrado[2]; for (let k = 0; k < v.pilas; k++) c.fillRect(ix + k * 2, iy + 8, 1, 1); }
@@ -1496,7 +1524,7 @@ function dibujarLinea(c) {
   // lugar de Turno
   c.fillStyle = MARCO.fondo; c.fillRect(L.turno - 3, L.y - 3, L.tam + 6, L.tam + 6);
   c.strokeStyle = MARCO.luz; c.lineWidth = 1; c.strokeRect(L.turno - 2.5, L.y - 2.5, L.tam + 5, L.tam + 5);
-  c.font = '10px "Jacquard 12", serif'; c.textAlign = 'right'; c.fillStyle = MARCO.luz;
+  c.font = '10px "New Rocker", serif'; c.textAlign = 'right'; c.fillStyle = MARCO.luz;
   c.fillText('Turno', L.turno - 6, cy + 3);
   c.textAlign = 'left';
   // los que vuelven pasan por debajo de la fila
@@ -1515,7 +1543,7 @@ function dibujarReparto(c, u, x, y) {
   c.fillStyle = MARCO.piedra; c.fillRect(x, y, w, 4);
   c.fillStyle = MARCO.fondo; c.fillRect(x + 1, y + 1, w - 2, 2);
   c.fillStyle = MARCO.luz; c.fillRect(x + 1, y + 1, Math.round((w - 2) * frac), 2);
-  c.font = '9px "Jersey 10", serif'; c.textAlign = 'left'; c.fillStyle = MARCO.luz;
+  c.font = '9px "New Rocker", serif'; c.textAlign = 'left'; c.fillStyle = MARCO.luz;
   c.fillText(`Nv ${a.nivel}`, x, y + 13);
   if (a.nivel > (a.nivel0 ?? (a.nivel0 = a.nivel))) {
     // flecha hacia arriba al final de la barra
@@ -1551,12 +1579,13 @@ function dibujarBatalla(c) {
   dibujarParticulas(c);
   for (const e of b.enemigos) {
     if (e.vida <= 0 || aparicion(e) < 1) continue;
+    dibujarOjos(c, e);
     dibujarVidaEnemigo(c, e);
     if ((Bt.fase === 'objetivo' && Bt.lista[Bt.tsel] === e) || b.actual === e) {
       // la flecha va sobre la cabeza real del sprite y el nombre arriba de ella
       const y = Math.max(15, FBASE - e.tam + topeVisible(e) - 9);
       const n = capaNitida();
-      n.font = '10px "Jacquard 12", serif'; n.textAlign = 'center';
+      n.font = '10px "New Rocker", serif'; n.textAlign = 'center';
       n.fillStyle = '#000'; n.fillText(e.nombre, e.x + 0.5, y - 3.5);
       n.fillStyle = R[5]; n.fillText(e.nombre, e.x, y - 4);
       c.fillStyle = R[5];

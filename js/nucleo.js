@@ -112,7 +112,7 @@ const NUCLEO = (() => {
       const d = D.enemigos[id], n = ids.filter(x => x === id).length;
       letras[id] = (letras[id] || 0) + 1;
       return { enemigo: true, tipo: id, i, nombre: d.nombre + (n > 1 ? ` ${'ABCD'[letras[id] - 1]}` : ''), sprite: d.sprite, imagen: d.imagen || null, vida: Math.round(d.vida * fuerza), vidaMax: Math.round(d.vida * fuerza),
-        golpe: d.ataque, defensa: d.defensa, velocidad: d.velocidad, critico: 0.05, esquiva: 0, exp: d.exp, jefe: !!d.jefe, especial: d.especial || null, robaImpetu: !!d.roba_impetu, turnos: 0, estados: [] };
+        golpe: d.ataque, defensa: d.defensa, velocidad: d.velocidad, critico: 0.05, esquiva: 0, exp: d.exp, jefe: !!d.jefe, especial: d.especial || null, robaImpetu: !!d.roba_impetu, turnos: 0, estados: [], fase: d.fase || null, escudos: 0, enfurecido: false };
     });
     const aliados = vivos(grupo);
     aliados.forEach((u, i) => Object.assign(u, { i, impetu: u.impetuInicial, guardia: false, provoca: 0, defensaExtra: 0, esquivaSegura: false }));
@@ -143,7 +143,11 @@ const NUCLEO = (() => {
     b.actual = u;
     if (u.enemigo) {
       // veneno y quemadura lastiman al empezar su turno; el sangrado sólo acumula
-      for (const v of u.estados) if (v.turnos) { u.vida -= v.por_turno; v.turnos--; eventos.push({ tipo: 'dano', quien: u, valor: v.por_turno, estado: v.tipo }); }
+      for (const v of u.estados) if (v.turnos) {
+        v.turnos--;
+        if (u.escudos) continue;      // mientras tenga escudos, los estados no le bajan la vida
+        restarVida(u, v.por_turno, eventos); eventos.push({ tipo: 'dano', quien: u, valor: v.por_turno, estado: v.tipo });
+      }
       u.estados = u.estados.filter(v => v.tipo === 'sangrado' || v.turnos > 0);
       if (u.vida <= 0) eventos.push({ tipo: 'muerte', quien: u });
     } else {
@@ -167,9 +171,24 @@ const NUCLEO = (() => {
     herir(t, dano, eventos, critico);
   }
 
-  function herir(t, dano, eventos, critico = false) {
-    if (t.guardia) dano = Math.max(1, Math.round(dano / 2));
+  // Baja la vida; al cruzar el umbral de su fase, el enemigo se detiene ahí y se cubre con escudos
+  function restarVida(t, dano, eventos) {
     t.vida -= dano;
+    if (!t.fase || t.enfurecido || t.vida <= 0 || t.vida > t.vidaMax * t.fase.umbral) return;
+    const f = t.fase;
+    t.enfurecido = true; t.escudos = f.escudos;
+    t.vida = Math.ceil(t.vidaMax * f.umbral);
+    t.velocidad *= f.velocidad;
+    t.golpe = t.golpe.map(v => Math.round(v * f.dano));
+    if (t.especial) t.especial = { ...t.especial, dano: t.especial.dano.map(v => Math.round(v * f.dano)) };
+    eventos.push({ tipo: 'fase', quien: t });
+  }
+
+  function herir(t, dano, eventos, critico = false) {
+    // cada golpe se lleva un escudo entero, sin importar cuánto pegue
+    if (t.escudos > 0) { t.escudos--; eventos.push({ tipo: 'escudo', quien: t, quedan: t.escudos }); return; }
+    if (t.guardia) dano = Math.max(1, Math.round(dano / 2));
+    restarVida(t, dano, eventos);
     eventos.push({ tipo: 'dano', quien: t, valor: dano, critico });
     if (t.vida <= 0) eventos.push({ tipo: 'muerte', quien: t });
   }
@@ -225,9 +244,10 @@ const NUCLEO = (() => {
     if (!v) { v = { tipo: 'sangrado', pilas: 0, umbral: entre(azar, 3, 4) }; t.estados.push(v); }
     v.pilas++;
     if (v.pilas < v.umbral) { eventos.push({ tipo: 'texto', clave: 'estado', quien: t, estado: 'sangrado' }); return; }
+    if (t.escudos) return;
     t.estados = t.estados.filter(x => x !== v);
     const dano = Math.max(1, Math.round(t.vidaMax * e.estallido));
-    t.vida -= dano;
+    restarVida(t, dano, eventos);
     eventos.push({ tipo: 'dano', quien: t, valor: dano, estado: 'estallido', critico: true });
     if (t.vida <= 0) eventos.push({ tipo: 'muerte', quien: t });
   }
@@ -235,10 +255,10 @@ const NUCLEO = (() => {
   // Hace estallar todas las pilas de sangrado de golpe
   function estallar(t, e, eventos) {
     const v = t.estados.find(x => x.tipo === 'sangrado');
-    if (!v || t.vida <= 0) return;
+    if (!v || t.vida <= 0 || t.escudos) return;
     t.estados = t.estados.filter(x => x !== v);
     const dano = Math.max(1, Math.round(t.vidaMax * e.por_pila * v.pilas));
-    t.vida -= dano;
+    restarVida(t, dano, eventos);
     eventos.push({ tipo: 'dano', quien: t, valor: dano, estado: 'estallido', critico: true });
     if (t.vida <= 0) eventos.push({ tipo: 'muerte', quien: t });
   }

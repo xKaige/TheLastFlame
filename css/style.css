@@ -1,7 +1,7 @@
 :root {
   --c0: #07050c; --c1: #22122e; --c2: #4f2148; --c3: #933a45; --c4: #d9753f; --c5: #f5c98a;
-  --f-title: 'Jacquard 12', 'Grenze Gotisch', serif;
-  --f-body: 'Jersey 10', 'Grenze', serif;
+  --f-title: 'New Rocker', 'Grenze Gotisch', serif;
+  --f-body: 'New Rocker', 'Grenze', serif;
 }
 /* Grenze Gotisch en negrita: a tamaño chico el trazo fino se pierde */
 #title .t1, #stName, .box, #create .ctitle, #cName, #create .chip.on, #create .gobtn,
@@ -11,7 +11,7 @@ html, body { margin: 0; height: 100%; background: #000; overflow: hidden; cursor
 #stage {
   position: absolute; left: 0; top: 0; width: 480px; height: 270px;
   transform-origin: 0 0;
-  font-family: var(--f-body); font-weight: 400; font-synthesis: none; font-size-adjust: 0.56;
+  font-family: var(--f-body); font-weight: 400; font-synthesis: none;
   color: var(--c5);
   background: var(--c0);
 }
@@ -29,7 +29,7 @@ html, body { margin: 0; height: 100%; background: #000; overflow: hidden; cursor
 
 /* ---------- Título ---------- */
 #title { position: absolute; inset: 0; text-align: center; text-shadow: 0 0 2px #000, 0 0 6px #000; }
-#title .t1 { position: absolute; top: 14px; width: 100%; font-family: var(--f-title); font-size: 34px; color: var(--c5); letter-spacing: 1px; }
+#title .t1 { position: absolute; top: 14px; width: 100%; font-family: 'Jacquard 12', serif; font-size: 34px; color: var(--c5); letter-spacing: 1px; }
 #title .t2 { position: absolute; top: 62px; width: 100%; font-size: 11px; color: var(--c4); }
 #title .t3 { position: absolute; bottom: 30px; width: 100%; font-size: 13px; animation: blink 1.6s steps(2) infinite; }
 #title .t4 { display: none; position: absolute; bottom: 8px; width: 100%; font-size: 7px; color: var(--c4); opacity: 0.85; }

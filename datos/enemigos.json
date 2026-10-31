@@ -593,7 +593,7 @@
   "reyOsario": {
     "nombre": "El Rey del Osario",
     "sprite": "boneKing",
-    "vida": 290,
+    "vida": 240,
     "ataque": [
       10,
       15
@@ -774,7 +774,23 @@
           "capa": -1.2
         }
       ]
-    }
+    },
+    "fase": {
+      "umbral": 0.5,
+      "escudos": 5,
+      "velocidad": 1.25,
+      "dano": 1.1
+    },
+    "ojos": [
+      [
+        58,
+        14
+      ],
+      [
+        62,
+        14
+      ]
+    ]
   },
   "necrofago": {
     "nombre": "Necrófago",
