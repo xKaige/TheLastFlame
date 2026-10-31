@@ -1464,7 +1464,7 @@ function dibujarLinea(c) {
   // lugar de Turno
   c.fillStyle = MARCO.fondo; c.fillRect(L.turno - 3, L.y - 3, L.tam + 6, L.tam + 6);
   c.strokeStyle = MARCO.luz; c.lineWidth = 1; c.strokeRect(L.turno - 2.5, L.y - 2.5, L.tam + 5, L.tam + 5);
-  c.font = '700 8px "Grenze Gotisch", serif'; c.textAlign = 'right'; c.fillStyle = MARCO.luz;
+  c.font = '10px "Jacquard 12", serif'; c.textAlign = 'right'; c.fillStyle = MARCO.luz;
   c.fillText('Turno', L.turno - 6, cy + 3);
   c.textAlign = 'left';
   // los que vuelven pasan por debajo de la fila
@@ -1483,7 +1483,7 @@ function dibujarReparto(c, u, x, y) {
   c.fillStyle = MARCO.piedra; c.fillRect(x, y, w, 4);
   c.fillStyle = MARCO.fondo; c.fillRect(x + 1, y + 1, w - 2, 2);
   c.fillStyle = MARCO.luz; c.fillRect(x + 1, y + 1, Math.round((w - 2) * frac), 2);
-  c.font = '700 7px "Grenze Gotisch", serif'; c.textAlign = 'left'; c.fillStyle = MARCO.luz;
+  c.font = '9px "Jersey 10", serif'; c.textAlign = 'left'; c.fillStyle = MARCO.luz;
   c.fillText(`Nv ${a.nivel}`, x, y + 13);
   if (a.nivel > (a.nivel0 ?? (a.nivel0 = a.nivel))) {
     // flecha hacia arriba al final de la barra
@@ -1524,7 +1524,7 @@ function dibujarBatalla(c) {
       // la flecha va sobre la cabeza real del sprite y el nombre arriba de ella
       const y = FBASE - e.tam + topeVisible(e) - 9;
       const n = capaNitida();
-      n.font = '700 11px "Grenze Gotisch", serif'; n.textAlign = 'center';
+      n.font = '10px "Jacquard 12", serif'; n.textAlign = 'center';
       n.fillStyle = '#000'; n.fillText(e.nombre, e.x + 0.5, y - 3.5);
       n.fillStyle = R[5]; n.fillText(e.nombre, e.x, y - 4);
       c.fillStyle = R[5];
@@ -1550,9 +1550,9 @@ function dibujarBatalla(c) {
     if (Bt.fase === 'objetivo' && Bt.lista[Bt.tsel] === u) marcoApuntado(n, x, y);
     if (u.vida <= 0) ditherFill(n, x + 1, y + 1, 44, 44, 0.7, R[0]);
     else if (u.golpeado > 0.12) ditherFill(n, x + 1, y + 1, 44, 44, 0.45, '#b52a2a');
-    placa(c, x + 48 + (u.sacude ? Math.round(Math.sin(Bt.t * 70)) : 0), y + 12, CW - 48, 9, Math.max(0, u.vida) / u.vidaMax, MARCO.vida, marcado, Math.max(0, u.fantasma ?? u.vida) / u.vidaMax);
-    if (Bt.fase === 'botin' && u.reparto) dibujarReparto(n, u, x + 49, y + 24);
-    else if (Bt.fase !== 'botin') for (let k = 0; k < NUCLEO.IMP_TOPE; k++) rombo(c, x + 50 + k * 10, y + 23, k < u.impetu);
+    placa(c, x + 48 + (u.sacude ? Math.round(Math.sin(Bt.t * 70)) : 0), y + 15, CW - 48, 9, Math.max(0, u.vida) / u.vidaMax, MARCO.vida, marcado, Math.max(0, u.fantasma ?? u.vida) / u.vidaMax);
+    if (Bt.fase === 'botin' && u.reparto) dibujarReparto(n, u, x + 49, y + 27);
+    else if (Bt.fase !== 'botin') for (let k = 0; k < NUCLEO.IMP_TOPE; k++) rombo(c, x + 50 + k * 10, y + 26, k < u.impetu);
   }
 }
 

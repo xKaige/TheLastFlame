@@ -49,7 +49,7 @@ const habilidadesConocidas = p => [...D.clases[p.clase].habilidades, ...X.grimor
 // Lo que se puede elegir en la pestaña abierta
 function filasTab() {
   const p = PJ.lista[PJ.i];
-  if (PJ.tab === 0) return [...(p.puntos ? REGLAS_ATR.lista.map(a => ({ atr: a })) : []), ...LUGARES_EQUIPO.map(s => ({ slot: s[0] }))];
+  if (PJ.tab === 0) return [...REGLAS_ATR.lista.map(a => ({ atr: a })), ...LUGARES_EQUIPO.map(s => ({ slot: s[0] }))];
   if (PJ.tab === 1) return habilidadesConocidas(p).map(id => ({ hab: id }));
   return X.mochila.map(id => ({ obj: id }));
 }
@@ -116,10 +116,13 @@ function pintarPj() {
 
 function accionPj(f) {
   const p = PJ.lista[PJ.i];
-  if (f.atr) { NUCLEO.subirAtributo(D, p, f.atr); sfx('level'); }
+  if (f.atr) {
+    if (p.puntos) { NUCLEO.subirAtributo(D, p, f.atr); sfx('level'); } else { PJ.msg = 'No hay puntos para repartir.'; sfx('bump'); }
+  }
   else if (f.slot) {
-    PJ.sub = { slot: f.slot, opciones: [null, ...new Set(X.mochila.filter(id => D.objetos[id].tipo === f.slot))] };
-    PJ.sel = 0; sfx('select');
+    const propios = [...new Set(X.mochila.filter(id => D.objetos[id].tipo === f.slot))];
+    if (!propios.length && !p.equipo[f.slot]) { PJ.msg = 'No hay nada para equipar acá.'; sfx('bump'); }
+    else { PJ.sub = { slot: f.slot, opciones: [null, ...propios], volver: PJ.sel }; PJ.sel = 0; sfx('select'); }
   } else if (f.hab) {
     if (!PJ.edita) { PJ.msg = 'Sólo se cambian en el Hogar o en un santuario.'; sfx('bump'); }
     else if (p.habilidades.includes(f.hab)) { p.habilidades = p.habilidades.filter(id => id !== f.hab); sfx('select'); }
@@ -136,7 +139,7 @@ function equiparElegido() {
   if (viejo) X.mochila.push(viejo);
   p.equipo[slot] = id;
   NUCLEO.recalcular(D, p);
-  PJ.sub = null; PJ.sel = 0; sfx('chest');
+  PJ.sel = PJ.sub.volver; PJ.sub = null; sfx('chest');
   pintarPj();
 }
 
@@ -145,7 +148,7 @@ function pjAction(act) {
   if (act === 'fwd' || act === 'back') { if (n) { PJ.sel = (PJ.sel + (act === 'fwd' ? n - 1 : 1)) % n; sfx('select'); } }
   else if (PJ.sub) {
     if (act === 'ok') return equiparElegido();
-    if (act === 'cancel') { PJ.sub = null; PJ.sel = 0; }
+    if (act === 'cancel') { PJ.sel = PJ.sub.volver; PJ.sub = null; }
   }
   else if (act === 'turnL' || act === 'turnR') { PJ.tab = (PJ.tab + (act === 'turnL' ? 2 : 1)) % 3; PJ.sel = 0; sfx('select'); }
   else if (act === 'strafeL' || act === 'strafeR') { PJ.i = (PJ.i + (act === 'strafeL' ? PJ.lista.length - 1 : 1)) % PJ.lista.length; PJ.sel = 0; sfx('select'); }

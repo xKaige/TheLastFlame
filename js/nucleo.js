@@ -99,6 +99,7 @@ const NUCLEO = (() => {
     while (p.exp >= p.nivel * D.mazmorra.exp_por_nivel) {
       p.exp -= p.nivel * D.mazmorra.exp_por_nivel; p.nivel++; subio = true; p.puntos++;
       p.base.vida += D.mazmorra.mejora_nivel.vida; p.base.ataque += D.mazmorra.mejora_nivel.ataque;
+      for (const [a, v] of Object.entries(D.clases[p.clase].crecimiento)) p.atributos[a] += v;   // lo que crece solo, según la clase
       recalcular(D, p);
     }
     return subio;

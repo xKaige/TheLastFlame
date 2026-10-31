@@ -7,12 +7,12 @@
 #bCards .bcard { position: absolute; top: 216px; width: 106px; height: 46px; padding-left: 49px; box-sizing: border-box; }
 #bCards .bcard.on { top: 213px; }
 #bCards .bcard.down { opacity: 0.45; }
-#bCards .bn { display: flex; justify-content: space-between; align-items: flex-start; height: 11px; font-family: var(--f-title); font-size: 9.5px; line-height: 11px; color: var(--c5); white-space: nowrap; overflow: hidden; }
-#bCards .bn small { font-family: var(--f-body); font-size: 6px; line-height: 11px; color: var(--c4); margin: 0 4px 0 2px; }
+#bCards .bn { display: flex; justify-content: space-between; align-items: flex-start; height: 11px; font-family: var(--f-title); font-size: 10px; line-height: 11px; color: var(--c5); white-space: nowrap; overflow: visible; }
+#bCards .bn small { flex: none; font-family: var(--f-body); font-size: 7px; font-size-adjust: none; line-height: 11px; color: var(--c4); margin: 0 3px 0 2px; }
 #bCards .bfila { position: absolute; left: 51px; right: 5px; height: 9px; display: flex; justify-content: space-between; font-size: 7px; line-height: 9px; color: var(--c5); text-shadow: 0 1px 0 #000, 0 0 2px #000; }
 #bCards .bfila b { font-weight: 600; }
-#bCards .bfila.hp { top: 12px; }
-#bCards .bestados { position: absolute; left: 48px; top: 33px; display: flex; gap: 2px; }
+#bCards .bfila.hp { top: 15px; }
+#bCards .bestados { position: absolute; left: 48px; top: 36px; display: flex; gap: 2px; }
 #bCards .bestados i { width: 11px; height: 11px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; font-style: normal; font-size: 7px; background: var(--c0); box-shadow: inset 0 0 0 0.5px var(--c3); }
 #bCards .bestados .ic { width: 8px; height: 8px; margin: 0; }
 #bCards .bestados .escudo { color: var(--c5); }
@@ -69,11 +69,11 @@
 #xBanner.hidden { display: none; }
 
 /* menú de acciones: sólo palabras, juntas; la llama del elegido se dibuja en el canvas */
-#bMenu { top: 183px; height: 14px; left: 30px; right: 30px; width: auto; background: none; box-shadow: none; padding: 0; }
-#bMenu .bopts { gap: 3px; }
-#bMenu .bopt { padding: 0 2px 0 7px; font-size: 10px; line-height: 13px; color: var(--c4); background: none; text-shadow: 0 1px 0 #000, 0 0 3px #000; }
+#bMenu { top: 180px; height: 24px; left: 16px; right: 16px; width: auto; background: none; box-shadow: none; padding: 0; }
+#bMenu .bopts { gap: 1px; align-items: flex-start; }
+#bMenu .bopt { display: flex; flex-direction: column; align-items: center; padding: 0 3px 0 7px; font-size: 10px; line-height: 12px; color: var(--c4); background: none; text-shadow: 0 1px 0 #000, 0 0 3px #000; }
 #bMenu .bopt.sel { background: none; color: var(--c5); font-family: var(--f-title); font-weight: 700; }
-#bMenu .bopt span, #bMenu .bopt.sel span { color: var(--c4); }
+#bMenu .bopt span, #bMenu .bopt.sel span { color: var(--c4); line-height: 6px; font-size: 5.5px; }
 
 /* números de daño por estado */
 .fnum.est-veneno { color: #b6e36a; }

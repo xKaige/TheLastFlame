@@ -1,7 +1,7 @@
 :root {
   --c0: #07050c; --c1: #22122e; --c2: #4f2148; --c3: #933a45; --c4: #d9753f; --c5: #f5c98a;
-  --f-title: 'Grenze Gotisch', 'Times New Roman', serif;
-  --f-body: 'Grenze', 'Georgia', serif;
+  --f-title: 'Jacquard 12', 'Grenze Gotisch', serif;
+  --f-body: 'Jersey 10', 'Grenze', serif;
 }
 /* Grenze Gotisch en negrita: a tamaño chico el trazo fino se pierde */
 #title .t1, #stName, .box, #create .ctitle, #cName, #create .chip.on, #create .gobtn,
@@ -11,7 +11,7 @@ html, body { margin: 0; height: 100%; background: #000; overflow: hidden; cursor
 #stage {
   position: absolute; left: 0; top: 0; width: 480px; height: 270px;
   transform-origin: 0 0;
-  font-family: var(--f-body); font-weight: 400;
+  font-family: var(--f-body); font-weight: 400; font-synthesis: none; font-size-adjust: 0.56;
   color: var(--c5);
   background: var(--c0);
 }

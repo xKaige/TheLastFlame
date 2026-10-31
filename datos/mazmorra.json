@@ -15,8 +15,8 @@
   ],
   "exp_por_nivel": 10,
   "mejora_nivel": {
-    "vida": 6,
-    "ataque": 1
+    "vida": 4,
+    "ataque": 0
   },
   "ceniza": {
     "por_grupo": 3,
