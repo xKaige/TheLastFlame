@@ -482,7 +482,7 @@ function dibujarHogar(c) {
 
 function recambiarCandidatos() { X.candidatos = [...NUCLEO.sortearCaidos(D, X.caidos, azarX), ...NUCLEO.sortearCandidatos(D, azarX)]; }
 function prepararHogar() {
-  if (!X.corridas && !X.plantel.length) X.plantel = NUCLEO.sortearCandidatos(D, azarX).slice(0, REGLAS_HOGAR.plantel_inicial);
+  if (!X.corridas && !X.plantel.length) X.plantel = NUCLEO.sortearCandidatos(D, azarX).filter((p, i, l) => l.findIndex(q => q.clase === p.clase) === i).slice(0, REGLAS_HOGAR.plantel_inicial);
   if (!X.candidatos.length) recambiarCandidatos();
   X.sel = X.sel.filter(p => X.plantel.includes(p));
   guardarX();
@@ -522,8 +522,9 @@ function abrirGrupo(hogar) {
   m.refresh = () => {
     m.text = tr('Elegí hasta {0}: {1} de {0}.', MAX_GRUPO, X.sel.length);
     m.items = X.plantel.map(p => {
-      const on = X.sel.includes(p);
-      return { label: `${fichaDe(p)}${on ? '◆' : '◇'} ${datosDe(p)}`, sub: detalleDe(p), off: !on && X.sel.length >= MAX_GRUPO,
+      // la primera expedición baja sin clases repetidas
+      const on = X.sel.includes(p), repetida = !on && !X.corridas && X.sel.some(q => q.clase === p.clase);
+      return { label: `${fichaDe(p)}${on ? '◆' : '◇'} ${datosDe(p)}`, sub: repetida ? tr('En la primera expedición no se repite la clase.') : detalleDe(p), off: repetida || (!on && X.sel.length >= MAX_GRUPO),
         fn: () => { if (on) X.sel.splice(X.sel.indexOf(p), 1); else X.sel.push(p); m.refresh(); renderMenu(); } };
     });
     if (!m.items.length) m.items.push({ label: 'No hay nadie en el plantel', sub: 'Reclutá a alguien primero.', off: true, fn: () => {} });
@@ -892,7 +893,7 @@ function efecto(o) {
   if (o.efecto === 'reclutar') {
     if (NUCLEO.vivos(X.grupo).length >= D.mazmorra.tamano_grupo) { X.ceniza += 4; log('El grupo está completo: te da su Ceniza y sigue solo (+4).', 'good'); }
     else {
-      const ms = Object.keys(D.modelos);
+      const clases = NUCLEO.vivos(X.grupo).map(q => q.clase), ms = Object.keys(D.modelos).filter(m => X.corridas > 1 || !clases.includes(D.modelos[m].clase));
       const p = NUCLEO.crearPersonaje(D, ms[Math.floor(azarX() * ms.length)], azarX);
       X.grupo.push(p); X.plantel.push(p); log(tr('{0} se suma al grupo.', p.nombre), 'good');
     }

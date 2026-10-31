@@ -4,7 +4,7 @@
   --f-body: 'New Rocker', 'Grenze', serif;
 }
 /* Grenze Gotisch en negrita: a tamaño chico el trazo fino se pierde */
-#title .t1, #stName, .box, #create .ctitle, #cName, #create .chip.on, #create .gobtn,
+#stName, .box, #create .ctitle, #cName, #create .chip.on, #create .gobtn,
 #inv .ihead, #inv .iname.t2, #iDetail .dname, #menu .mtitle, #menu .mopt.sel .ml, #screenMsg .big { font-weight: 700; }
 html, body { margin: 0; height: 100%; background: #000; overflow: hidden; cursor: default; user-select: none; }
 
@@ -29,8 +29,10 @@ html, body { margin: 0; height: 100%; background: #000; overflow: hidden; cursor
 
 /* ---------- Título ---------- */
 #title { position: absolute; inset: 0; text-align: center; text-shadow: 0 0 2px #000, 0 0 6px #000; }
-#title .t1 { position: absolute; top: 14px; width: 100%; font-family: 'Jacquard 12', serif; font-size: 34px; color: var(--c5); letter-spacing: 1px; }
-#title .t2 { position: absolute; top: 62px; width: 100%; font-size: 11px; color: var(--c4); }
+#title .t1 { position: absolute; top: 6px; left: 50%; height: 126px; transform: translateX(-50%); filter: drop-shadow(0 0 6px #000); }
+/* el logo va sólo con el menú principal: las otras pantallas del título usan ese lugar */
+#stage:has(#menu.bg-title:not(.compact):not(.hidden)) #title .t1, #stage:has(#menu.bg-title:not(.compact):not(.hidden)) #title .t2 { display: none; }
+#title .t2 { position: absolute; top: 133px; width: 100%; font-size: 11px; color: var(--c4); }
 #title .t3 { position: absolute; bottom: 30px; width: 100%; font-size: 13px; animation: blink 1.6s steps(2) infinite; }
 #title .t4 { display: none; position: absolute; bottom: 8px; width: 100%; font-size: 7px; color: var(--c4); opacity: 0.85; }
 /* versión del juego, abajo a la izquierda (al cambiarla, también en package.json) */
@@ -228,6 +230,7 @@ html, body { margin: 0; height: 100%; background: #000; overflow: hidden; cursor
 /* ---------- Menús (título, pausa, ranuras) ---------- */
 #menu { position: absolute; font-size: 10px; line-height: 12px; text-shadow: 0 0 2px #000; }
 #menu.bg-title { left: 150px; top: 86px; width: 180px; }
+#menu.bg-title.compact { top: 150px; }
 #menu.bg-game { left: 50px; top: 30px; width: 240px; }
 #menu .mtitle { font-family: var(--f-title); font-size: 16px; line-height: 19px; color: var(--c5); margin-bottom: 5px; text-align: center; }
 #menu .mopt { padding: 2px 6px 3px; margin-bottom: 2px; border-left: 1px solid var(--c2); background: rgba(0, 0, 0, 0.5); cursor: pointer; }

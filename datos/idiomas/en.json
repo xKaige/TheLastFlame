@@ -983,5 +983,6 @@
   "Expedición en curso · piso {0} · {1}": "Expedition in progress · floor {0} · {1}",
   "El grupo sigue adelante.": "The party presses on.",
   "Máximo de la zona": "Zone maximum",
-  "Nv {0} máx": "Lv {0} max"
+  "Nv {0} máx": "Lv {0} max",
+  "En la primera expedición no se repite la clase.": "Classes cannot repeat on the first expedition."
 }
