@@ -11,6 +11,17 @@ for (const f of ['clases', 'habilidades', 'objetos', 'modelos', 'enemigos', 'maz
   x.open('GET', `datos/${f}.json`, false); x.send();
   D[f] = JSON.parse(x.responseText);
 }
+// Los textos de los datos se leen ya traducidos
+localizeAllIn(D.clases, ['nombre', 'rol']);
+localizeAllIn(D.modelos, ['titulo', 'rasgo']);
+localizeAllIn(D.habilidades, ['nombre', 'descripcion', 'pista']);
+localizeAllIn(D.objetos, ['nombre', 'descripcion']);
+localizeAllIn(D.enemigos, ['nombre']);
+for (const e of Object.values(D.enemigos)) if (e.especial) localize(e.especial, ['nombre']);
+localizeAllIn(D.mazmorra.pisos, ['nombre']);
+localizeMap(D.mazmorra.atributos.nombres);
+localizeAllIn(D.historia.modelos, ['motivo', 'baja', 'piso', 'fondo', 'muerte']);
+localizeAllIn(D.historia.finales, ['label', 'sub']);
 const CLAVE = 'expedicion.estado';
 const X = { ceniza: 0, caidos: [], corridas: 0, plantel: [], candidatos: [], leyendas: [], grimorio: [], mochila: [], memoria: { hondo: 1, reveladas: [], ultimoCaido: null, habitante: null, finales: {} }, perdidos: [], grupo: [], sel: [], ganada: 0 };
 try { Object.assign(X, JSON.parse(STORE.get(CLAVE) || '{}')); } catch (e) { /* sin progreso */ }
@@ -44,7 +55,7 @@ const baseX = { draw, update, onAction, updateHUD, enterLevel, afterStep };
 
 // Retratos de cada modelo: el PNG se pasa por la paleta del piso, como todo lo demás
 const RET = {};
-for (const [id, m] of Object.entries(D.modelos)) RET[id] = { img: Object.assign(new Image(), { src: `interfaz/retratos/${m.retrato}.png` }), c: {} };
+for (const [id, m] of Object.entries(D.modelos)) RET[id] = { img: Object.assign(new Image(), { src: tr('interfaz/retratos/{0}.png', m.retrato) }), c: {} };
 function retratoX(id, size, ramp = S.env) {
   const r = RET[id], k = ramp + size;
   if (!r.c[k] && r.img.complete && r.img.naturalWidth) r.c[k] = spriteCanvas(spriteDesdeImagen(r.img, 128), size, ramp, 1.05);
@@ -76,7 +87,7 @@ function spriteDesdeImagen(img, size) {
 }
 
 const COFRES = { chest: D.mazmorra.accesorios.cofres.cerrado, chestOpen: D.mazmorra.accesorios.cofres.abierto };
-for (const k in COFRES) COFRES[k] = Object.assign(new Image(), { src: `interfaz/mazmorra/cripta/accesorios/${COFRES[k]}.png` });
+for (const k in COFRES) COFRES[k] = Object.assign(new Image(), { src: tr('interfaz/mazmorra/cripta/accesorios/{0}.png', COFRES[k]) });
 
 function aplicarEnemigosEnMapa() {
   for (const [k, img] of Object.entries(COFRES)) {
@@ -112,7 +123,7 @@ function aplicarTexturas() {
 // Accesorios de pared: cada uno es una variante del muro, así reciben la perspectiva y la luz del motor.
 // Se eligen por posición, para que un nivel quede siempre igual.
 const ACC_BASE = 10, ACCESORIOS = D.mazmorra.accesorios;
-for (const a of ACCESORIOS.lista) a.img = Object.assign(new Image(), { src: `interfaz/mazmorra/cripta/accesorios/${a.imagen}.png` });
+for (const a of ACCESORIOS.lista) a.img = Object.assign(new Image(), { src: tr('interfaz/mazmorra/cripta/accesorios/{0}.png', a.imagen) });
 function muroConAccesorio(base, a) {
   const c = document.createElement('canvas'); c.width = c.height = TEX;
   // el motor ensancha los muros (el ancho de pantalla rinde más que el alto): se compensa para que el dibujo no se deforme
@@ -148,7 +159,7 @@ function decorarMuros(w, nivel) {
 
 // Accesorios de techo: sprites de la altura del muro con el dibujo arriba, así siempre tocan el techo.
 // Nunca bajan de la línea de los ojos: el grupo pasa por debajo y no chocan con nada.
-const TECHO = ACCESORIOS.techo, IMG_TECHO = TECHO.lista.map(n => Object.assign(new Image(), { src: `interfaz/mazmorra/cripta/accesorios/${n}.png` }));
+const TECHO = ACCESORIOS.techo, IMG_TECHO = TECHO.lista.map(n => Object.assign(new Image(), { src: tr('interfaz/mazmorra/cripta/accesorios/{0}.png', n) }));
 const SPR_TECHO = [];
 function spriteTecho(n) {
   const img = IMG_TECHO[n];
@@ -166,7 +177,7 @@ function colgarDelTecho(w, nivel) {
 }
 // Accesorios de piso: sprites sólidos, siempre en esquinas de sala y donde no dejan nada aislado.
 const PISO = ACCESORIOS.piso;
-for (const a of PISO.lista) a.img = Object.assign(new Image(), { src: `interfaz/mazmorra/cripta/accesorios/${a.imagen}.png` });
+for (const a of PISO.lista) a.img = Object.assign(new Image(), { src: tr('interfaz/mazmorra/cripta/accesorios/{0}.png', a.imagen) });
 function zonaAlcanzable(w, tapado) {
   const pila = [w.start[1] * MW + w.start[0]], visto = new Set(pila);
   while (pila.length) {
@@ -231,7 +242,7 @@ async function iniciarTema(st) {
   st.out.gain.linearRampToValueAtTime(t.volumen, AC.currentTime + 0.25);
 }
 // Cada jefe puede tener su tema en mazmorra.json (jefe_1, jefe_2...); si no, usa el del juego base
-const temaDeJefe = () => (TEMAS[`jefe_${S.floor}`] ? `jefe_${S.floor}` : S.floor === LAST_FLOOR ? 'final' : 'boss');
+const temaDeJefe = () => (TEMAS[`jefe_${S.floor}`] ? tr('jefe_{0}', S.floor) : S.floor === LAST_FLOOR ? 'final' : 'boss');
 const baseSetMusic = setMusic, baseFadeOut = fadeOutTrack;
 window.fadeOutTrack = st => { baseFadeOut(st); if (st.src) setTimeout(() => st.src.stop(), 2500); };
 window.setMusic = name => {
@@ -252,7 +263,7 @@ window.openTitleMenu = () => {
   showScreen(null); setPalette('castle'); setMusic('intro');
   S.mode = 'title';
   const hay = hayPartida(), items = [];
-  if (hay) items.push({ label: 'Continuar', sub: `${X.ceniza} de Ceniza · ${X.plantel.length} en el plantel · ${X.corridas} expedicion${X.corridas === 1 ? '' : 'es'}`, fn: abrirHogar });
+  if (hay) items.push({ label: 'Continuar', sub: tr('{0} de Ceniza · {1} en el plantel · {2} expedicion{3}', X.ceniza, X.plantel.length, X.corridas, X.corridas === 1 ? '' : 'es'), fn: abrirHogar });
   items.push({ label: 'Nueva partida', fn: () => (hay ? confirmMenu('¿Empezar de nuevo? Se borra todo el progreso.', nuevaPartida) : nuevaPartida()) });
   items.push({ label: 'Opciones', fn: openOptionsMenu });
   if (PRUEBA) items.push({ label: 'Peleas de prueba', sub: 'Va directo a una pelea. No se guarda nada.', fn: abrirPeleasDePrueba });
@@ -273,8 +284,8 @@ function abrirPeleasDePrueba() {
   const items = [];
   for (const piso of [1, 2, 3]) {
     const jefes = D.mazmorra.jefes[piso];
-    items.push({ label: `Jefe del piso ${piso}`, sub: nombre(jefes), fn: () => pelearDePrueba(jefes, piso, true) });
-    for (const ids of D.mazmorra.grupos_por_piso[piso]) items.push({ label: `Piso ${piso} <small>· ${nombre(ids)}</small>`, fn: () => pelearDePrueba(ids, piso, false) });
+    items.push({ label: tr('Jefe del piso {0}', piso), sub: nombre(jefes), fn: () => pelearDePrueba(jefes, piso, true) });
+    for (const ids of D.mazmorra.grupos_por_piso[piso]) items.push({ label: tr('Piso {0} <small>· {1}</small>', piso, nombre(ids)), fn: () => pelearDePrueba(ids, piso, false) });
   }
   openMenu({ title: 'Peleas de prueba', cls: 'altar', items });
 }
@@ -303,7 +314,7 @@ window.openPauseMenu = () => openMenu({ title: 'Pausa', items: [
 // Cada escena sale de un dibujo de interfaz/intro; los textos están en historia.json.
 // La última es el Hogar mismo: al terminar, la fogata sigue ardiendo y el juego empieza ahí.
 const ARTE_INTRO = {};
-for (const n of ['velombra', 'escalera', 'rey_llama', 'rey_apagada', 'velombra_apagada', 'boca']) ARTE_INTRO[n] = Object.assign(new Image(), { src: `interfaz/intro/${n}.png` });
+for (const n of ['velombra', 'escalera', 'rey_llama', 'rey_apagada', 'velombra_apagada', 'boca']) ARTE_INTRO[n] = Object.assign(new Image(), { src: tr('interfaz/intro/{0}.png', n) });
 // El fuego del dibujo se mueve por filas: abajo queda quieto, sobre el cuenco, y arriba ondula más
 const LLAMA = { x: 224, w: 74, arriba: 1, abajo: 112 };     // no llega a la mano ni a la cara del rey
 const LLAMA_TEMPLO = { x: 298, w: 28, arriba: 78, abajo: 97 };
@@ -466,8 +477,8 @@ function prepararHogar() {
 // Mientras el plantel no alcance para bajar de a dos, los reclutas son gratis: la partida nunca queda trabada
 const costoRecluta = p => (p.condicion ? p.condicion.ceniza || 0 : X.plantel.length < REGLAS_HOGAR.plantel_gratis ? 0 : REGLAS_HOGAR.costo_recluta);
 const fichaDe = p => `<img class="xr" src="${retratoX(p.modelo, LADO_RETRATO, 'crypt').toDataURL()}" alt="">`;
-const datosDe = p => `${p.nombre} <small>· ${D.clases[p.clase].nombre} nv ${p.nivel}, ${D.modelos[p.modelo].titulo}${p.caido ? ' · caído' : ''}${p.marcado ? ' · marcado' : ''}</small>`;
-const detalleDe = p => `${D.historia.modelos[p.modelo].motivo} ${D.modelos[p.modelo].rasgo}. Vida ${p.vidaMax} · Ataque ${p.ataque} · Velocidad ${p.velocidad}. ${D.clases[p.clase].rol}.`;
+const datosDe = p => tr('{0} <small>· {1} nv {2}, {3}{4}{5}</small>', p.nombre, D.clases[p.clase].nombre, p.nivel, D.modelos[p.modelo].titulo, p.caido ? ' · caído' : '', p.marcado ? ' · marcado' : '');
+const detalleDe = p => tr('{0} {1}. Vida {2} · Ataque {3} · Velocidad {4}. {5}.', D.historia.modelos[p.modelo].motivo, D.modelos[p.modelo].rasgo, p.vidaMax, p.ataque, p.velocidad, D.clases[p.clase].rol);
 
 function abrirHogar() {
   closeAllMenus();
@@ -478,13 +489,13 @@ function abrirHogar() {
     m.text = `Ceniza: <b>${X.ceniza}</b>`;
     const n = X.sel.length;
     m.items = [
-      { label: 'Descender ✠', sub: n ? `Bajan ${n}. Una sola antorcha para todos.` : 'Elegí al menos un portador.', off: !n, fn: partir },
-      { label: `El grupo <small>· ${n} de ${MAX_GRUPO}</small>`, sub: 'Quiénes bajan en esta expedición.', fn: () => abrirGrupo(m) },
-      { label: 'Reclutar', sub: `${X.plantel.length} de ${REGLAS_HOGAR.plantel_max} en el plantel.`, fn: () => abrirReclutas(m) },
-      { label: 'Los caídos', sub: 'Quienes quedaron en la cripta.', off: !X.caidos.length, fn: () => abrirLista('Los caídos', X.caidos, c => `Cayó en el nivel ${c.cayo}. Puede volver a aparecer entre los reclutas.`) },
-      { label: 'Las leyendas', sub: 'Quienes volvieron con la Llama.', off: !X.leyendas.length, fn: () => abrirLista('Las leyendas', X.leyendas, c => `Sobrevivió a la expedición ${c.corrida}.`) },
+      { label: 'Descender ✠', sub: n ? tr('Bajan {0}. Una sola antorcha para todos.', n) : 'Elegí al menos un portador.', off: !n, fn: partir },
+      { label: tr('El grupo <small>· {0} de {1}</small>', n, MAX_GRUPO), sub: 'Quiénes bajan en esta expedición.', fn: () => abrirGrupo(m) },
+      { label: 'Reclutar', sub: tr('{0} de {1} en el plantel.', X.plantel.length, REGLAS_HOGAR.plantel_max), fn: () => abrirReclutas(m) },
+      { label: 'Los caídos', sub: 'Quienes quedaron en la cripta.', off: !X.caidos.length, fn: () => abrirLista('Los caídos', X.caidos, c => tr('Cayó en el nivel {0}. Puede volver a aparecer entre los reclutas.', c.cayo)) },
+      { label: 'Las leyendas', sub: 'Quienes volvieron con la Llama.', off: !X.leyendas.length, fn: () => abrirLista('Las leyendas', X.leyendas, c => tr('Sobrevivió a la expedición {0}.', c.corrida)) },
       { label: 'Personajes', sub: 'Atributos, equipo y habilidades.', off: !X.plantel.length, fn: () => abrirPersonajes(X.plantel, true) },
-      { label: 'Grimorio', sub: `${X.grimorio.length} habilidades desbloqueadas.`, fn: abrirGrimorio },
+      { label: 'Grimorio', sub: tr('{0} habilidades desbloqueadas.', X.grimorio.length), fn: abrirGrimorio },
       { label: 'La historia', sub: 'Lo que pasó con la Llama.', fn: verIntro },
       { label: 'Volver al título', fn: openTitleMenu },
     ];
@@ -496,7 +507,7 @@ function abrirHogar() {
 function abrirGrupo(hogar) {
   const m = { title: 'El grupo', cls: 'altar hogar', items: [], onClose: hogar.refresh };
   m.refresh = () => {
-    m.text = `Elegí hasta ${MAX_GRUPO}: ${X.sel.length} de ${MAX_GRUPO}.`;
+    m.text = tr('Elegí hasta {0}: {1} de {0}.', MAX_GRUPO, X.sel.length);
     m.items = X.plantel.map(p => {
       const on = X.sel.includes(p);
       return { label: `${fichaDe(p)}${on ? '◆' : '◇'} ${datosDe(p)}`, sub: detalleDe(p), off: !on && X.sel.length >= MAX_GRUPO,
@@ -536,7 +547,7 @@ function contratar(p, costo) {
 }
 
 function abrirLista(titulo, lista, nota) {
-  openMenu({ title: titulo, cls: 'altar hogar', items: lista.map(c => ({ label: `${c.nombre} <small>· ${D.clases[c.clase].nombre}, ${D.modelos[c.modelo].titulo}</small>`, sub: nota(c), fn: () => {} })) });
+  openMenu({ title: titulo, cls: 'altar hogar', items: lista.map(c => ({ label: tr('{0} <small>· {1}, {2}</small>', c.nombre, D.clases[c.clase].nombre, D.modelos[c.modelo].titulo), sub: nota(c), fn: () => {} })) });
 }
 
 function partir() {
@@ -596,10 +607,10 @@ window.openChest = c => {
   const r = azarX(), lista = sinDesbloquear('cofre'), objetos = Object.keys(D.objetos);
   if (lista.length && azarX() < D.mazmorra.botin.habilidad) {
     const id = lista[Math.floor(azarX() * lista.length)];
-    desbloquear(id); sfx('level'); log(`Un pergamino: ${D.habilidades[id].nombre} queda en el Grimorio.`, 'em');
+    desbloquear(id); sfx('level'); log(tr('Un pergamino: {0} queda en el Grimorio.', D.habilidades[id].nombre), 'em');
   } else if (azarX() < D.mazmorra.botin.objeto) {
     const id = objetos[Math.floor(azarX() * objetos.length)];
-    X.mochila.push(id); guardarX(); log(`Encuentras ${D.objetos[id].nombre}.`, 'good');
+    X.mochila.push(id); guardarX(); log(tr('Encuentras {0}.', D.objetos[id].nombre), 'good');
   } else if (r < 0.35 && P.potions < BAL.maxPotions) { P.potions++; log('Encuentras una poción de sangre.', 'good'); }
   else if (r < 0.65 && P.oil < BAL.maxOil) { P.oil++; log('Encuentras un frasco de aceite.', 'good'); }
   else { X.ceniza += 3; log('Ceniza tibia en el fondo del cofre (+3).', 'good'); }
@@ -610,7 +621,7 @@ window.usePotion = () => {
   if (!P.potions) { log('No te quedan pociones.'); return; }
   const t = NUCLEO.vivos(X.grupo).sort((a, b) => a.vida / a.vidaMax - b.vida / b.vidaMax)[0];
   P.potions--; const v = Math.round(t.vidaMax * 0.4); t.vida = Math.min(t.vidaMax, t.vida + v);
-  sfx('heal'); log(`${t.nombre} recupera ${v} de vida.`, 'good'); updateHUD();
+  sfx('heal'); log(tr('{0} recupera {1} de vida.', t.nombre, v), 'good'); updateHUD();
 };
 
 // El inventario del base no aplica: se muestra el grupo
@@ -631,7 +642,7 @@ window.afterStep = () => {
 
 // Exploración a pantalla completa: sin panel; mapa, zona y objetos
 const CASILLEROS = {};
-for (const n of ['pocion', 'aceite', 'antorcha']) CASILLEROS[n] = { img: Object.assign(new Image(), { src: `interfaz/hud/casillero_${n}.png` }), c: {} };
+for (const n of ['pocion', 'aceite', 'antorcha']) CASILLEROS[n] = { img: Object.assign(new Image(), { src: tr('interfaz/hud/casillero_{0}.png', n) }), c: {} };
 function casilleroX(n) {
   const k = CASILLEROS[n];
   if (!k.c[S.env] && k.img.complete && k.img.naturalWidth) k.c[S.env] = spriteCanvas(spriteDesdeImagen(k.img, k.img.naturalWidth), k.img.naturalWidth, S.env, 1).toDataURL();
@@ -645,8 +656,8 @@ window.updateHUD = () => {
     ? `<div class="obj">${nombre} <b>${n}</b></div>`
     : `<div class="obj"><i style="background-image:url(${casilleroX(img)})"></i><b>${n}</b></div>`;
   const i = D.mazmorra.niveles.indexOf(S.level), total = D.mazmorra.niveles.length;
-  const nivel = !S.level ? '<small>Santuario</small>' : { hondo: `<small>${i === total - 1 ? 'La guarida' : ['Primer', 'Segundo'][i] + ' descenso'}</small>`, romano: ` · ${['I', 'II', 'III'][i]}`,
-    rombos: `<small>${'◆'.repeat(i + 1)}${'◇'.repeat(total - i - 1)}</small>` }[HUD_X.nivel];
+  const nivel = !S.level ? '<small>Santuario</small>' : { hondo: tr('<small>{0}</small>', i === total - 1 ? 'La guarida' : ['Primer', 'Segundo'][i] + ' descenso'), romano: ` · ${['I', 'II', 'III'][i]}`,
+    rombos: tr('<small>{0}{1}</small>', '◆'.repeat(i + 1), '◇'.repeat(total - i - 1)) }[HUD_X.nivel];
   $('xEsq').innerHTML = `<div class="zona">${D.mazmorra.pisos[S.floor - 1].nombre}${nivel}</div>` +
     `<div class="fila ${HUD_X.objetos}">${objeto('pocion', 'Pociones', P.potions)}${objeto('aceite', 'Aceite', P.oil)}${objeto('antorcha', 'Antorcha', Math.ceil(P.fuel))}</div>` +
     (heridos ? `<div class="alerta">${heridos} en peligro · ${glyph('inv')}</div>` : '');
@@ -752,7 +763,7 @@ let CH = null;
 // La cara de quien habla flota sobre el diálogo; cada línea puede elegir su gesto ("caras" en dialogos.json)
 const CARAS = { sombra: { base: 'sombra', risa: 'sombra_risa', enojo: 'sombra_enojo' } };
 const IMG_CARAS = {};
-for (const g of Object.values(CARAS)) for (const n of Object.values(g)) IMG_CARAS[n] = { img: Object.assign(new Image(), { src: `interfaz/personajes/${n}.png` }), c: {} };
+for (const g of Object.values(CARAS)) for (const n of Object.values(g)) IMG_CARAS[n] = { img: Object.assign(new Image(), { src: tr('interfaz/personajes/{0}.png', n) }), c: {} };
 const CARA = { lado: 124, x: 172, y: 62 };
 function caraDe(nombre) {
   const k = IMG_CARAS[nombre];
@@ -788,7 +799,7 @@ function encadenar(lista, fin) {
   if (!uno) { if (fin) fin(); return; }
   charla(uno, () => encadenar(resto, fin));
 }
-const conNombre = (id, nombre) => ({ ...D.dialogos[id], lineas: D.dialogos[id].lineas.map(l => l.replace('{nombre}', nombre)) });
+const conNombre = (id, nombre) => ({ ...D.dialogos[id], lineas: D.dialogos[id].lineas.map(l => tr(l).replace('{nombre}', nombre)) });
 // Una línea dicha por alguien del grupo, al azar entre los vivos
 function dichoDeAlguien(clave) {
   const v = NUCLEO.vivos(X.grupo), p = v[Math.floor(azarX() * v.length)];
@@ -810,8 +821,8 @@ window.showDialog = (lineas, quien, cara, listo) => {
 function pintarCharla() {
   const { n, i, sel } = CH, q = n.p ? [0, 0, n.p.nombre] : QUIEN[n.quien], ops = i >= n.lineas.length - 1 && n.opciones ? n.opciones.filter(o => o.requiere !== 'pocion' || P.potions > 0) : null;
   CH.ops = ops;
-  $('xCharla').innerHTML = `<div class="cb">${q[2] ? `<div class="cq">${q[2]}</div>` : ''}<div class="ct">${n.lineas[i]}</div>` +
-    (ops ? ops.map((o, k) => `<div class="co${k === sel ? ' sel' : ''}">${o.texto}</div>`).join('') : '<div class="cs">Enter</div>') + '</div>';
+  $('xCharla').innerHTML = `<div class="cb">${q[2] ? `<div class="cq">${tr(q[2])}</div>` : ''}<div class="ct">${tr(n.lineas[i])}</div>` +
+    (ops ? ops.map((o, k) => `<div class="co${k === sel ? ' sel' : ''}">${tr(o.texto)}</div>`).join('') : '<div class="cs">Enter</div>') + '</div>';
 }
 function charlaAction(act) {
   if (CH.ops && (act === 'fwd' || act === 'back')) { CH.sel = (CH.sel + (act === 'fwd' ? CH.ops.length - 1 : 1)) % CH.ops.length; sfx('select'); pintarCharla(); return; }
@@ -825,13 +836,13 @@ function charlaAction(act) {
   if (luego) luego();
 }
 function efecto(o) {
-  if (o.efecto === 'ceniza') { P.potions--; X.ceniza += o.valor; log(`El portador se aleja. +${o.valor} de Ceniza.`, 'good'); }
+  if (o.efecto === 'ceniza') { P.potions--; X.ceniza += o.valor; log(tr('El portador se aleja. +{0} de Ceniza.', o.valor), 'good'); }
   if (o.efecto === 'reclutar') {
     if (NUCLEO.vivos(X.grupo).length >= D.mazmorra.tamano_grupo) { X.ceniza += 4; log('El grupo está completo: te da su Ceniza y sigue solo (+4).', 'good'); }
     else {
       const ms = Object.keys(D.modelos), cs = Object.keys(D.clases);
       const p = NUCLEO.crearPersonaje(D, ms[Math.floor(azarX() * ms.length)], cs[Math.floor(azarX() * cs.length)], azarX);
-      X.grupo.push(p); X.plantel.push(p); log(`${p.nombre} se suma al grupo.`, 'good');
+      X.grupo.push(p); X.plantel.push(p); log(tr('{0} se suma al grupo.', p.nombre), 'good');
     }
   }
   updateHUD();
@@ -898,7 +909,7 @@ const FONDOS = { crypt: Object.assign(new Image(), { src: 'interfaz/batalla/crip
 const ANTORCHAS = { crypt: [[25, 77], [454, 77]] };
 // Dibujos propios de enemigos (campo "imagen" de enemigos.json); los demás usan el sprite del juego base
 const IMG_ENEMIGOS = {};
-for (const d of Object.values(D.enemigos)) if (d.imagen) IMG_ENEMIGOS[d.imagen] = Object.assign(new Image(), { src: `interfaz/enemigos/${d.imagen}.png` });
+for (const d of Object.values(D.enemigos)) if (d.imagen) IMG_ENEMIGOS[d.imagen] = Object.assign(new Image(), { src: tr('interfaz/enemigos/{0}.png', d.imagen) });
 
 function fondoBatalla() {
   const f = FONDOS[S.env] || FONDOS.crypt, n = 480 * 270, g = new Float32Array(n).fill(0.14);
@@ -955,10 +966,10 @@ function siguiente() {
     iniciarAtaqueAnimado(u);
     later(600, () => { if (Bt) { mostrar(NUCLEO.turnoEnemigo(Bt.b, u, azarX)); later(450, () => { if (Bt) Bt.fase = 'cambio'; }); later(800, siguiente); } });
   } else {
-    Bt.ops = [{ id: 'atk', nombre: 'Atacar', descripcion: D.clases[u.clase].doble_golpe ? 'Dos golpes: el segundo, más flojo. +1 Ímpetu.' : 'Golpe común. +1 Ímpetu.', objetivo: 'enemigo' },
+    Bt.ops = [{ id: 'atk', nombre: tr('Atacar'), descripcion: tr(D.clases[u.clase].doble_golpe ? 'Dos golpes: el segundo, más flojo. +1 Ímpetu.' : 'Golpe común. +1 Ímpetu.'), objetivo: 'enemigo' },
       ...NUCLEO.opciones(D, u),
-      { id: 'def', nombre: 'Defender', descripcion: 'Mitad de daño hasta tu próximo turno. +1 Ímpetu.' },
-      { id: 'pot', nombre: 'Poción', descripcion: `Cura un 40% al aliado más herido. Quedan ${P.potions}.`, apagada: !P.potions }];
+      { id: 'def', nombre: tr('Defender'), descripcion: tr('Mitad de daño hasta tu próximo turno. +1 Ímpetu.') },
+      { id: 'pot', nombre: tr('Poción'), descripcion: tr('Cura un 40% al aliado más herido. Quedan {0}.', P.potions), apagada: !P.potions }];
     Bt.sel = 0; Bt.fase = 'menu'; Bt.msg = ''; pintarBatalla();
   }
 }
@@ -980,30 +991,30 @@ function mostrarEvento(e) {
   const q = e.quien, x = q.enemigo ? q.x : CX[q.i] + 26, y = q.enemigo ? FBASE - 60 : CY - 6;
   if (e.tipo === 'dano') {
     q.golpeado = 0.3; golpeBarra(q);
-    numero(x, y, q.enemigo ? String(e.valor) : `−${e.valor}`, e.estado ? `est-${e.estado}` : e.critico ? 'crit' : q.enemigo ? 'hit' : 'hurt');
+    numero(x, y, q.enemigo ? String(e.valor) : `−${e.valor}`, e.estado ? tr('est-{0}', e.estado) : e.critico ? 'crit' : q.enemigo ? 'hit' : 'hurt');
     if (e.estado) efectoEstado(q, e.estado);
     else if (q.enemigo) { efectoGolpe(q, Bt.golpe, e.critico); sfx('hit'); } else { Bt.temblor = Math.max(Bt.temblor, 2); sfx('hurt'); }
     Bt.msg = e.estado === 'estallido' ? '¡La herida se abre!' : '';       // el daño ya se ve en el número que salta
   }
-  if (e.tipo === 'cura') { numero(x, y, `+${e.valor}`, 'heal'); sfx('heal'); chispas(x, CY - 6, 10, [RAMPS[S.env][5], RAMPS[S.env][4]], -30); Bt.msg = `${q.nombre} recupera ${e.valor}.`; }
-  if (e.tipo === 'esquiva') { sfx('miss'); Bt.msg = `${q.nombre} esquiva.`; }
+  if (e.tipo === 'cura') { numero(x, y, `+${e.valor}`, 'heal'); sfx('heal'); chispas(x, CY - 6, 10, [RAMPS[S.env][5], RAMPS[S.env][4]], -30); Bt.msg = tr('{0} recupera {1}.', q.nombre, e.valor); }
+  if (e.tipo === 'esquiva') { sfx('miss'); Bt.msg = tr('{0} esquiva.', q.nombre); }
   if (e.tipo === 'muerte') {
-    Bt.msg = q.enemigo ? `${q.nombre} cae.` : `${q.nombre} cae. Su chispa se apaga.`;
+    Bt.msg = q.enemigo ? tr('{0} cae.', q.nombre) : tr('{0} cae. Su chispa se apaga.', q.nombre);
     if (q.enemigo) { q.muriendo = 0.6; chispas(q.x, FBASE - q.tam * 0.45, 24, [RAMPS[S.env][2], RAMPS[S.env][3], RAMPS[S.env][4]], -18); }
   }
-  if (e.tipo === 'fase') { Bt.msg = `${q.nombre} se enfurece y se cubre de escudos.`; Bt.temblor = 6; Bt.destello = 0.5; sfx('encounter'); chispas(q.x, FBASE - q.tam * 0.5, 30, VIDA_ESCUDO, -24); }
+  if (e.tipo === 'fase') { Bt.msg = tr('{0} se enfurece y se cubre de escudos.', q.nombre); Bt.temblor = 6; Bt.destello = 0.5; sfx('encounter'); chispas(q.x, FBASE - q.tam * 0.5, 30, VIDA_ESCUDO, -24); }
   if (e.tipo === 'escudo') {
     q.golpeado = 0.2; sfx(e.quedan ? 'miss' : 'chest');
     chispas(q.x, FBASE - q.tam * 0.45, e.quedan ? 10 : 34, VIDA_ESCUDO, -30);
-    Bt.msg = e.quedan ? `Quedan ${e.quedan} escudos.` : `Se rompen los escudos de ${q.nombre}.`;
+    Bt.msg = e.quedan ? tr('Quedan {0} escudos.', e.quedan) : tr('Se rompen los escudos de {0}.', q.nombre);
     if (!e.quedan) Bt.temblor = 5;
   }
-  if (e.tipo === 'texto' && e.clave === 'aturdido') Bt.msg = `${q.nombre} no ve nada.`;
-  if (e.tipo === 'texto' && e.clave === 'pierde_turno') Bt.msg = `${q.nombre} pierde el turno.`;
-  if (e.tipo === 'texto' && e.clave === 'jefe_resiste') Bt.msg = `${q.nombre} ni se inmuta.`;
-  if (e.tipo === 'texto' && e.clave === 'resiste') Bt.msg = `${q.nombre} ya tiene ese efecto: no se renueva.`;
+  if (e.tipo === 'texto' && e.clave === 'aturdido') Bt.msg = tr('{0} no ve nada.', q.nombre);
+  if (e.tipo === 'texto' && e.clave === 'pierde_turno') Bt.msg = tr('{0} pierde el turno.', q.nombre);
+  if (e.tipo === 'texto' && e.clave === 'jefe_resiste') Bt.msg = tr('{0} ni se inmuta.', q.nombre);
+  if (e.tipo === 'texto' && e.clave === 'resiste') Bt.msg = tr('{0} ya tiene ese efecto: no se renueva.', q.nombre);
   if (e.tipo === 'texto' && e.clave === 'especial') { Bt.msg = `${q.nombre} ${e.texto}.`; Bt.temblor = 5; Bt.destello = 0.5; }
-  if (e.tipo === 'texto' && e.clave === 'roba') Bt.msg = `El Soplo le roba Ímpetu a ${q.nombre}.`;
+  if (e.tipo === 'texto' && e.clave === 'roba') Bt.msg = tr('El Soplo le roba Ímpetu a {0}.', q.nombre);
 }
 
 // ---------- Efectos de golpe ----------
@@ -1140,7 +1151,7 @@ function terminarPelea(gano) {
   if (ent.def.boss && S.floor < LAST_FLOOR) { W_().map[ent.y * MW + ent.x] = 2; W_().explored[ent.y * MW + ent.x] = 1; }   // se abre la bajada
   const exp = b.enemigos.reduce((n, e) => n + e.exp, 0);
   const hallado = soltarBotin(ent.def.boss);
-  for (const id of sinDesbloquear('jefe')) if (b.enemigos.some(e => e.tipo === D.habilidades[id].jefe)) { desbloquear(id); log(`${D.habilidades[id].nombre} queda en el Grimorio.`, 'em'); }
+  for (const id of sinDesbloquear('jefe')) if (b.enemigos.some(e => e.tipo === D.habilidades[id].jefe)) { desbloquear(id); log(tr('{0} queda en el Grimorio.', D.habilidades[id].nombre), 'em'); }
   X.ceniza += Math.round((ent.def.boss ? D.mazmorra.ceniza.por_jefe : D.mazmorra.ceniza.por_grupo) * porGrupo('ceniza'));
   for (const u of NUCLEO.vivos(X.grupo)) {
     // lo que se anima en pantalla sale de los valores de antes del reparto
@@ -1150,7 +1161,7 @@ function terminarPelea(gano) {
   }
   guardarX();
   b.actual = null;
-  Object.assign(Bt, { fase: 'botin', listo: false, msg: `+${exp} de experiencia${hallado ? ` · ${hallado}` : ''}`, velXp: Math.max(exp / 1.3, 6) });
+  Object.assign(Bt, { fase: 'botin', listo: false, msg: tr('+{0} de experiencia{1}', exp, hallado ? ` · ${hallado}` : ''), velXp: Math.max(exp / 1.3, 6) });
   sfx('level');
   pintarBatalla();
 }
@@ -1214,7 +1225,7 @@ function seguirTrasPelea() {
   const muerte = caido && { quien: 'sombra', caras: ['risa'], lineas: [D.historia.modelos[caido.modelo].muerte.replace('{nombre}', caido.nombre)] };
   X.memoria.ultimoCaido = null;
   if (jefe && piso === LAST_FLOOR) return encadenar([muerte, 'jefe_3_muerto', revelar(4)], elegirPortador);
-  encadenar([muerte, caido ? revelar(1) : null, jefe ? `jefe_${piso}_muerto` : null]);
+  encadenar([muerte, caido ? revelar(1) : null, jefe ? tr('jefe_{0}_muerto', piso) : null]);
 }
 
 // ---------- El santuario ----------
@@ -1269,7 +1280,7 @@ const ARTE_FINAL = {
 };
 window.endingScenes = (id, who) => {
   const nombres = X.grupo.filter(p => p.vida > 0).map(p => p.nombre).join(' · ');
-  const poner = l => (typeof l === 'string' ? l.replaceAll('{nombre}', who.name).replaceAll('{nombres}', nombres) : Object.fromEntries(Object.entries(l).map(([k, v]) => [k, poner(v)])));
+  const poner = l => (typeof l === 'string' ? tr(l).replaceAll('{nombre}', who.name).replaceAll('{nombres}', nombres) : Object.fromEntries(Object.entries(l).map(([k, v]) => [k, poner(v)])));
   const intro = endingIntro().map(e => ({ ...e, lines: e.lines.map(l => (typeof l === 'string' ? l.replace('Tu antorcha', `La antorcha de ${who.name}`) : l)) }));
   return [...intro, ...ARTE_FINAL[id].map((e, i) => ({ ...e, lines: D.historia.finales[id].escenas[i].map(poner) }))];
 };
@@ -1284,7 +1295,7 @@ function finExpedicion(gano) {
   guardarX();
   charla(gano ? 'victoria' : 'derrota', () => {
     const vivos = NUCLEO.vivos(X.grupo).length;
-    openMenu({ title: gano ? 'Expedición cumplida' : 'El grupo cayó', back: false, text: `Sobrevivieron ${vivos} de ${X.grupo.length}. Ceniza acumulada: ${X.ceniza}. Quienes cayeron pueden volver a aparecer entre los reclutas.`,
+    openMenu({ title: gano ? 'Expedición cumplida' : 'El grupo cayó', back: false, text: tr('Sobrevivieron {0} de {1}. Ceniza acumulada: {2}. Quienes cayeron pueden volver a aparecer entre los reclutas.', vivos, X.grupo.length, X.ceniza),
       items: [{ label: 'Volver al Hogar', fn: abrirHogar }] }, 'game');
   });
 }
@@ -1292,7 +1303,7 @@ function finExpedicion(gano) {
 function pintarBatalla() {
   if (!Bt) return;
   const b = Bt.b, u = b.actual, pct = q => Math.round(Math.max(0, q.vida) / q.vidaMax * 100);
-  $('bLog').textContent = Bt.fase === 'objetivo' ? '' : Bt.msg;
+  $('bLog').textContent = Bt.fase === 'objetivo' ? '' : tr(Bt.msg);
   $('bCards').innerHTML = b.aliados.map(q => `<div class="bcard${u === q ? ' on' : ''}${q.vida <= 0 ? ' down' : ''}" style="left:${CX[q.i]}px">
     <div class="bn">${q.nombre}<small>${D.clases[q.clase].nombre}</small></div>
     <div class="bfila hp"><span>HP</span><b>${Math.max(0, q.vida)}/${q.vidaMax}</b></div>
@@ -1525,7 +1536,7 @@ function dibujarLinea(c) {
   c.fillStyle = MARCO.fondo; c.fillRect(L.turno - 3, L.y - 3, L.tam + 6, L.tam + 6);
   c.strokeStyle = MARCO.luz; c.lineWidth = 1; c.strokeRect(L.turno - 2.5, L.y - 2.5, L.tam + 5, L.tam + 5);
   c.font = '10px "New Rocker", serif'; c.textAlign = 'right'; c.fillStyle = MARCO.luz;
-  c.fillText('Turno', L.turno - 6, cy + 3);
+  c.fillText(tr('Turno'), L.turno - 6, cy + 3);
   c.textAlign = 'left';
   // los que vuelven pasan por debajo de la fila
   const orden = b.unidades.filter(u => u.vida > 0 && u.lx !== undefined).sort((x, y) => (y.ly || 0) - (x.ly || 0));
@@ -1608,7 +1619,7 @@ function dibujarBatalla(c) {
   if (Bt.ini >= Bt.entrada * 0.8 && Bt.fase !== 'botin') dibujarLinea(capaNitida());
   // las tarjetas suben desde abajo
   const sube = 1 - clamp((Bt.ini - Bt.entrada * 0.45) / (Bt.entrada * 0.4), 0, 1), bajan = Math.round(sube * sube * 70);
-  $('bCards').style.transform = bajan ? `translateY(${bajan}px)` : '';
+  $('bCards').style.transform = bajan ? tr('translateY({0}px)', bajan) : '';
   $('bLog').style.visibility = Bt.ini < Bt.entrada * 0.8 ? 'hidden' : '';
   for (const u of b.aliados) {
     const marcado = b.actual === u || (Bt.fase === 'objetivo' && Bt.lista[Bt.tsel] === u);

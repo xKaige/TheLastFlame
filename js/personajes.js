@@ -64,16 +64,16 @@ function pintarPj() {
   const ps = promptStyle() === 'ps', uno = PJ.lista.length < 2;
   const tecla = (letra, boton) => (promptStyle() === 'kb' ? `<span class="k ptecla">${letra}</span>`
     : boton === 'lt' || boton === 'rt' ? `<span class="pg bump ptecla">${ps ? boton.replace('lt', 'L2').replace('rt', 'R2') : boton.toUpperCase()}</span>` : glyph(boton));
-  const panel = (titulo, extra, cuerpo, cls = '') => `<section class="ppanel ${cls}"><h4>${titulo}${extra ? `<small>${extra}</small>` : ''}</h4>${cuerpo}</section>`;
+  const panel = (titulo, extra, cuerpo, cls = '') => `<section class="ppanel ${cls}"><h4>${tr(titulo)}${extra ? `<small>${extra}</small>` : ''}</h4>${cuerpo}</section>`;
 
-  const pestanas = PESTANAS.map((t, i) => `<div class="ptab${i === PJ.tab ? ' on' : ''}">${t}</div>`).join('');
+  const pestanas = PESTANAS.map((t, i) => `<div class="ptab${i === PJ.tab ? ' on' : ''}">${tr(t)}</div>`).join('');
   const grupo = PJ.lista.map((q, i) => `<img class="${i === PJ.i ? 'on' : ''}${q.vida <= 0 ? ' caido' : ''}" src="${retrato(q)}" alt="">`).join('');
   const falta = p.nivel * D.mazmorra.exp_por_nivel;
   const barra = (cls, frac) => `<i class="pbarra ${cls}"><b style="width:${clamp(frac, 0, 1) * 100}%"></b></i>`;
   const ficha = `<section class="ppanel pficha"><div class="pnom">${p.nombre}</div><div class="ptit">${D.modelos[p.modelo].titulo} · ${c.nombre}</div>
     <img class="pret" src="${retrato(p)}" alt="">
-    <div class="pdato"><span>Nivel ${p.nivel}</span><em>${Math.floor(p.exp)}/${falta} XP</em></div>${barra('xp', p.exp / falta)}
-    <div class="pdato vida"><span>Vida</span><em>${Math.max(0, p.vida)}/${p.vidaMax}</em></div>${barra('vida', p.vida / p.vidaMax)}</section>`;
+    <div class="pdato"><span>${tr('Nivel {0}', p.nivel)}</span><em>${Math.floor(p.exp)}/${falta} XP</em></div>${barra('xp', p.exp / falta)}
+    <div class="pdato vida"><span>${tr('Vida')}</span><em>${Math.max(0, p.vida)}/${p.vidaMax}</em></div>${barra('vida', p.vida / p.vidaMax)}</section>`;
 
   let centro = '';
   if (PJ.tab === 0) {
@@ -83,10 +83,10 @@ function pintarPj() {
     };
     const filaEquipo = ([s, n]) => {
       const id = p.equipo[s], o = id && D.objetos[id];
-      return `<div class="pequipo${elegida(filas.find(x => x.slot === s)) ? ' sel' : ''}${o ? '' : ' vacio'}"><small>${n}</small><span>${o ? o.nombre : 'Vacío'}</span>${o ? `<em>${textoBonos(o)}</em>` : ''}</div>`;
+      return `<div class="pequipo${elegida(filas.find(x => x.slot === s)) ? ' sel' : ''}${o ? '' : ' vacio'}"><small>${tr(n)}</small><span>${o ? o.nombre : tr('Vacío')}</span>${o ? `<em>${textoBonos(o)}</em>` : ''}</div>`;
     };
-    const dato = (n, v, cls = '') => `<div class="pstat ${cls}"><span>${n}</span><em>${v}</em></div>`;
-    const atributos = panel('Atributos', p.puntos ? `${p.puntos} pts libres` : '', `${p.puntos ? `<div class="paviso">✦ ${p.puntos} punto${p.puntos > 1 ? 's' : ''} para repartir</div>` : ''}${REGLAS_ATR.lista.map(filaAtr).join('')}`, 'patrs');
+    const dato = (n, v, cls = '') => `<div class="pstat ${cls}"><span>${tr(n)}</span><em>${v}</em></div>`;
+    const atributos = panel('Atributos', p.puntos ? tr('{0} pts libres', p.puntos) : '', `${p.puntos ? `<div class="paviso">✦ ${p.puntos} punto${p.puntos > 1 ? 's' : ''} para repartir</div>` : ''}${REGLAS_ATR.lista.map(filaAtr).join('')}`, 'patrs');
     const combate = panel('Combate', '', `<div class="pstats">${dato('Ataque', p.ataque)}${dato('Defensa', p.defensa)}${dato('Vel', p.velocidad)}${dato('Crítico', `${Math.round(p.critico * 100)}%`)}${dato('Esquiva', `${Math.round(p.esquiva * 100)}%`, 'ancho')}</div>`);
     const equipo = panel('Equipo', '', LUGARES_EQUIPO.map(filaEquipo).join(''));
     centro = `${atributos}<div class="pcol">${combate}${equipo}</div>`;
@@ -96,21 +96,21 @@ function pintarPj() {
       const x = D.habilidades[f.hab], lleva = p.habilidades.includes(f.hab), puede = NUCLEO.cumpleRequisito(D, p, f.hab);
       return `<div class="pitem${elegida(f) ? ' sel' : ''}${puede ? '' : ' no'}"><span>${lleva ? '✦ ' : ''}${x.nombre}</span><em>${'◆'.repeat(x.costo)}</em></div>`;
     }).join('');
-    const detalle = h ? `<div class="pnom2">${h.nombre}</div><div class="pdesc">${h.descripcion}</div><div class="pdesc">Costo: ${'◆'.repeat(h.costo)}</div>${h.requisito ? `<div class="pdesc ${NUCLEO.cumpleRequisito(D, p, filas[PJ.sel].hab) ? '' : 'no'}">Requiere ${textoRequisito(h)}</div>` : ''}${PJ.edita ? '' : '<div class="pdesc nota">Sólo se cambian en el Hogar o en un santuario.</div>'}` : '';
+    const detalle = h ? `<div class="pnom2">${h.nombre}</div><div class="pdesc">${h.descripcion}</div><div class="pdesc">${tr('Costo')}: ${'◆'.repeat(h.costo)}</div>${h.requisito ? `<div class="pdesc ${NUCLEO.cumpleRequisito(D, p, filas[PJ.sel].hab) ? '' : 'no'}">Requiere ${textoRequisito(h)}</div>` : ''}${PJ.edita ? '' : `<div class="pdesc nota">${tr('Sólo se cambian en el Hogar o en un santuario.')}</div>`}` : '';
     centro = `${panel('Conocidas', `lleva ${p.habilidades.length} de ${D.mazmorra.max_habilidades}`, `<div class="plista">${lista}</div>`, 'patrs')}<div class="pcol">${panel('Detalle', '', detalle, 'plleno')}</div>`;
   } else {
     const o = filas[PJ.sel] && D.objetos[filas[PJ.sel].obj];
-    const lista = filas.length ? filas.map(f => `<div class="pitem${elegida(f) ? ' sel' : ''}"><span>${D.objetos[f.obj].nombre}</span><em>${textoBonos(D.objetos[f.obj])}</em></div>`).join('') : '<div class="pdesc">Está vacía.</div>';
-    const detalle = `${o ? `<div class="pnom2">${o.nombre}</div><div class="pdesc">${o.descripcion}</div><div class="pdesc">Se equipa desde Estado.</div>` : ''}<div class="pdesc nota">${P ? `${P.potions || 0} pociones · ${P.oil || 0} de aceite` : ''}</div>`;
+    const lista = filas.length ? filas.map(f => `<div class="pitem${elegida(f) ? ' sel' : ''}"><span>${D.objetos[f.obj].nombre}</span><em>${textoBonos(D.objetos[f.obj])}</em></div>`).join('') : `<div class="pdesc">${tr('Está vacía.')}</div>`;
+    const detalle = `${o ? `<div class="pnom2">${o.nombre}</div><div class="pdesc">${o.descripcion}</div><div class="pdesc">${tr('Se equipa desde Estado.')}</div>` : ''}<div class="pdesc nota">${P ? `${P.potions || 0} pociones · ${P.oil || 0} de aceite` : ''}</div>`;
     centro = `${panel('Mochila', `${filas.length} objetos`, `<div class="plista">${lista}</div>`, 'patrs')}<div class="pcol">${panel('Detalle', '', detalle, 'plleno')}</div>`;
   }
-  const sub = PJ.sub ? `<div class="psubm"><h4>${LUGARES_EQUIPO.find(x => x[0] === PJ.sub.slot)[1]}</h4>${PJ.sub.opciones.map((id, i) => {
+  const sub = PJ.sub ? `<div class="psubm"><h4>${tr(LUGARES_EQUIPO.find(x => x[0] === PJ.sub.slot)[1])}</h4>${PJ.sub.opciones.map((id, i) => {
     const o = id && D.objetos[id];
-    return `<div class="pitem${i === PJ.sel ? ' sel' : ''}"><span>${o ? o.nombre : 'Dejar vacío'}</span><em>${o ? textoBonos(o) : ''}</em></div>`;
+    return `<div class="pitem${i === PJ.sel ? ' sel' : ''}"><span>${o ? o.nombre : tr('Dejar vacío')}</span><em>${o ? textoBonos(o) : ''}</em></div>`;
   }).join('')}</div>` : '';
   $('personajes').innerHTML = `<div class="ptop"><div class="ptabs">${tecla('Q', 'strafeL')}${pestanas}${tecla('E', 'strafeR')}</div><div class="pgrupo">${uno ? '' : tecla('Z', 'lt')}<span>Grupo</span>${grupo}${uno ? '' : tecla('X', 'rt')}</div></div>
     <div class="pcuerpo">${ficha}<div class="pder">${centro}</div></div>${sub}
-    <div class="pinfo">${PJ.msg || ''}</div><div class="payuda">${glyph('ok')} aceptar · ${glyph('cancel')} volver</div>`;
+    <div class="pinfo">${tr(PJ.msg || '')}</div><div class="payuda">${glyph('ok')} ${tr('aceptar')} · ${glyph('cancel')} ${tr('volver')}</div>`;
   PJ.msg = '';
   const sel = $('personajes').querySelector('.pitem.sel');
   if (sel) sel.scrollIntoView({ block: 'nearest' });
@@ -128,8 +128,8 @@ function accionPj(f) {
   } else if (f.hab) {
     if (!PJ.edita) { PJ.msg = 'Sólo se cambian en el Hogar o en un santuario.'; sfx('bump'); }
     else if (p.habilidades.includes(f.hab)) { p.habilidades = p.habilidades.filter(id => id !== f.hab); sfx('select'); }
-    else if (!NUCLEO.cumpleRequisito(D, p, f.hab)) { PJ.msg = `${p.nombre} no cumple el requisito.`; sfx('bump'); }
-    else if (p.habilidades.length >= D.mazmorra.max_habilidades) { PJ.msg = `Lleva el máximo: primero sacá una.`; sfx('bump'); }
+    else if (!NUCLEO.cumpleRequisito(D, p, f.hab)) { PJ.msg = tr('{0} no cumple el requisito.', p.nombre); sfx('bump'); }
+    else if (p.habilidades.length >= D.mazmorra.max_habilidades) { PJ.msg = 'Lleva el máximo: primero sacá una.'; sfx('bump'); }
     else { p.habilidades.push(f.hab); sfx('select'); }
   }
   pintarPj();
@@ -221,11 +221,11 @@ const sinDesbloquear = fuente => Object.keys(D.habilidades).filter(id => D.habil
 function abrirGrimorio() {
   const m = { title: 'Grimorio', cls: 'altar', items: [] };
   m.refresh = () => {
-    m.text = `Lo que encuentres queda acá para siempre. Ceniza: <b>${X.ceniza}</b>`;
+    m.text = tr('Lo que encuentres queda acá para siempre. Ceniza: <b>{0}</b>', X.ceniza);
     m.items = Object.keys(D.habilidades).filter(id => D.habilidades[id].fuente).map(id => {
-      const h = D.habilidades[id], tiene = X.grimorio.includes(id), req = h.requisito ? ` Requiere ${textoRequisito(h)}.` : '';
+      const h = D.habilidades[id], tiene = X.grimorio.includes(id), req = h.requisito ? tr(' Requiere {0}.', textoRequisito(h)) : '';
       if (tiene) return { label: h.nombre, sub: `${h.descripcion}${req}`, fn: () => {} };
-      if (h.fuente === 'compra') return { label: `${h.nombre} <small>· ${h.precio} de Ceniza</small>`, sub: `${h.descripcion}${req}`, off: X.ceniza < h.precio, fn: () => { X.ceniza -= h.precio; desbloquear(id); sfx('level'); m.refresh(); renderMenu(); } };
+      if (h.fuente === 'compra') return { label: tr('{0} <small>· {1} de Ceniza</small>', h.nombre, h.precio), sub: `${h.descripcion}${req}`, off: X.ceniza < h.precio, fn: () => { X.ceniza -= h.precio; desbloquear(id); sfx('level'); m.refresh(); renderMenu(); } };
       return { label: '???', sub: h.pista, off: true, fn: () => {} };
     });
   };

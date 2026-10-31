@@ -55,3 +55,11 @@ con **dithering Bayer 4×4**, en 480×270. Sólo el fuego y el rojo de la vida q
 3. Sumarlo a la lista que corresponda en `datos/mazmorra.json` (`accesorios`) o en `datos/enemigos.json`.
 
 La migración a Godot, si se hace, está en [MIGRACION_GODOT.md](MIGRACION_GODOT.md). Lo que sigue, en [ROADMAP.md](ROADMAP.md).
+
+## Idiomas
+
+Cada idioma es un archivo en `datos/idiomas/` (clave: el texto en español). Para sumar uno, agregalo a `datos/idiomas/lista.json` y corré:
+
+    node tools/textos_faltantes.js pt --escribir
+
+Eso crea el archivo con los textos vacíos para completar; lo que queda vacío se ve en español. Los textos nuevos del código van en `tr('Texto {0}', valor)`.

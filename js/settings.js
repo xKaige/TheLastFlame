@@ -12,10 +12,7 @@ const FIRST_RUN = STORE.get(SETTINGS_KEY) === null;   // sin opciones guardadas:
 // Primera vez que se abre el juego: elegir idioma antes del título
 function openLanguagePick(then) {
   const choose = lang => { SETTINGS.lang = lang; saveSettings(); applyStaticTr(); closeAllMenus(); then(); };
-  openMenu({ title: 'Idioma · Language', back: false, items: [
-    { label: 'Español', fn: () => choose('es') },
-    { label: 'English', fn: () => choose('en') },
-  ] }, 'title');
+  openMenu({ title: 'Idioma · Language', back: false, items: IDIOMAS.map(x => ({ label: x.nombre, fn: () => choose(x.id) })) }, 'title');
 }
 
 // ---------- Teclas ----------
@@ -120,8 +117,10 @@ function openOptionsMenu(focus) {
           sub: pending ? tr('Enter para aplicar.') : `${tr(DISPLAY_HELP[cur()])} ${tr('F11 alterna ventana y pantalla completa.')}`,
           adjust: step, fn: () => { setDisplayMode(cur()); m.displayPick = null; m.refresh(); renderMenu(); } };
       })(),
-      { label: `${tr('Idioma')} <small>· ${SETTINGS.lang === 'en' ? 'English' : 'Español'}</small>`, sub: 'Español / English',
-        fn: () => { SETTINGS.lang = SETTINGS.lang === 'en' ? 'es' : 'en'; saveSettings(); applyStaticTr(); m.refresh(); refreshPrompts(); } },
+      (() => {
+        const step = d => { const i = IDIOMAS.findIndex(x => x.id === SETTINGS.lang); SETTINGS.lang = IDIOMAS[(i + d + IDIOMAS.length) % IDIOMAS.length].id; saveSettings(); applyStaticTr(); m.refresh(); refreshPrompts(); };
+        return { label: `${tr('Idioma')} <small>· ◂ ${IDIOMAS.find(x => x.id === SETTINGS.lang).nombre} ▸</small>`, sub: IDIOMAS.map(x => x.nombre).join(' / '), adjust: step, fn: () => step(1) };
+      })(),
       { label: `${tr('Temblor de pantalla')} <small>· ${SETTINGS.shake ? tr('sí') : tr('no')}</small>`, sub: tr('Sacudidas al golpear y al recibir golpes.'),
         fn: () => { SETTINGS.shake = !SETTINGS.shake; saveSettings(); m.refresh(); renderMenu(); } },
       (() => {
