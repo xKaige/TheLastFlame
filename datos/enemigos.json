@@ -37,7 +37,8 @@
     "defensa": 0,
     "velocidad": 14,
     "exp": 4,
-    "roba_impetu": true
+    "roba_impetu": true,
+    "imagen": "soplo"
   },
   "centinela": {
     "nombre": "Centinela del Osario",
@@ -84,7 +85,8 @@
     ],
     "defensa": 2,
     "velocidad": 9,
-    "exp": 7
+    "exp": 7,
+    "imagen": "necrofago"
   },
   "sombra": {
     "nombre": "Sombra Susurrante",
@@ -97,7 +99,8 @@
     "defensa": 2,
     "velocidad": 13,
     "exp": 7,
-    "roba_impetu": true
+    "roba_impetu": true,
+    "imagen": "sombra"
   },
   "acechador": {
     "nombre": "El Acechador",
@@ -109,7 +112,8 @@
     ],
     "defensa": 1,
     "velocidad": 12,
-    "exp": 8
+    "exp": 8,
+    "imagen": "acechador"
   },
   "caballero": {
     "nombre": "Caballero Hueco",
@@ -121,7 +125,21 @@
     ],
     "defensa": 4,
     "velocidad": 7,
-    "exp": 10
+    "exp": 10,
+    "imagen": "caballero"
+  },
+  "cebado": {
+    "nombre": "El Cebado",
+    "sprite": "bloat",
+    "vida": 74,
+    "ataque": [
+      10,
+      15
+    ],
+    "defensa": 2,
+    "velocidad": 5,
+    "exp": 9,
+    "imagen": "cebado"
   },
   "cazador": {
     "nombre": "El Cazador Gris",

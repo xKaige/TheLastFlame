@@ -417,7 +417,7 @@ function wispFade(lum, a, size) {
 const SPRITES = {};
 function buildSprites() {
   const defs = {
-    kobold: [drawKobold], rat: [drawRat], ghoul: [drawGhoul],
+    kobold: [drawKobold], rat: [drawRat], ghoul: [drawGhoul], bloat: [drawGhoul],
     shade: [g => drawShade(g, false), wispFade], boss: [g => drawShade(g, true), wispFade],
     knight: [drawKnight], boneKing: [drawBoneKing], bones: [drawBonePile], candles: [drawCandles], armorStand: [drawArmorStand], brazier: [g => drawBrazier(g, true)], brazierOut: [g => drawBrazier(g, false)], stalagmite: [drawStalagmite], obelisk: [drawObelisk], hunter: [drawGreyHunter], ember: [drawEmber], wisp: [drawWisp, wispFade], lurker: [drawLurker], sentinel: [drawSentinel], reliquary: [g => drawReliquary(g, false)], reliquaryOpen: [g => drawReliquary(g, true)], pilgrim: [drawPilgrim], altar: [g => drawAltar(g, true)], bell: [drawBell], merchant: [drawMerchant], knightKneel: [drawKneelingKnight], girl: [drawLanternGirl], coffin: [g => drawCoffin(g, false)], coffinOpen: [g => drawCoffin(g, true)], mirror: [g => drawMirror(g, false)], mirrorBroken: [g => drawMirror(g, true)], door: [g => drawDoor(g, true)], doorShut: [g => drawDoor(g, false)], altarCold: [g => drawAltar(g, false)], chest: [g => drawChest(g, false)], chestOpen: [g => drawChest(g, true)],
   };

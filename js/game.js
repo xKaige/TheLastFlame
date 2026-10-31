@@ -42,6 +42,7 @@ const ENEMIES = {
   acechador: { name: 'El Acechador', hitFx: 'claw', spr: 'lurker', hp: 20, atk: [4, 8], def: 1, xp: 15, ramp: 0, speed: 1, scale: 0.85, fearsFire: true, flee: 0.4, lurk: true },
   centinela: { name: 'Centinela del Osario', idle: 'heavy', hitFx: 'smash', short: 'Centinela', spr: 'sentinel', hp: 22, atk: [3, 6], def: 2, xp: 14, ramp: 0, speed: 0.6, scale: 1, flee: 0.6, shield: true },
   hueco:  { name: 'Caballero Hueco', idle: 'heavy', hitFx: 'blade', spr: 'knight', hp: 30, atk: [4, 9], def: 3, xp: 24, ramp: 0, speed: 0.6, scale: 1.0, flee: 0.5 },
+  cebado: { name: 'El Cebado', idle: 'heavy', hitFx: 'smash', spr: 'bloat', hp: 30, atk: [4, 8], def: 2, xp: 20, ramp: 0, speed: 0.5, scale: 1.05, flee: 0.6 },
   // jefes: uno al final de cada piso
   // los jefes no escalan con la profundidad: sus números ya están pensados para su piso
   reyOsario: { name: 'El Rey del Osario', idle: 'heavy', hitFx: 'smash', spr: 'boneKing', hp: 200, atk: [12, 18], def: 3, xp: 45, ramp: 2, speed: 0, scale: 1.3, glow: 0.3, boss: true,
@@ -55,8 +56,8 @@ const ENEMIES = {
 };
 const POOLS = {
   1: ['rata', 'rata', 'kobold', 'kobold', 'centinela', 'soplo'],
-  2: ['kobold', 'ghoul', 'sombra', 'rata', 'soplo', 'acechador', 'centinela'],
-  3: ['ghoul', 'sombra', 'hueco', 'hueco', 'acechador', 'soplo'],
+  2: ['kobold', 'ghoul', 'sombra', 'rata', 'soplo', 'acechador', 'centinela', 'cebado'],
+  3: ['ghoul', 'sombra', 'hueco', 'hueco', 'acechador', 'soplo', 'cebado'],
 };
 
 const LINES = {
@@ -1445,7 +1446,7 @@ function draw() {
   const sprites = [];
   for (const e of S.world.ents) {
     if (C && e === C.e) continue;
-    if (e.type === 'chest') sprites.push({ x: e.vx, y: e.vy, spr: SPRITES[e.open ? 'chestOpen' : 'chest'].w, scale: 0.5, ramp: 0 });
+    if (e.type === 'chest') sprites.push({ x: e.vx, y: e.vy, spr: SPRITES[e.open ? 'chestOpen' : 'chest'].w, scale: 0.8, ramp: 0 });
     else if (e.type === 'prop') { const d = propDef(e); sprites.push({ x: e.vx, y: e.vy, spr: spriteFrame(d[0], e), scale: d[1], ramp: 0, glow: d[2] * flick }); }
     else if (e.type === 'event') { const ev = EVENTS[e.ev]; sprites.push({ x: e.vx, y: e.vy, spr: SPRITES[eventSprite(e)].w, scale: ev.scale, ramp: 0, glow: e.done ? 0 : ev.glow * flick }); }
     else if (e.type === 'reliquary') sprites.push({ x: e.vx, y: e.vy, spr: SPRITES[e.open ? 'reliquaryOpen' : 'reliquary'].w, scale: 0.55, ramp: 0, glow: e.open ? 0 : 0.45 * flick });

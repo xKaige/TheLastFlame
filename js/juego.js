@@ -52,7 +52,17 @@ function spriteDesdeImagen(img, size) {
   return { size, lum, a };
 }
 
+const COFRES = { chest: D.mazmorra.accesorios.cofres.cerrado, chestOpen: D.mazmorra.accesorios.cofres.abierto };
+for (const k in COFRES) COFRES[k] = Object.assign(new Image(), { src: `interfaz/mazmorra/cripta/accesorios/${COFRES[k]}.png` });
+
 function aplicarEnemigosEnMapa() {
+  for (const [k, img] of Object.entries(COFRES)) {
+    if (img.enMapa || !img.complete || !img.naturalWidth) continue;
+    const spr = spriteDesdeImagen(img, img.naturalWidth);
+    for (let i = 0; i < spr.lum.length; i++) spr.lum[i] = Math.pow(spr.lum[i], 0.6);   // la madera oscura se perdía a la luz de la antorcha
+    SPRITES[k].w = spr;
+    img.enMapa = true;
+  }
   for (const [id, d] of Object.entries(D.enemigos)) {
     const img = IMG_ENEMIGOS[d.imagen];
     if (!img || img.enMapa || !img.complete || !img.naturalWidth) continue;

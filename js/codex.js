@@ -7,6 +7,7 @@ const FOE_LORE = {
   rata: 'Engordan con lo que dejan los entierros. Nunca andan solas.',
   kobold: 'Mineros que siguieron cavando después de morir.',
   ghoul: 'Tienen hambre desde hace siglos y no recuerdan de qué.',
+  cebado: 'Comió lo que nadie se animaba a mirar. Sigue con hambre.',
   sombra: 'Susurran tu nombre para que te des vuelta. Odian el fuego.',
   soplo: 'Un aliento helado sin cuerpo. Apaga antorchas desde lejos.',
   acechador: 'Solo se lo ve con luz fuerte. Cuando lo ves, ya saltó.',
