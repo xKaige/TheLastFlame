@@ -32,7 +32,7 @@ html, body { margin: 0; height: 100%; background: #000; overflow: hidden; cursor
 #title .t1 { position: absolute; top: 14px; width: 100%; font-family: var(--f-title); font-size: 34px; color: var(--c5); letter-spacing: 1px; }
 #title .t2 { position: absolute; top: 62px; width: 100%; font-size: 11px; color: var(--c4); }
 #title .t3 { position: absolute; bottom: 30px; width: 100%; font-size: 13px; animation: blink 1.6s steps(2) infinite; }
-#title .t4 { position: absolute; bottom: 8px; width: 100%; font-size: 7px; color: var(--c4); opacity: 0.85; }
+#title .t4 { display: none; position: absolute; bottom: 8px; width: 100%; font-size: 7px; color: var(--c4); opacity: 0.85; }
 /* versión del juego, abajo a la izquierda (al cambiarla, también en package.json) */
 #title .tver { position: absolute; left: 8px; bottom: 7px; font-size: 8px; color: var(--c4); }
 @keyframes blink { 50% { opacity: 0.15; } }
@@ -280,7 +280,7 @@ html, body { margin: 0; height: 100%; background: #000; overflow: hidden; cursor
 #menu.with-art .mtext { text-align: left; margin: -2px 0 6px; }
 #menu .mtext { font-size: 9px; line-height: 11.5px; color: var(--c5); margin: -2px 2px 6px; text-align: center; }
 #menu .mmsg { margin-top: 4px; font-size: 9px; color: var(--c5); font-style: italic; text-align: center; }
-#menu .mhint { margin-top: 5px; font-size: 7.5px; color: var(--c3); text-align: center; }
+#menu .mhint { display: none; margin-top: 5px; font-size: 7.5px; color: var(--c3); text-align: center; }
 
 /* ---------- Cinemática ---------- */
 #cine { position: absolute; inset: 0; }

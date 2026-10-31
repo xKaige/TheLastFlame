@@ -874,7 +874,7 @@ function actualizarTransicion(dt) {
     Tr.sono = true; sfx('encounter');
     if (Tr.tipo === 'jefe') banner(D.enemigos[Tr.ids.find(id => D.enemigos[id].jefe)].nombre);
   }
-  if (Tr.t >= Tr.cierre + Tr.negro) { const { ent, ids, tipo, entrada } = Tr; Tr = null; banner(tipo === 'emboscada' ? '¡Emboscada!' : ''); iniciarPelea(ent, ids, entrada); }
+  if (Tr.t >= Tr.cierre + Tr.negro) { const { ent, ids, tipo, entrada } = Tr; Tr = null; banner(tipo === 'emboscada' ? '¡Emboscada!' : ''); iniciarPelea(ent, ids, entrada, tipo === 'emboscada'); }
 }
 
 // El círculo de luz se achica con el mismo tramado de la mazmorra
@@ -928,8 +928,8 @@ function grisDeEnemigo(e) {
   return g;
 }
 
-function iniciarPelea(ent, ids, entrada = 0.95) {
-  const b = NUCLEO.iniciarBatalla(D, X.grupo, ids);
+function iniciarPelea(ent, ids, entrada = 0.95, emboscada = false) {
+  const b = NUCLEO.iniciarBatalla(D, X.grupo, ids, emboscada);
   const fx = ids.length === 1 ? [240] : ids.length === 2 ? [190, 290] : ids.some(id => D.enemigos[id].tam_batalla) ? [92, 240, 388] : FX3;   // un jefe grande necesita lugar
   for (const e of b.enemigos) { e.x = fx[e.i]; const propia = IMG_ENEMIGOS[e.imagen], lista = propia && propia.complete && propia.naturalWidth; const tam = lista ? D.enemigos[e.tipo].tam_batalla || propia.naturalWidth : e.jefe ? FTAM + 14 : FTAM; e.tam = tam; e.img = lista ? propia : spriteCanvas(SPRITES[e.sprite].p, tam, S.env, 1); e.golpeado = 0; e.luz = luzDeEnemigo(e); e.gris = grisDeEnemigo(e); e.icono = spriteCanvas(e.gris, e.tam, S.env, 1); prepararPoses(e); }
   for (const u of b.aliados) u.golpeado = 0;

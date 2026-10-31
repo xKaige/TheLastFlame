@@ -106,7 +106,7 @@ const NUCLEO = (() => {
   }
 
   // ---------- Batalla ----------
-  function iniciarBatalla(D, grupo, ids) {
+  function iniciarBatalla(D, grupo, ids, emboscada = false) {
     const letras = {}, fuerza = D.mazmorra.grupo.fuerza_enemiga[Math.min(vivos(grupo).length, 4) - 1];
     const enemigos = ids.map((id, i) => {
       const d = D.enemigos[id], n = ids.filter(x => x === id).length;
@@ -118,6 +118,7 @@ const NUCLEO = (() => {
     aliados.forEach((u, i) => Object.assign(u, { i, impetu: u.impetuInicial, guardia: false, provoca: 0, defensaExtra: 0, esquivaSegura: false }));
     const unidades = [...aliados, ...enemigos];
     for (const u of unidades) u.reloj = 100 / u.velocidad;
+    if (emboscada) enemigos.forEach((u, i) => { u.reloj = i * 0.01; });     // te sorprenden: todos actúan antes que el grupo
     return { aliados, enemigos, unidades, actual: null, muroLlamas: 0 };
   }
 
