@@ -1,5 +1,5 @@
 # Pasa una imagen por el estilo del juego: 480×270, gris, 6 tonos de la paleta y dithering Bayer 4×4.
-# Uso: python expedicion/pasar_a_paleta.py origen destino.png [paleta]
+# Uso: python tools/pasar_a_paleta.py origen destino.png [paleta]
 import sys
 import numpy as np
 from PIL import Image

@@ -1,5 +1,5 @@
 # Recorta los retratos de la hoja de muestra y genera los tamaños que usa la Expedición.
-# Uso: python expedicion/recortar_retratos.py hoja.webp
+# Uso: python tools/recortar_retratos.py hoja.webp
 import os, sys
 from PIL import Image
 ORDEN = ['ladrona', 'desertor', 'cantora', 'penitente', 'exiliado', 'novicia', 'minero', 'guardabosque', 'viuda', 'buhonero']

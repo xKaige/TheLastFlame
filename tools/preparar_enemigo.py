@@ -1,5 +1,5 @@
 # Convierte un dibujo con fondo magenta en un sprite de enemigo: sin fondo, recortado y con los pies abajo.
-# Uso: python expedicion/preparar_enemigo.py origen destino.png [lado] [alto_colgante]
+# Uso: python tools/preparar_enemigo.py origen destino.png [lado] [alto_colgante]
 # Con alto_colgante el dibujo queda arriba del lienzo, a esa altura: es un accesorio que cuelga del techo.
 import sys
 import numpy as np

@@ -2,7 +2,7 @@
 // Resolución interna (16:9, escala entera a 1080p x4 y 4K x8)
 const W = 480, H = 270;
 // Ventana 3D
-const VX = 20, VY = 18, VW = 300, VH = 180;
+const VX = 0, VY = 0, VW = 480, VH = 270;
 const TEX = 64;
 const MW = 28, MH = 28;
 

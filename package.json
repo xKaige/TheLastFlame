@@ -1,14 +1,15 @@
 {
   "name": "la-ultima-llama",
-  "version": "0.2.0",
-  "description": "Dungeon crawler RPG por casillas con estética de grabado y dithering",
+  "version": "0.3.0",
+  "description": "Dungeon crawler de grupo por turnos con estética de dithering y pocos colores",
   "main": "main.js",
   "private": true,
   "scripts": {
     "web": "python tools/servidor.py",
     "start": "electron .",
     "prueba": "electron . --prueba",
-    "dist": "electron-builder --win --dir"
+    "dist": "electron-builder --win --dir",
+    "simular": "node tools/simular.js 1000"
   },
   "devDependencies": {
     "electron": "^33.0.0",
@@ -24,7 +25,9 @@
       "ipc.js",
       "css/**",
       "js/**",
-      "assets/**"
+      "assets/**",
+      "datos/**",
+      "interfaz/**"
     ],
     "win": {
       "target": "dir",

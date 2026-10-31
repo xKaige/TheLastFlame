@@ -1,9 +1,9 @@
 // Prueba las reglas sin pantalla: un bot juega expediciones enteras y mide cuántos sobreviven.
-// Uso: node expedicion/simular.js [cantidad]
+// Uso: node tools/simular.js [cantidad]
 const fs = require('fs'), path = require('path');
-const N = require('./nucleo.js');
+const N = require('../js/nucleo.js');
 const D = {};
-for (const f of ['clases', 'habilidades', 'modelos', 'enemigos', 'mazmorra', 'dialogos']) D[f] = JSON.parse(fs.readFileSync(path.join(__dirname, 'datos', f + '.json'), 'utf8'));
+for (const f of ['clases', 'habilidades', 'modelos', 'enemigos', 'mazmorra', 'dialogos']) D[f] = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'datos', f + '.json'), 'utf8'));
 const azar = Math.random, MEZCLA = ['guerrero', 'picaro', 'mago', 'sanador'];
 
 function pelear(grupo, ids) {

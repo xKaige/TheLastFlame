@@ -1,5 +1,5 @@
 # Convierte una textura grande en un muro de 64×64 que empalma, en escala de grises.
-# Uso: python expedicion/preparar_textura.py origen destino.png [lado_del_recorte] [brillo_maximo]
+# Uso: python tools/preparar_textura.py origen destino.png [lado_del_recorte] [brillo_maximo]
 import sys
 import numpy as np
 from PIL import Image

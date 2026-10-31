@@ -1,37 +1,38 @@
 'use strict';
-// Expedición: capa sobre el juego base, que se carga sin modificar. Reemplaza el título, la creación de
-// personaje y el combate; reutiliza la mazmorra, el arte y el sonido. Las reglas están en nucleo.js y los
-// contenidos en datos/: acá sólo hay presentación y el flujo de la partida.
+// El juego: expediciones con un grupo elegido al azar y combate por turnos según velocidad.
+// Se apoya en el motor de los otros scripts (mazmorra, arte, sonido) y reemplaza su título, creación de
+// personaje y combate. Las reglas están en nucleo.js y los contenidos en datos/: acá sólo hay
+// presentación y el flujo de la partida.
 
 // ---------- Datos y estado ----------
 const D = {};
 for (const f of ['clases', 'habilidades', 'modelos', 'enemigos', 'mazmorra', 'dialogos']) {
   const x = new XMLHttpRequest();
-  x.open('GET', `expedicion/datos/${f}.json`, false); x.send();
+  x.open('GET', `datos/${f}.json`, false); x.send();
   D[f] = JSON.parse(x.responseText);
 }
 const CLAVE = 'expedicion.estado';
 const X = { ceniza: 0, caidos: [], corridas: 0, grupo: [], cands: [], sel: [], ganada: 0 };
-try { Object.assign(X, JSON.parse(localStorage.getItem(CLAVE) || '{}')); } catch (e) { /* sin progreso */ }
+try { Object.assign(X, JSON.parse(STORE.get(CLAVE) || '{}')); } catch (e) { /* sin progreso */ }
 X.caidos = X.caidos.filter(c => D.modelos[c.modelo] && D.clases[c.clase]);   // caídos de modelos que ya no existen
-const guardarX = () => { try { localStorage.setItem(CLAVE, JSON.stringify({ ceniza: X.ceniza, caidos: X.caidos, corridas: X.corridas })); } catch (e) { /* sin almacenamiento */ } };
+const guardarX = () => STORE.set(CLAVE, JSON.stringify({ ceniza: X.ceniza, caidos: X.caidos, corridas: X.corridas }));
 const azarX = () => Math.random();
 const baseX = { draw, update, onAction, updateHUD, enterLevel, afterStep };
 
 // Retratos de cada modelo: el PNG se pasa por la paleta del piso, como todo lo demás
 const RET = {};
-for (const [id, m] of Object.entries(D.modelos)) RET[id] = { img: Object.assign(new Image(), { src: `expedicion/interfaz/retratos/${m.retrato}.png` }), c: {} };
+for (const [id, m] of Object.entries(D.modelos)) RET[id] = { img: Object.assign(new Image(), { src: `interfaz/retratos/${m.retrato}.png` }), c: {} };
 function retratoX(id, size, ramp = S.env) {
   const r = RET[id], k = ramp + size;
   if (!r.c[k] && r.img.complete && r.img.naturalWidth) r.c[k] = spriteCanvas(spriteDesdeImagen(r.img, 128), size, ramp, 1.05);
   return r.c[k] || document.createElement('canvas');
 }
 
-// Texturas propias de la mazmorra: reemplazan las procedurales del juego base sólo en esta página
+// Texturas propias de la mazmorra: reemplazan las procedurales del motor
 const TEXTURAS_X = [
-  { tema: 'crypt', clave: 'walls', src: 'expedicion/interfaz/mazmorra/cripta/muro_1.png' },
-  { tema: 'crypt', clave: 'floor', src: 'expedicion/interfaz/mazmorra/cripta/piso_1.png' },
-  { tema: 'crypt', clave: 'ceil', src: 'expedicion/interfaz/mazmorra/cripta/techo_1.png' },
+  { tema: 'crypt', clave: 'walls', src: 'interfaz/mazmorra/cripta/muro_1.png' },
+  { tema: 'crypt', clave: 'floor', src: 'interfaz/mazmorra/cripta/piso_1.png' },
+  { tema: 'crypt', clave: 'ceil', src: 'interfaz/mazmorra/cripta/techo_1.png' },
 ];
 for (const t of TEXTURAS_X) { t.img = new Image(); t.img.src = t.src; }
 // Los dibujos propios de enemigos también van en la mazmorra: se pasan al formato de sprite del motor
@@ -78,7 +79,7 @@ function aplicarTexturas() {
 // Accesorios de pared: cada uno es una variante del muro, así reciben la perspectiva y la luz del motor.
 // Se eligen por posición, para que un nivel quede siempre igual.
 const ACC_BASE = 10, ACCESORIOS = D.mazmorra.accesorios;
-for (const a of ACCESORIOS.lista) a.img = Object.assign(new Image(), { src: `expedicion/interfaz/mazmorra/cripta/accesorios/${a.imagen}.png` });
+for (const a of ACCESORIOS.lista) a.img = Object.assign(new Image(), { src: `interfaz/mazmorra/cripta/accesorios/${a.imagen}.png` });
 function muroConAccesorio(base, a) {
   const c = document.createElement('canvas'); c.width = c.height = TEX;
   // el motor ensancha los muros (el ancho de pantalla rinde más que el alto): se compensa para que el dibujo no se deforme
@@ -114,7 +115,7 @@ function decorarMuros(w, nivel) {
 
 // Accesorios de techo: sprites de la altura del muro con el dibujo arriba, así siempre tocan el techo.
 // Nunca bajan de la línea de los ojos: el grupo pasa por debajo y no chocan con nada.
-const TECHO = ACCESORIOS.techo, IMG_TECHO = TECHO.lista.map(n => Object.assign(new Image(), { src: `expedicion/interfaz/mazmorra/cripta/accesorios/${n}.png` }));
+const TECHO = ACCESORIOS.techo, IMG_TECHO = TECHO.lista.map(n => Object.assign(new Image(), { src: `interfaz/mazmorra/cripta/accesorios/${n}.png` }));
 const SPR_TECHO = [];
 function spriteTecho(n) {
   const img = IMG_TECHO[n];
@@ -133,7 +134,7 @@ function colgarDelTecho(w, nivel) {
 // Accesorios de piso: sprites sólidos que se esquivan. Sólo van en salas, nunca en pasillos ni frente a su boca,
 // y donde no dejan nada aislado.
 const PISO = ACCESORIOS.piso;
-for (const a of PISO.lista) a.img = Object.assign(new Image(), { src: `expedicion/interfaz/mazmorra/cripta/accesorios/${a.imagen}.png` });
+for (const a of PISO.lista) a.img = Object.assign(new Image(), { src: `interfaz/mazmorra/cripta/accesorios/${a.imagen}.png` });
 function zonaAlcanzable(w, tapado) {
   const pila = [w.start[1] * MW + w.start[0]], visto = new Set(pila);
   while (pila.length) {
@@ -190,8 +191,7 @@ window.openTitleMenu = () => {
   openMenu({ back: false, cls: 'compact', items: [
     { label: 'Reunir el grupo', sub: `${X.ceniza} de Ceniza · ${X.caidos.length} caído${X.caidos.length === 1 ? '' : 's'} · ${X.corridas} expedicion${X.corridas === 1 ? '' : 'es'}`, fn: abrirReunion },
     { label: 'Los caídos', sub: 'Quienes quedaron en la cripta.', fn: abrirCaidos, off: !X.caidos.length },
-    { label: 'Borrar progreso', sub: 'Ceniza y caídos de esta prueba.', fn: () => confirmMenu('¿Borrar la Ceniza y los caídos?', () => { X.ceniza = 0; X.caidos = []; X.corridas = 0; guardarX(); openTitleMenu(); }) },
-    { label: 'Volver al juego base', fn: () => { location.href = new URL('index.html', document.baseURI).href; } },
+    { label: 'Borrar progreso', sub: 'Ceniza y caídos de tus expediciones.', fn: () => confirmMenu('¿Borrar la Ceniza y los caídos?', () => { X.ceniza = 0; X.caidos = []; X.corridas = 0; guardarX(); openTitleMenu(); }) },
   ] }, 'title');
 };
 
@@ -253,7 +253,7 @@ function partir() {
 
 // ---------- Mazmorra (la del juego base) ----------
 window.enterLevel = (floor, level) => {
-  // la expedición de prueba es corta: dos niveles y la guarida
+  // la expedición es corta: dos niveles y la guarida
   if (floor === 1 && !D.mazmorra.niveles.includes(level)) level = D.mazmorra.niveles.find(n => n > level);
   aplicarTexturas();
   baseX.enterLevel(floor, level);
@@ -311,7 +311,7 @@ window.afterStep = () => {
 
 // Exploración a pantalla completa: sin panel; mapa, zona y objetos
 const CASILLEROS = {};
-for (const n of ['pocion', 'aceite', 'antorcha']) CASILLEROS[n] = { img: Object.assign(new Image(), { src: `expedicion/interfaz/hud/casillero_${n}.png` }), c: {} };
+for (const n of ['pocion', 'aceite', 'antorcha']) CASILLEROS[n] = { img: Object.assign(new Image(), { src: `interfaz/hud/casillero_${n}.png` }), c: {} };
 function casilleroX(n) {
   const k = CASILLEROS[n];
   if (!k.c[S.env] && k.img.complete && k.img.naturalWidth) k.c[S.env] = spriteCanvas(spriteDesdeImagen(k.img, k.img.naturalWidth), k.img.naturalWidth, S.env, 1).toDataURL();
@@ -377,7 +377,7 @@ window.drawMinimap = (c, R, w, p) => {
 // La mano con la antorcha: el dibujo pasa por la paleta del piso y se apaga junto con el combustible;
 // el fuego es la llama animada del juego, que crece o baja con lo que queda.
 window.renderTorch = () => {};
-const MANO = { img: Object.assign(new Image(), { src: 'expedicion/interfaz/hud/mano_antorcha.png' }), x: 326, y: 152, lado: 136, cache: {} };
+const MANO = { img: Object.assign(new Image(), { src: 'interfaz/hud/mano_antorcha.png' }), x: 326, y: 152, lado: 136, cache: {} };
 RAMPS.fuegoX = ['#3a0d06', '#7c1f0a', '#c9440c', '#ee7d1a', '#fab634', '#ffeeb0'];
 function manoIluminada(nivel) {
   const clave = S.env + nivel;
@@ -518,11 +518,11 @@ function dibujarCierre(c) {
 }
 
 // Fondo pintado de cada zona; si no cargó, el procedural
-const FONDOS = { crypt: Object.assign(new Image(), { src: 'expedicion/interfaz/batalla/cripta.png' }) };
+const FONDOS = { crypt: Object.assign(new Image(), { src: 'interfaz/batalla/cripta.png' }) };
 const ANTORCHAS = { crypt: [[25, 77], [454, 77]] };
 // Dibujos propios de enemigos (campo "imagen" de enemigos.json); los demás usan el sprite del juego base
 const IMG_ENEMIGOS = {};
-for (const d of Object.values(D.enemigos)) if (d.imagen) IMG_ENEMIGOS[d.imagen] = Object.assign(new Image(), { src: `expedicion/interfaz/enemigos/${d.imagen}.png` });
+for (const d of Object.values(D.enemigos)) if (d.imagen) IMG_ENEMIGOS[d.imagen] = Object.assign(new Image(), { src: `interfaz/enemigos/${d.imagen}.png` });
 
 function fondoBatalla() {
   const f = FONDOS[S.env], n = 480 * 270, g = new Float32Array(n).fill(0.14);

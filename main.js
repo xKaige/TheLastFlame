@@ -1,8 +1,21 @@
 // Envoltorio de escritorio (Electron) para distribuir en Steam
-const { app, BrowserWindow, ipcMain, screen } = require('electron');
+const { app, BrowserWindow, ipcMain, net, protocol, screen } = require('electron');
 const fs = require('fs');
 const path = require('path');
+const { pathToFileURL } = require('url');
 require('./ipc'); // guardado en archivos y Steam
+
+// ---------- Archivos del juego ----------
+// El juego lee sus datos y analiza sus imágenes píxel por píxel, y Chromium no deja hacer eso desde file://.
+// Por eso se sirve con un protocolo propio, sin red: sólo entrega archivos de la carpeta del juego.
+protocol.registerSchemesAsPrivileged([{ scheme: 'juego', privileges: { standard: true, secure: true, supportFetchAPI: true } }]);
+function servirJuego() {
+  protocol.handle('juego', req => {
+    const ruta = path.normalize(path.join(__dirname, decodeURIComponent(new URL(req.url).pathname)));
+    if (ruta !== __dirname && !ruta.startsWith(__dirname + path.sep)) return new Response('', { status: 403 });
+    return net.fetch(pathToFileURL(ruta).toString());
+  });
+}
 
 // ---------- Modo de pantalla ----------
 // ventana: con bordes, redimensionable · completa: pantalla completa nativa (tapa la barra de tareas)
@@ -47,8 +60,8 @@ function createWindow(m) {
   const remember = () => { if (mode === 'ventana' && !w.isFullScreen() && !w.isMinimized()) lastBounds = w.getBounds(); };
   w.on('resize', remember);
   w.on('move', remember);
-  // `npm run prueba`: abre el juego en modo prueba (menú Pruebas, sin guardar nada)
-  w.loadFile('index.html', process.argv.includes('--prueba') ? { query: { prueba: '1' } } : {});
+  // `npm run prueba`: abre el juego en modo prueba (sin guardar nada)
+  w.loadURL('juego://local/index.html' + (process.argv.includes('--prueba') ? '?prueba=1' : ''));
   return w;
 }
 
@@ -84,5 +97,5 @@ ipcMain.on('display:set', (e, m, state) => {
 // la ventana nueva pregunta si tiene que retomar algo (una sola vez)
 ipcMain.on('display:resume', e => { e.returnValue = resume; resume = null; });
 
-app.whenReady().then(() => open(savedMode()));
+app.whenReady().then(() => { servirJuego(); open(savedMode()); });
 app.on('window-all-closed', () => app.quit());

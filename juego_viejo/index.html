@@ -2,13 +2,10 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<base href="../">
-<script>if (!/[?&]prueba/.test(location.search)) location.replace(location.pathname + "?prueba");</script>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>La Última Llama · Expedición</title>
+<title>La Última Llama</title>
 <link rel="stylesheet" href="css/fonts.css">
 <link rel="stylesheet" href="css/style.css">
-<link rel="stylesheet" href="expedicion/estilo.css">
 </head>
 <body>
 <div id="stage">
@@ -86,9 +83,6 @@
 
   <div id="battle" class="hidden"><div id="bLog"></div><div id="bMenu" class="hidden"></div><div id="bCards"></div></div>
 
-  <div id="xEsq"></div>
-  <div id="xBanner" class="hidden"></div>
-  <div id="xCharla" class="hidden"></div>
   <div id="toast" class="hidden"></div>
   <div id="dialog" class="hidden"></div>
   <div id="screenMsg" class="hidden"></div>
@@ -100,16 +94,7 @@
 </div>
 
 <script src="assets/voz/voces.js"></script>
-<script>
-// La vista 3D ocupa toda la pantalla: se carga util.js del juego base (sin modificarlo) con otras medidas
-(() => {
-  const x = new XMLHttpRequest();
-  x.open('GET', 'js/util.js', false); x.send();
-  const s = document.createElement('script');
-  s.text = x.responseText.replace('const VX = 20, VY = 18, VW = 300, VH = 180;', 'const VX = 0, VY = 0, VW = 480, VH = 270;');
-  document.head.appendChild(s);
-})();
-</script>
+<script src="js/util.js"></script>
 <script src="js/store.js"></script>
 <script src="js/settings.js"></script>
 <script src="js/i18n.js"></script>
@@ -137,9 +122,9 @@
 <script src="js/meta.js"></script>
 <script src="js/codex.js"></script>
 <script src="js/daily.js"></script>
+<script src="js/batalla.js"></script>
+<script src="js/pruebas.js"></script>
 <script src="js/i18n-en.js"></script>
 <script src="js/game.js"></script>
-<script src="expedicion/nucleo.js"></script>
-<script src="expedicion/juego.js"></script>
 </body>
 </html>

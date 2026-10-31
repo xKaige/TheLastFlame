@@ -1,5 +1,5 @@
 # Recorta de la imagen de referencia los casilleros de la exploración.
-# Uso: python expedicion/recortar_hud.py referencia.webp
+# Uso: python tools/recortar_hud.py referencia.webp
 import os, sys
 from PIL import Image
 ESC = 480 / 1279
