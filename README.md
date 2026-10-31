@@ -30,7 +30,7 @@ Sin servidor no funciona con doble clic en `index.html`: el juego lee archivos J
 | `js/juego.js` | Presentación y flujo de la partida |
 | `js/` (el resto) | Motor: raycaster, dithering, generación de niveles, sonido y menús |
 | `tools/` | Servidor, simulador y conversión de arte |
-| `juego_viejo/` | El juego anterior (personaje único), completo. Se abre en http://localhost:8123/juego_viejo/ |
+| `juego_viejo/` | Todo lo anterior: el juego de personaje único, sus documentos, el plan de Steam y su ejecutable (`dist/`, no va a GitHub). Se abre en http://localhost:8123/juego_viejo/ |
 
 Parte del motor viene del juego anterior y `js/juego.js` reemplaza lo que hace falta: varias funciones de esos
 archivos quedaron sin uso y se pueden limpiar con el tiempo.

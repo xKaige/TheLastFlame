@@ -1,7 +1,7 @@
 # Roadmap
 
 El camino del juego es la expedición de grupo. El plan del juego anterior está en `juego_viejo/ROADMAP.md`.
-Steam sigue en pausa hasta que el juego esté pulido.
+Steam sigue en pausa hasta que el juego esté pulido; sus notas están en `juego_viejo/STEAM.md`.
 
 ## Pendiente de elegir
 
@@ -28,4 +28,3 @@ Steam sigue en pausa hasta que el juego esté pulido.
 ## Limpieza
 
 - Quitar del motor lo que quedó sin uso (combate, creación de personaje, partidas del juego anterior).
-- Regenerar `dist/` con `npm run dist` cuando haga falta un ejecutable.
