@@ -41,7 +41,7 @@ for (const tam of [4, 3, 2, 1]) {
         tot.peleas++; tot.turnos += turnos; vivo = r === 'victoria';
         if (piso === 1) { tot.peleas1++; tot.turnos1 += turnos; }
         const exp = 8;
-        for (const u of N.vivos(grupo)) N.ganarExp(D, u, exp);
+        for (const u of N.vivos(grupo)) N.ganarExp(D, u, exp, N.topeNivel(D, piso));
         descanso(G.descanso);
         if (k % 2 === 1) descanso(0.25);          // pociones del grupo
       }
@@ -49,7 +49,7 @@ for (const tam of [4, 3, 2, 1]) {
         descanso(0.3);
         const { r } = pelear(grupo, G.jefes[piso]);
         vivo = r === 'victoria';
-        if (vivo) { tot.jefes[piso - 1]++; for (const u of N.vivos(grupo)) N.ganarExp(D, u, D.enemigos[G.jefes[piso].find(i => D.enemigos[i].jefe)].exp); descanso(G.santuario.cura); }
+        if (vivo) { tot.jefes[piso - 1]++; for (const u of N.vivos(grupo)) N.ganarExp(D, u, D.enemigos[G.jefes[piso].find(i => D.enemigos[i].jefe)].exp, N.topeNivel(D, piso)); descanso(G.santuario.cura); }
       }
     }
     if (vivo) tot.gana++;

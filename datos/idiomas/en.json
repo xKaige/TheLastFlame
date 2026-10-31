@@ -967,7 +967,6 @@
   "Pulsa el botón nuevo (Esc cancela).": "Press the new button (Esc cancels).",
   "Restablecer botones": "Reset buttons",
   "Botones de fábrica.": "Default buttons.",
-  "¿Salir? La expedición en curso se pierde.": "Quit? The current expedition is lost.",
   "¿Empezar de nuevo? Se borra todo el progreso.": "Start over? All progress is erased.",
   "Segundo golpe {0}–{1}%": "Second strike {0}–{1}%",
   " Remata con la otra daga: {0}–{1}.": " Follows up with the other dagger: {0}–{1}.",
@@ -978,5 +977,11 @@
   "<em>Necesitas {0} de Ímpetu: ataca o defiéndete para juntarlo.</em> ": "<em>You need {0} Momentum: attack or defend to build it.</em> ",
   "Ímpetu: atacar o defender lo carga; las habilidades lo gastan.": "Momentum: attacking or defending builds it; skills spend it.",
   "Atacar, defenderte o esquivar un golpe da 1 de Ímpetu (hasta {0}); las habilidades activas lo gastan.": "Attacking, defending or dodging a blow gives 1 Momentum (up to {0}); active skills spend it.",
-  "Atacar y defenderte cargan Ímpetu ◆; tus habilidades lo gastan.": "Attacking and defending build Momentum ◆; your skills spend it."
+  "Atacar y defenderte cargan Ímpetu ◆; tus habilidades lo gastan.": "Attacking and defending build Momentum ◆; your skills spend it.",
+  "Guardar y salir": "Save and quit",
+  "La expedición sigue donde la dejaste.": "The expedition resumes where you left it.",
+  "Expedición en curso · piso {0} · {1}": "Expedition in progress · floor {0} · {1}",
+  "El grupo sigue adelante.": "The party presses on.",
+  "Máximo de la zona": "Zone maximum",
+  "Nv {0} máx": "Lv {0} max"
 }

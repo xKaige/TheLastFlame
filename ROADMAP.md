@@ -6,7 +6,12 @@ Steam sigue en pausa hasta que el juego esté pulido; sus notas están en `juego
 ## Orden de trabajo
 
 Por partes: primero la base y el piso 1 (La Cripta) terminado. Después se remodela el piso 2, y recién entonces el resto.
-Lo próximo son los menús y la tipografía.
+Lo próximo son los eventos propios del piso 1.
+
+## Reglas decididas
+
+- **Zonas:** cada 3 pisos son una zona, con nivel máximo 10, 20, 30... (`zonas` en `datos/mazmorra.json`). En un piso de una zona ya superada el personaje no gana experiencia.
+- **Continuar:** la expedición se guarda sola explorando, nunca en medio de una pelea. Morir no se deshace cerrando el juego.
 
 ## Pendiente de elegir
 
@@ -15,17 +20,14 @@ Lo próximo son los menús y la tipografía.
 
 ## Falta para que sea un juego completo
 
-- **Continuar:** hoy una expedición a medias no se retoma; sólo se guardan la Ceniza y los caídos.
-- **Equipo y botín** para el grupo.
-- **Eventos propios:** se quitaron los del juego anterior y sólo queda el peregrino.
-- **Inventario y opciones** adaptados al grupo.
-- **Más variedad:** hoy son 8 habilidades y 10 enemigos; faltan escenarios de batalla propios para Los Salones y El Fondo.
+- **Eventos propios:** se quitaron los del juego anterior y sólo queda el peregrino. Acá entran misiones y cofres secretos.
+- **Más variedad:** hoy son 7 objetos, 18 habilidades y 10 enemigos; faltan escenarios de batalla propios para Los Salones y El Fondo.
 - **Más historia:** diálogos entre personajes del grupo, y Aldemar y La Sombra con más escenas.
-- **Inglés:** el juego nuevo está sólo en español.
+- **Traducciones:** el sistema de idiomas está listo; faltan textos en inglés (`node tools/textos_faltantes.js en`).
+- **Logo y música de exploración:** pendientes de los archivos.
 
 ## Arte
 
-- Soplo: falta su dibujo.
 - Velas sobre la calavera: siguen con el dibujo viejo.
 - Grillete: poco contraste contra el muro.
 - Retratos: faltan los PNG originales sin marco.

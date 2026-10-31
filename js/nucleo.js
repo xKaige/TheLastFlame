@@ -99,15 +99,20 @@ const NUCLEO = (() => {
     return coste;
   }
 
-  function ganarExp(D, p, exp) {
+  // Cada zona son varios pisos y tiene su nivel máximo: evita subir sin fin en los primeros
+  const topeNivel = (D, piso) => Math.ceil(piso / D.mazmorra.zonas.pisos) * D.mazmorra.zonas.nivel_maximo;
+
+  function ganarExp(D, p, exp, tope = Infinity) {
+    if (p.nivel >= tope) { p.exp = 0; return false; }
     p.exp += exp;
     let subio = false;
-    while (p.exp >= p.nivel * D.mazmorra.exp_por_nivel) {
+    while (p.nivel < tope && p.exp >= p.nivel * D.mazmorra.exp_por_nivel) {
       p.exp -= p.nivel * D.mazmorra.exp_por_nivel; p.nivel++; subio = true; p.puntos++;
       p.base.vida += D.mazmorra.mejora_nivel.vida; p.base.ataque += D.mazmorra.mejora_nivel.ataque;
       for (const [a, v] of Object.entries(D.clases[p.clase].crecimiento)) p.atributos[a] += v;   // lo que crece solo, según la clase
       recalcular(D, p);
     }
+    if (p.nivel >= tope) p.exp = 0;
     return subio;
   }
 
@@ -291,7 +296,7 @@ const NUCLEO = (() => {
     return eventos;
   }
 
-  return { IMP_TOPE, vivos, crearPersonaje, asegurarPersonaje, ajustarModelo, atributosDe, recalcular, subirAtributo, cumpleRequisito, sortearCandidatos, sortearCaidos, aplicarCondicion, ganarExp, iniciarBatalla, haTerminado, vistaPrevia, proximoTurno, opciones, atacar, defender, usarHabilidad, turnoEnemigo };
+  return { IMP_TOPE, vivos, crearPersonaje, asegurarPersonaje, ajustarModelo, atributosDe, recalcular, subirAtributo, cumpleRequisito, sortearCandidatos, sortearCaidos, aplicarCondicion, topeNivel, ganarExp, iniciarBatalla, haTerminado, vistaPrevia, proximoTurno, opciones, atacar, defender, usarHabilidad, turnoEnemigo };
 })();
 
 if (typeof module !== 'undefined') module.exports = NUCLEO;

@@ -14,6 +14,10 @@
     5
   ],
   "exp_por_nivel": 10,
+  "zonas": {
+    "pisos": 3,
+    "nivel_maximo": 10
+  },
   "mejora_nivel": {
     "vida": 4,
     "ataque": 0

@@ -140,10 +140,14 @@ function muroConAccesorio(base, a) {
     return base[y * TEX + x] * (alfa(x - 1, y - 1) || alfa(x - 2, y - 2) ? 0.4 : 1);       // sombra sobre el muro
   });
 }
-function decorarMuros(w, nivel) {
-  const T = TEXTURES[w.theme || 'crypt'], lista = ACCESORIOS.lista.filter(a => a.img.complete && a.img.naturalWidth), puestos = [];
-  if (!lista.length) return;
+function prepararMuros(w) {
+  const T = TEXTURES[w.theme || 'crypt'], lista = ACCESORIOS.lista.filter(a => a.img.complete && a.img.naturalWidth);
   lista.forEach(a => { const k = ACC_BASE + ACCESORIOS.lista.indexOf(a); if (!T.walls[k]) T.walls[k] = muroConAccesorio(T.walls[0], a); });
+  return lista;
+}
+function decorarMuros(w, nivel) {
+  const lista = prepararMuros(w), puestos = [];
+  if (!lista.length) return;
   const muro = (x, y) => x < 0 || y < 0 || x >= MW || y >= MH || w.map[y * MW + x] === 1;
   const azar = (x, y, s) => { let h = Math.imul(x + 1, 73856093) ^ Math.imul(y + 1, 19349663) ^ Math.imul(nivel + s, 83492791); h = Math.imul(h ^ (h >>> 13), 1274126177); return ((h ^ (h >>> 16)) >>> 0) / 4294967296; };
   for (let y = 1; y < MH - 1; y++) for (let x = 1; x < MW - 1; x++) {
@@ -198,15 +202,20 @@ function esquinaDeSala(w, x, y) {
   }
   return false;
 }
-function ponerEnElPiso(w, nivel) {
-  w.adornos = []; w.solidos = new Set();
+function prepararAdornos() {
   const lista = PISO.lista.filter(a => a.img.complete && a.img.naturalWidth);
-  if (!lista.length) return;
-  const azar = (x, y, s) => { let h = Math.imul(x + 7, 83492791) ^ Math.imul(y + 11, 19349663) ^ Math.imul(nivel + s, 73856093); h = Math.imul(h ^ (h >>> 13), 1274126177); return ((h ^ (h >>> 16)) >>> 0) / 4294967296; };
   for (const a of lista) {
     if (!a.spr) a.spr = spriteDesdeImagen(a.img, a.img.naturalWidth);
     if (a.reemplaza) SPRITES[a.reemplaza].w = a.spr;      // el adorno viejo del juego base usa el dibujo nuevo
   }
+  return lista;
+}
+const adornoEn = (x, y, a) => ({ x, y, spr: a.spr, scale: a.escala, ramp: 0, glow: 0.3, n: PISO.lista.indexOf(a) });
+function ponerEnElPiso(w, nivel) {
+  w.adornos = []; w.solidos = new Set();
+  const lista = prepararAdornos();
+  if (!lista.length) return;
+  const azar = (x, y, s) => { let h = Math.imul(x + 7, 83492791) ^ Math.imul(y + 11, 19349663) ^ Math.imul(nivel + s, 73856093); h = Math.imul(h ^ (h >>> 13), 1274126177); return ((h ^ (h >>> 16)) >>> 0) / 4294967296; };
   let total = zonaAlcanzable(w, -1);
   for (let y = 1; y < MH - 1; y++) for (let x = 1; x < MW - 1; x++) {
     const i = y * MW + x;
@@ -214,7 +223,7 @@ function ponerEnElPiso(w, nivel) {
     if (w.ents.some(e => e.x === x && e.y === y) || w.adornos.some(p => Math.abs(p.x - x - 0.5) + Math.abs(p.y - y - 0.5) < PISO.separacion)) continue;
     if (zonaAlcanzable(w, i) !== total - 1) continue;
     const a = lista[Math.floor(azar(x, y, 4) * lista.length)];
-    w.adornos.push({ x: x + 0.5, y: y + 0.5, spr: a.spr, scale: a.escala, ramp: 0, glow: 0.3 });
+    w.adornos.push(adornoEn(x + 0.5, y + 0.5, a));
     w.solidos.add(i); total--;
   }
 }
@@ -263,8 +272,10 @@ window.openTitleMenu = () => {
   for (const id of ['combat', 'inv', 'dialog', 'battle', 'xCharla']) $(id).classList.add('hidden');
   showScreen(null); setPalette('castle'); setMusic('intro');
   S.mode = 'title';
-  const hay = hayPartida(), items = [];
-  if (hay) items.push({ label: 'Continuar', sub: tr('{0} de Ceniza · {1} en el plantel · {2} expedicion{3}', X.ceniza, X.plantel.length, X.corridas, X.corridas === 1 ? '' : 'es'), fn: abrirHogar });
+  const hay = hayPartida(), curso = leerExpedicion(), items = [];
+  // con una expedición en marcha no se pasa por el Hogar: el grupo sigue abajo
+  if (curso) items.push({ label: 'Continuar', sub: tr('Expedición en curso · piso {0} · {1}', ROMAN[curso.snap.floor], curso.grupo.filter(p => p.vida > 0).map(p => p.nombre).join(', ')), fn: continuarExpedicion });
+  else if (hay) items.push({ label: 'Continuar', sub: tr('{0} de Ceniza · {1} en el plantel · {2} expedicion{3}', X.ceniza, X.plantel.length, X.corridas, X.corridas === 1 ? '' : 'es'), fn: abrirHogar });
   items.push({ label: 'Nueva partida', fn: () => (hay ? confirmMenu('¿Empezar de nuevo? Se borra todo el progreso.', nuevaPartida) : nuevaPartida()) });
   items.push({ label: 'Opciones', fn: openOptionsMenu });
   if (PRUEBA) items.push({ label: 'Peleas de prueba', sub: 'Va directo a una pelea. No se guarda nada.', fn: abrirPeleasDePrueba });
@@ -276,6 +287,7 @@ const hayPartida = () => X.corridas > 0 || X.ceniza > 0 || !!X.memoria.introVist
 function nuevaPartida() {
   Object.assign(X, { ceniza: 0, caidos: [], corridas: 0, plantel: [], candidatos: [], leyendas: [], grimorio: [], mochila: [], sel: [], memoria: { hondo: 1, reveladas: [], ultimoCaido: null, habitante: null, finales: {} } });
   guardarX();
+  borrarExpedicion();
   verIntro();
 }
 
@@ -308,7 +320,7 @@ function pelearDePrueba(ids, piso, jefe) {
 window.openPauseMenu = () => openMenu({ title: 'Pausa', items: [
   { label: 'Continuar', fn: closeMenu },
   { label: 'Opciones', fn: openOptionsMenu },
-  { label: 'Salir al título', fn: () => confirmMenu('¿Salir? La expedición en curso se pierde.', openTitleMenu) },
+  { label: 'Guardar y salir', sub: 'La expedición sigue donde la dejaste.', fn: () => { closeAllMenus(); S.mode = 'explore'; guardarExpedicion(); openTitleMenu(); } },
 ] }, 'game');
 
 // ---------- La introducción ----------
@@ -574,8 +586,47 @@ function partir() {
   const marcado = X.grupo.find(p => p.marcado);
   if (marcado) recuerdo.push(conNombre('marcado', marcado.nombre));
   if (M.habitante) recuerdo.push(conNombre('habitante_nuevo', M.habitante));
-  M.ultimoCaido = null; guardarX();
+  M.ultimoCaido = null; guardarX(); guardarExpedicion();
   encadenar([X.grupo.length === MAX_GRUPO ? 'inicio' : 'inicio_pocos', ...recuerdo, dichoDeAlguien('baja')]);
+}
+
+// ---------- Continuar ----------
+// La expedición en marcha va en su propio archivo. Se guarda explorando, nunca en medio de una pelea:
+// quien cierra el juego peleando vuelve a justo antes de empezarla.
+const CLAVE_CURSO = 'expedicion.curso';
+function leerExpedicion() {
+  try { return JSON.parse(STORE.get(CLAVE_CURSO) || 'null'); } catch (e) { return null; }
+}
+const borrarExpedicion = () => STORE.remove(CLAVE_CURSO);
+function guardarExpedicion() {
+  if (S.mode !== 'explore' || Bt || !S.world || !NUCLEO.vivos(X.grupo).length) return;
+  guardarX();
+  const w = W_();
+  STORE.set(CLAVE_CURSO, JSON.stringify({ snap: snapshot(), grupo: X.grupo, adornos: (w.adornos || []).map(({ x, y, n }) => ({ x, y, n })) }));
+}
+window.autosave = guardarExpedicion;
+addEventListener('beforeunload', guardarExpedicion);
+
+function continuarExpedicion() {
+  const d = leerExpedicion();
+  // quien ya no está en el plantel murió después de este guardado: cerrar el juego no lo revive
+  X.grupo = d.grupo.map(g => {
+    const q = X.plantel.find(p => p.id === g.id);
+    return q ? Object.assign(q, g) : { ...g, vida: 0, cayo: g.cayo || d.snap.level };
+  });
+  X.perdidos = X.grupo.filter(p => p.vida <= 0); X.sel = []; X.ganada = 0;
+  closeAllMenus();
+  if (!NUCLEO.vivos(X.grupo).length) { borrarExpedicion(); recambiarCandidatos(); guardarX(); return abrirHogar(); }
+  audioInit(); sfx('stairs');
+  aplicarTexturas();
+  restore(d.snap);
+  const w = W_(), lista = prepararAdornos();
+  prepararMuros(w);
+  colgarDelTecho(w, S.level);
+  w.adornos = d.adornos.filter(a => lista.includes(PISO.lista[a.n])).map(a => adornoEn(a.x, a.y, PISO.lista[a.n]));
+  w.solidos = new Set(w.adornos.map(a => Math.floor(a.y) * MW + Math.floor(a.x)));
+  log('El grupo sigue adelante.', 'em');
+  updateHUD();
 }
 
 // ---------- Mazmorra (la del juego base) ----------
@@ -856,6 +907,7 @@ const CX = [10, 128, 246, 364], CY = 216, CW = 106, FX3 = [145, 240, 335], FBASE
 let Bt = null;
 window.startCombat = (e, emboscada) => {
   if (Bt || S.mode !== 'explore') return;
+  guardarExpedicion();
   const jefe = e.def.boss, tipo = jefe ? 'jefe' : emboscada ? 'emboscada' : 'comun';
   const ids = jefe ? D.mazmorra.jefes[S.floor] : (p => p[Math.floor(azarX() * p.length)])(D.mazmorra.grupos_por_piso[S.floor]);
   const go = () => iniciarTransicion(e, ids, tipo);
@@ -1154,10 +1206,11 @@ function terminarPelea(gano) {
   const hallado = soltarBotin(ent.def.boss);
   for (const id of sinDesbloquear('jefe')) if (b.enemigos.some(e => e.tipo === D.habilidades[id].jefe)) { desbloquear(id); log(tr('{0} queda en el Grimorio.', D.habilidades[id].nombre), 'em'); }
   X.ceniza += Math.round((ent.def.boss ? D.mazmorra.ceniza.por_jefe : D.mazmorra.ceniza.por_grupo) * porGrupo('ceniza'));
+  const tope = NUCLEO.topeNivel(D, S.floor);
   for (const u of NUCLEO.vivos(X.grupo)) {
     // lo que se anima en pantalla sale de los valores de antes del reparto
-    u.reparto = { exp: u.exp, nivel: u.nivel, falta: exp, subio: 0 };
-    NUCLEO.ganarExp(D, u, exp);
+    u.reparto = { exp: u.exp, nivel: u.nivel, falta: u.nivel >= tope ? 0 : exp, subio: 0, tope };
+    NUCLEO.ganarExp(D, u, exp, tope);
     u.vida = Math.min(u.vidaMax, u.vida + Math.round(u.vidaMax * D.mazmorra.descanso));
   }
   guardarX();
@@ -1183,7 +1236,8 @@ function actualizarBotin(dt) {
     if (a.falta <= 0) continue;
     const paso = Math.min(a.falta, dt * Bt.velXp);
     a.exp += paso; a.falta -= paso;
-    while (a.exp >= a.nivel * D.mazmorra.exp_por_nivel) { a.exp -= a.nivel * D.mazmorra.exp_por_nivel; a.nivel++; a.subio = 1; sfx('level'); }
+    while (a.nivel < a.tope && a.exp >= a.nivel * D.mazmorra.exp_por_nivel) { a.exp -= a.nivel * D.mazmorra.exp_por_nivel; a.nivel++; a.subio = 1; sfx('level'); }
+    if (a.nivel >= a.tope) a.falta = 0;
     if (a.falta > 0) queda = true;
   }
   if (!queda && !Bt.listo) Bt.listo = true;
@@ -1226,6 +1280,7 @@ function seguirTrasPelea() {
   const muerte = caido && { quien: 'sombra', caras: ['risa'], lineas: [D.historia.modelos[caido.modelo].muerte.replace('{nombre}', caido.nombre)] };
   X.memoria.ultimoCaido = null;
   if (jefe && piso === LAST_FLOOR) return encadenar([muerte, 'jefe_3_muerto', revelar(4)], elegirPortador);
+  guardarExpedicion();
   encadenar([muerte, caido ? revelar(1) : null, jefe ? tr('jefe_{0}_muerto', piso) : null]);
 }
 
@@ -1245,6 +1300,7 @@ window.useBonfire = b => {
 };
 function retirarse() {
   closeAllMenus(); S.mode = 'explore';
+  borrarExpedicion();
   charla('retirada', () => { recambiarCandidatos(); guardarX(); abrirHogar(); });
 }
 
@@ -1287,6 +1343,7 @@ window.endingScenes = (id, who) => {
 };
 
 function finExpedicion(gano) {
+  borrarExpedicion();
   if (gano) {
     X.ganada = 1;
     // quienes recuperan la Llama se retiran: quedan como leyendas del Hogar
@@ -1551,12 +1608,12 @@ function dibujarLinea(c) {
 
 // Barra de experiencia del reparto: se llena, y si sube de nivel vuelve a empezar con una flecha al final
 function dibujarReparto(c, u, x, y) {
-  const a = u.reparto, w = 46, frac = clamp(a.exp / (a.nivel * D.mazmorra.exp_por_nivel), 0, 1);
+  const a = u.reparto, w = 46, enElTope = a.nivel >= a.tope, frac = enElTope ? 1 : clamp(a.exp / (a.nivel * D.mazmorra.exp_por_nivel), 0, 1);
   c.fillStyle = MARCO.piedra; c.fillRect(x, y, w, 4);
   c.fillStyle = MARCO.fondo; c.fillRect(x + 1, y + 1, w - 2, 2);
   c.fillStyle = MARCO.luz; c.fillRect(x + 1, y + 1, Math.round((w - 2) * frac), 2);
   c.font = '9px "New Rocker", serif'; c.textAlign = 'left'; c.fillStyle = MARCO.luz;
-  c.fillText(`Nv ${a.nivel}`, x, y + 13);
+  c.fillText(enElTope ? tr('Nv {0} máx', a.nivel) : `Nv ${a.nivel}`, x, y + 13);
   if (a.nivel > (a.nivel0 ?? (a.nivel0 = a.nivel))) {
     // flecha hacia arriba al final de la barra
     const ax = x + w + 2, ay = y - 1 - Math.round(a.subio * 3);

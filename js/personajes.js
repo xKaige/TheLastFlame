@@ -68,11 +68,11 @@ function pintarPj() {
 
   const pestanas = PESTANAS.map((t, i) => `<div class="ptab${i === PJ.tab ? ' on' : ''}">${tr(t)}</div>`).join('');
   const grupo = PJ.lista.map((q, i) => `<img class="${i === PJ.i ? 'on' : ''}${q.vida <= 0 ? ' caido' : ''}" src="${retrato(q)}" alt="">`).join('');
-  const falta = p.nivel * D.mazmorra.exp_por_nivel;
+  const falta = p.nivel * D.mazmorra.exp_por_nivel, enElTope = p.nivel >= NUCLEO.topeNivel(D, PJ.lista === X.grupo ? S.floor : X.memoria.hondo);
   const barra = (cls, frac) => `<i class="pbarra ${cls}"><b style="width:${clamp(frac, 0, 1) * 100}%"></b></i>`;
   const ficha = `<section class="ppanel pficha"><div class="pnom">${p.nombre}</div><div class="ptit">${D.modelos[p.modelo].titulo} · ${c.nombre}</div>
     <img class="pret" src="${retrato(p)}" alt="">
-    <div class="pdato"><span>${tr('Nivel {0}', p.nivel)}</span><em>${Math.floor(p.exp)}/${falta} XP</em></div>${barra('xp', p.exp / falta)}
+    <div class="pdato"><span>${tr('Nivel {0}', p.nivel)}</span><em>${enElTope ? tr('Máximo de la zona') : `${Math.floor(p.exp)}/${falta} XP`}</em></div>${barra('xp', enElTope ? 1 : p.exp / falta)}
     <div class="pdato vida"><span>${tr('Vida')}</span><em>${Math.max(0, p.vida)}/${p.vidaMax}</em></div>${barra('vida', p.vida / p.vidaMax)}</section>`;
 
   let centro = '';
