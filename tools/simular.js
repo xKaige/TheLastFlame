@@ -3,7 +3,7 @@
 const fs = require('fs'), path = require('path');
 const N = require('../js/nucleo.js');
 const D = {};
-for (const f of ['clases', 'habilidades', 'modelos', 'enemigos', 'mazmorra', 'dialogos']) D[f] = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'datos', f + '.json'), 'utf8'));
+for (const f of ['clases', 'habilidades', 'objetos', 'modelos', 'enemigos', 'mazmorra', 'dialogos']) D[f] = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'datos', f + '.json'), 'utf8'));
 const azar = Math.random, MEZCLA = ['guerrero', 'picaro', 'mago', 'sanador'];
 
 function pelear(grupo, ids) {

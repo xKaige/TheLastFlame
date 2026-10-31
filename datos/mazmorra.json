@@ -229,5 +229,47 @@
       ],
       "volumen": 0.42
     }
+  },
+  "max_habilidades": 4,
+  "atributos": {
+    "lista": [
+      "fue",
+      "des",
+      "vit",
+      "int",
+      "per"
+    ],
+    "nombres": {
+      "fue": "Fuerza",
+      "des": "Destreza",
+      "vit": "Vitalidad",
+      "int": "Intelecto",
+      "per": "Perspicacia",
+      "ataque": "Ataque",
+      "defensa": "Defensa"
+    },
+    "por_punto": {
+      "fue": {
+        "ataque": 1
+      },
+      "des": {
+        "velocidad": 0.5,
+        "esquiva": 0.01
+      },
+      "vit": {
+        "vida": 3,
+        "defensa": 0.34
+      },
+      "int": {
+        "magia": 0.04
+      },
+      "per": {
+        "critico": 0.015
+      }
+    }
+  },
+  "botin": {
+    "objeto": 0.3,
+    "habilidad": 0.2
   }
 }

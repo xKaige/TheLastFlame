@@ -1,0 +1,60 @@
+{
+  "espada_oxidada": {
+    "nombre": "Espada Oxidada",
+    "tipo": "arma",
+    "bonos": {
+      "fue": 2
+    },
+    "descripcion": "Pesada y mellada, todavía corta."
+  },
+  "daga_fina": {
+    "nombre": "Daga Fina",
+    "tipo": "arma",
+    "bonos": {
+      "des": 2
+    },
+    "descripcion": "Rápida en la mano."
+  },
+  "baston_brasa": {
+    "nombre": "Bastón de Brasa",
+    "tipo": "arma",
+    "bonos": {
+      "int": 2
+    },
+    "descripcion": "La punta nunca se enfría del todo."
+  },
+  "cota_malla": {
+    "nombre": "Cota de Malla",
+    "tipo": "armadura",
+    "bonos": {
+      "vit": 2
+    },
+    "descripcion": "De un caballero que ya no la necesita."
+  },
+  "capa_raida": {
+    "nombre": "Capa Raída",
+    "tipo": "armadura",
+    "bonos": {
+      "des": 1,
+      "per": 1
+    },
+    "descripcion": "No abriga, pero no hace ruido."
+  },
+  "anillo_plata": {
+    "nombre": "Anillo de Plata",
+    "tipo": "accesorio",
+    "bonos": {
+      "per": 2
+    },
+    "descripcion": "Frío, aunque lo lleves puesto."
+  },
+  "amuleto_hueso": {
+    "nombre": "Amuleto de Hueso",
+    "tipo": "accesorio",
+    "bonos": {
+      "int": 1,
+      "vit": 1
+    },
+    "descripcion": "Alguien lo talló con paciencia."
+  }
+}

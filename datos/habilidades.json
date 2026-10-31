@@ -128,5 +128,183 @@
       }
     ],
     "descripcion": "Cura un poco a todos y les da +2 de defensa en esta pelea."
+  },
+  "muro_escudos": {
+    "nombre": "Muro de Escudos",
+    "costo": 2,
+    "objetivo": "aliados",
+    "efectos": [
+      {
+        "tipo": "defensa",
+        "valor": 3
+      }
+    ],
+    "descripcion": "Todo el grupo gana +3 de defensa en esta pelea.",
+    "requisito": {
+      "vit": 12
+    },
+    "fuente": "compra",
+    "precio": 10
+  },
+  "ultimo_aliento": {
+    "nombre": "Último Aliento",
+    "costo": 3,
+    "objetivo": "enemigo",
+    "efectos": [
+      {
+        "tipo": "dano",
+        "mult": 1,
+        "por_herida": 2
+      }
+    ],
+    "descripcion": "Pega más fuerte cuanta menos vida te quede.",
+    "requisito": {
+      "fue": 12
+    },
+    "fuente": "jefe",
+    "jefe": "reyOsario",
+    "pista": "Algo así solo lo enseña quien gobierna entre huesos."
+  },
+  "tajo_giratorio": {
+    "nombre": "Tajo Giratorio",
+    "costo": 3,
+    "objetivo": "enemigos",
+    "efectos": [
+      {
+        "tipo": "dano",
+        "mult": 0.8
+      }
+    ],
+    "descripcion": "Golpea a todos los enemigos.",
+    "requisito": {
+      "fue": 12,
+      "des": 9
+    },
+    "fuente": "compra",
+    "precio": 14
+  },
+  "paso_sombra": {
+    "nombre": "Paso de Sombra",
+    "costo": 1,
+    "objetivo": "propio",
+    "efectos": [
+      {
+        "tipo": "esquiva_segura"
+      }
+    ],
+    "descripcion": "Esquiva seguro el próximo ataque.",
+    "requisito": {
+      "des": 13
+    },
+    "fuente": "cofre",
+    "pista": "Dicen que hay un pergamino en un cofre de la cripta."
+  },
+  "abrir_herida": {
+    "nombre": "Abrir la Herida",
+    "costo": 2,
+    "objetivo": "enemigo",
+    "efectos": [
+      {
+        "tipo": "dano",
+        "mult": 0.5
+      },
+      {
+        "tipo": "estallar",
+        "por_pila": 0.1
+      }
+    ],
+    "descripcion": "Hace estallar todo el sangrado del enemigo.",
+    "requisito": {
+      "des": 14
+    },
+    "fuente": "compra",
+    "precio": 12
+  },
+  "polvo_ojos": {
+    "nombre": "Polvo en los Ojos",
+    "costo": 1,
+    "objetivo": "enemigo",
+    "efectos": [
+      {
+        "tipo": "aturdir"
+      }
+    ],
+    "descripcion": "El enemigo pierde su próximo turno. No sirve contra jefes.",
+    "requisito": {
+      "per": 13
+    },
+    "fuente": "cofre",
+    "pista": "Dicen que hay un pergamino en un cofre de la cripta."
+  },
+  "brasa_avida": {
+    "nombre": "Brasa Ávida",
+    "costo": 1,
+    "objetivo": "enemigo",
+    "efectos": [
+      {
+        "tipo": "brasa",
+        "por_turno": 2,
+        "min": 2,
+        "max": 3
+      }
+    ],
+    "descripcion": "Enciende al enemigo. Si ya ardía, recuperás 1 de Ímpetu.",
+    "requisito": {
+      "int": 12
+    },
+    "fuente": "compra",
+    "precio": 8
+  },
+  "muro_llamas": {
+    "nombre": "Muro de Llamas",
+    "costo": 3,
+    "objetivo": "propio",
+    "efectos": [
+      {
+        "tipo": "muro_llamas",
+        "golpes": 4
+      }
+    ],
+    "descripcion": "Los próximos 4 ataques enemigos dejan a quien los hace ardiendo.",
+    "requisito": {
+      "int": 14
+    },
+    "fuente": "cofre",
+    "pista": "Dicen que hay un pergamino en un cofre de la cripta."
+  },
+  "manos_tibias": {
+    "nombre": "Manos Tibias",
+    "costo": 1,
+    "objetivo": "aliado",
+    "efectos": [
+      {
+        "tipo": "cura",
+        "porcentaje": 0.15
+      }
+    ],
+    "descripcion": "Devuelve el 15% de la vida a un aliado.",
+    "requisito": {
+      "int": 9
+    },
+    "fuente": "compra",
+    "precio": 6
+  },
+  "chispa_prestada": {
+    "nombre": "Chispa Prestada",
+    "costo": 2,
+    "objetivo": "aliado",
+    "efectos": [
+      {
+        "tipo": "dar_impetu",
+        "valor": 2
+      }
+    ],
+    "descripcion": "Le da 2 de Ímpetu a un aliado.",
+    "requisito": {
+      "per": 11
+    },
+    "fuente": "jefe",
+    "jefe": "cazador",
+    "pista": "Quien guió al rey hasta el fuego sabe cómo prestarlo."
   }
 }

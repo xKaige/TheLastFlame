@@ -90,3 +90,45 @@
 
 /* textos y retratos en alta resolución, entre el canvas y la interfaz */
 #nitido { position: absolute; left: 0; top: 0; width: 480px; height: 270px; pointer-events: none; }
+
+/* menú de personajes */
+#personajes { position: absolute; inset: 0; z-index: 60; box-sizing: border-box; padding: 6px 12px; background: #090b0a; color: var(--c5); font-family: var(--f-body); font-size: 8px; line-height: 11px; }
+#personajes.hidden { display: none; }
+#personajes h4 { margin: 0 0 1px; font-family: var(--f-title); font-size: 10px; line-height: 12px; color: var(--c5); border-bottom: 0.5px solid var(--c3); }
+#personajes h4 small { font-family: var(--f-body); font-size: 7px; color: var(--c4); font-weight: 400; }
+.ptabs { display: flex; gap: 4px; margin-bottom: 5px; border-bottom: 1px solid var(--c3); }
+.ptab { padding: 1px 12px; font-family: var(--f-title); font-size: 10px; line-height: 14px; color: var(--c4); border: 0.5px solid var(--c3); border-bottom: none; }
+.ptab.on { color: var(--c0); background: var(--c5); }
+.pcuerpo { display: flex; gap: 10px; }
+.pizq { width: 96px; flex: none; }
+.pnom { font-family: var(--f-title); font-size: 12px; line-height: 13px; }
+.psub { font-size: 7px; line-height: 9px; color: var(--c4); }
+.pret { display: block; width: 92px; height: 92px; margin: 3px 0; border: 1px solid var(--c3); }
+.pnav { margin-top: 4px; font-size: 7px; color: var(--c4); }
+.pder { flex: 1; min-width: 0; }
+.pcols { display: flex; gap: 10px; margin-bottom: 4px; }
+.pcols > div { flex: 1; }
+.pfila { display: flex; align-items: center; gap: 4px; height: 11px; padding: 0 2px; }
+.pfila span { flex: none; width: 46px; }
+.pcols > div + div .pfila span { flex: 1; }
+.pfila em { margin-left: auto; font-style: normal; font-weight: 600; }
+.pbar { flex: 1; height: 4px; background: #000; border: 0.5px solid var(--c3); }
+.pbar b { display: block; height: 100%; background: var(--c5); }
+.pfila.sel, .pslot.sel, .pitem.sel { background: var(--c5); color: var(--c0); }
+.pfila.sel .pbar b { background: var(--c0); }
+.pslots { display: flex; flex-direction: column; gap: 1px; margin-top: 2px; }
+.pslot { display: flex; gap: 6px; align-items: center; height: 13px; padding: 0 4px; border: 0.5px solid var(--c3); }
+.pslot small { width: 44px; font-size: 7px; color: var(--c4); }
+.pslot.sel small { color: var(--c1); }
+.pslot em { margin-left: auto; font-style: normal; font-size: 7px; }
+.plista { max-height: 118px; overflow: hidden; margin-top: 2px; }
+.pitem { display: flex; justify-content: space-between; height: 11px; padding: 0 4px; }
+.pitem em { font-style: normal; font-size: 7px; }
+.pitem.no { color: var(--c3); }
+.pitem.no.sel { color: var(--c1); }
+.pdesc { margin-top: 4px; padding-top: 2px; border-top: 0.5px solid var(--c3); font-size: 8px; line-height: 10px; color: var(--c4); }
+.pdesc b { color: var(--c5); font-weight: 600; }
+.pdesc b.no { color: #d0463c; }
+.psubm { position: absolute; left: 150px; right: 30px; top: 70px; padding: 6px; background: #000; border: 1px solid var(--c4); }
+.pinfo { position: absolute; left: 12px; right: 12px; bottom: 15px; height: 10px; text-align: center; color: var(--c5); }
+.payuda { position: absolute; left: 12px; right: 12px; bottom: 4px; text-align: center; font-size: 7px; color: var(--c4); }

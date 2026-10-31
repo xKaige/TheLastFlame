@@ -6,16 +6,16 @@
 
 // ---------- Datos y estado ----------
 const D = {};
-for (const f of ['clases', 'habilidades', 'modelos', 'enemigos', 'mazmorra', 'dialogos', 'historia']) {
+for (const f of ['clases', 'habilidades', 'objetos', 'modelos', 'enemigos', 'mazmorra', 'dialogos', 'historia']) {
   const x = new XMLHttpRequest();
   x.open('GET', `datos/${f}.json`, false); x.send();
   D[f] = JSON.parse(x.responseText);
 }
 const CLAVE = 'expedicion.estado';
-const X = { ceniza: 0, caidos: [], corridas: 0, plantel: [], candidatos: [], leyendas: [], memoria: { hondo: 1, reveladas: [], ultimoCaido: null, habitante: null, finales: {} }, perdidos: [], grupo: [], sel: [], ganada: 0 };
+const X = { ceniza: 0, caidos: [], corridas: 0, plantel: [], candidatos: [], leyendas: [], grimorio: [], mochila: [], memoria: { hondo: 1, reveladas: [], ultimoCaido: null, habitante: null, finales: {} }, perdidos: [], grupo: [], sel: [], ganada: 0 };
 try { Object.assign(X, JSON.parse(STORE.get(CLAVE) || '{}')); } catch (e) { /* sin progreso */ }
-for (const k of ['caidos', 'plantel', 'candidatos']) X[k] = X[k].filter(c => D.modelos[c.modelo] && D.clases[c.clase]);   // personajes de modelos que ya no existen
-const guardarX = () => STORE.set(CLAVE, JSON.stringify({ ceniza: X.ceniza, caidos: X.caidos, corridas: X.corridas, plantel: X.plantel, candidatos: X.candidatos, leyendas: X.leyendas, memoria: X.memoria }));
+for (const k of ['caidos', 'plantel', 'candidatos']) X[k] = X[k].filter(c => D.modelos[c.modelo] && D.clases[c.clase]).map(c => NUCLEO.asegurarPersonaje(D, c));   // personajes de modelos que ya no existen
+const guardarX = () => STORE.set(CLAVE, JSON.stringify({ grimorio: X.grimorio, mochila: X.mochila, ceniza: X.ceniza, caidos: X.caidos, corridas: X.corridas, plantel: X.plantel, candidatos: X.candidatos, leyendas: X.leyendas, memoria: X.memoria }));
 const azarX = () => Math.random();
 // Capa fina sobre el canvas de 480x270: textos, retratos e ilustraciones no se pixelan al agrandar la ventana.
 // Se dibuja con las mismas coordenadas que el canvas, y su tamaño real es el de la ventana en pantalla:
@@ -259,7 +259,7 @@ window.openTitleMenu = () => {
 
 const hayPartida = () => X.corridas > 0 || X.ceniza > 0 || !!X.memoria.introVista;
 function nuevaPartida() {
-  Object.assign(X, { ceniza: 0, caidos: [], corridas: 0, plantel: [], candidatos: [], leyendas: [], sel: [], memoria: { hondo: 1, reveladas: [], ultimoCaido: null, habitante: null, finales: {} } });
+  Object.assign(X, { ceniza: 0, caidos: [], corridas: 0, plantel: [], candidatos: [], leyendas: [], grimorio: [], mochila: [], sel: [], memoria: { hondo: 1, reveladas: [], ultimoCaido: null, habitante: null, finales: {} } });
   guardarX();
   verIntro();
 }
@@ -455,6 +455,8 @@ function abrirHogar() {
       { label: 'Reclutar', sub: `${X.plantel.length} de ${REGLAS_HOGAR.plantel_max} en el plantel.`, fn: () => abrirReclutas(m) },
       { label: 'Los caídos', sub: 'Quienes quedaron en la cripta.', off: !X.caidos.length, fn: () => abrirLista('Los caídos', X.caidos, c => `Cayó en el nivel ${c.cayo}. Puede volver a aparecer entre los reclutas.`) },
       { label: 'Las leyendas', sub: 'Quienes volvieron con la Llama.', off: !X.leyendas.length, fn: () => abrirLista('Las leyendas', X.leyendas, c => `Sobrevivió a la expedición ${c.corrida}.`) },
+      { label: 'Personajes', sub: 'Atributos, equipo y habilidades.', off: !X.plantel.length, fn: () => abrirPersonajes(X.plantel, true) },
+      { label: 'Grimorio', sub: `${X.grimorio.length} habilidades desbloqueadas.`, fn: abrirGrimorio },
       { label: 'La historia', sub: 'Lo que pasó con la Llama.', fn: verIntro },
       { label: 'Volver al título', fn: openTitleMenu },
     ];
@@ -563,8 +565,14 @@ window.openEvent = e => {
 window.openChest = c => {
   if (c.open) { log('El cofre está vacío.'); sfx('bump'); return; }
   c.open = true; sfx('chest');
-  const r = azarX();
-  if (r < 0.35 && P.potions < BAL.maxPotions) { P.potions++; log('Encuentras una poción de sangre.', 'good'); }
+  const r = azarX(), lista = sinDesbloquear('cofre'), objetos = Object.keys(D.objetos);
+  if (lista.length && azarX() < D.mazmorra.botin.habilidad) {
+    const id = lista[Math.floor(azarX() * lista.length)];
+    desbloquear(id); sfx('level'); log(`Un pergamino: ${D.habilidades[id].nombre} queda en el Grimorio.`, 'em');
+  } else if (azarX() < D.mazmorra.botin.objeto) {
+    const id = objetos[Math.floor(azarX() * objetos.length)];
+    X.mochila.push(id); guardarX(); log(`Encuentras ${D.objetos[id].nombre}.`, 'good');
+  } else if (r < 0.35 && P.potions < BAL.maxPotions) { P.potions++; log('Encuentras una poción de sangre.', 'good'); }
   else if (r < 0.65 && P.oil < BAL.maxOil) { P.oil++; log('Encuentras un frasco de aceite.', 'good'); }
   else { X.ceniza += 3; log('Ceniza tibia en el fondo del cofre (+3).', 'good'); }
   updateHUD();
@@ -578,10 +586,6 @@ window.usePotion = () => {
 };
 
 // El inventario del base no aplica: se muestra el grupo
-window.openInv = () => openMenu({ title: 'El grupo', cls: 'altar', items: X.grupo.map(p => ({
-  label: `${p.nombre} <small>· ${D.clases[p.clase].nombre} nv ${p.nivel}${p.vida <= 0 ? ' · caído' : ''}${p.marcado ? ' · marcado' : ''}</small>`,
-  sub: `${D.modelos[p.modelo].titulo}. Vida ${Math.max(0, p.vida)}/${p.vidaMax} · Ataque ${p.ataque} · Defensa ${p.defensa} · Velocidad ${p.velocidad}.`, fn: () => {} })) }, 'game');
-
 // La oscuridad le pega a todo el grupo, no al P del juego base
 const ANTORCHA_BASE = BAL.fuelPerStep;
 const porGrupo = lista => D.mazmorra.grupo[lista][Math.max(1, Math.min(NUCLEO.vivos(X.grupo).length, 4)) - 1];
@@ -901,7 +905,7 @@ function iniciarPelea(ent, ids, entrada = 0.95) {
   const fx = ids.length === 1 ? [240] : ids.length === 2 ? [190, 290] : FX3;
   for (const e of b.enemigos) { e.x = fx[e.i]; const propia = IMG_ENEMIGOS[e.imagen], lista = propia && propia.complete && propia.naturalWidth; const tam = lista ? propia.naturalWidth : e.jefe ? FTAM + 14 : FTAM; e.tam = tam; e.img = lista ? propia : spriteCanvas(SPRITES[e.sprite].p, tam, S.env, 1); e.golpeado = 0; e.luz = luzDeEnemigo(e); e.gris = grisDeEnemigo(e); e.icono = spriteCanvas(e.gris, e.tam, S.env, 1); }
   for (const u of b.aliados) u.golpeado = 0;
-  Bt = { b, ent, fase: 'espera', sel: 0, tsel: 0, ops: [], msg: 'Te cierran el paso.', t: 0, gris: fondoBatalla(), fx: [], part: [], temblor: 0, destello: 0, golpe: 'tajo', ini: 0, entrada };
+  Bt = { b, ent, fase: 'espera', sel: 0, tsel: 0, ops: [], msg: 'Te cierran el paso.', t: 0, gris: fondoBatalla(), fx: [], fxHab: [], part: [], temblor: 0, destello: 0, golpe: 'tajo', ini: 0, entrada };
   S.mode = 'xbat';
   $('battle').classList.remove('hidden');
   $('bMenu').classList.add('hidden');
@@ -958,6 +962,9 @@ function mostrarEvento(e) {
     Bt.msg = q.enemigo ? `${q.nombre} cae.` : `${q.nombre} cae. Su chispa se apaga.`;
     if (q.enemigo) { q.muriendo = 0.6; chispas(q.x, FBASE - q.tam * 0.45, 24, [RAMPS[S.env][2], RAMPS[S.env][3], RAMPS[S.env][4]], -18); }
   }
+  if (e.tipo === 'texto' && e.clave === 'aturdido') Bt.msg = `${q.nombre} no ve nada.`;
+  if (e.tipo === 'texto' && e.clave === 'pierde_turno') Bt.msg = `${q.nombre} pierde el turno.`;
+  if (e.tipo === 'texto' && e.clave === 'jefe_resiste') Bt.msg = `${q.nombre} ni se inmuta.`;
   if (e.tipo === 'texto' && e.clave === 'resiste') Bt.msg = `${q.nombre} ya tiene ese efecto: no se renueva.`;
   if (e.tipo === 'texto' && e.clave === 'especial') { Bt.msg = `${q.nombre} ${e.texto}.`; Bt.temblor = 5; Bt.destello = 0.5; }
   if (e.tipo === 'texto' && e.clave === 'roba') Bt.msg = `El Soplo le roba Ímpetu a ${q.nombre}.`;
@@ -1075,7 +1082,8 @@ function ejecutar(o, t) {
   sfx('swing');
   // el efecto depende de quién pega y con qué
   const h = D.habilidades[o.id], fuego = h && h.efectos.some(x => x.tipo === 'dano_fijo');
-  Bt.golpe = fuego ? 'fuego' : u.clase === 'picaro' ? 'estocada' : u.clase === 'guerrero' ? 'tajo' : 'golpe';
+  Bt.golpe = h ? 'propio' : fuego ? 'fuego' : u.clase === 'picaro' ? 'estocada' : u.clase === 'guerrero' ? 'tajo' : 'golpe';   // cada habilidad trae su efecto
+  if (h) lanzarEfecto(o.id, u, t);
   let ev;
   if (o.id === 'atk') ev = NUCLEO.atacar(D, u, t, azarX);
   else if (o.id === 'def') ev = NUCLEO.defender(u);
@@ -1095,6 +1103,7 @@ function terminarPelea(gano) {
   W_().ents.splice(W_().ents.indexOf(ent), 1);
   if (ent.def.boss && S.floor < LAST_FLOOR) { W_().map[ent.y * MW + ent.x] = 2; W_().explored[ent.y * MW + ent.x] = 1; }   // se abre la bajada
   const exp = b.enemigos.reduce((n, e) => n + e.exp, 0);
+  for (const id of sinDesbloquear('jefe')) if (b.enemigos.some(e => e.tipo === D.habilidades[id].jefe)) { desbloquear(id); log(`${D.habilidades[id].nombre} queda en el Grimorio.`, 'em'); }
   X.ceniza += Math.round((ent.def.boss ? D.mazmorra.ceniza.por_jefe : D.mazmorra.ceniza.por_grupo) * porGrupo('ceniza'));
   for (const u of NUCLEO.vivos(X.grupo)) {
     // lo que se anima en pantalla sale de los valores de antes del reparto
@@ -1179,6 +1188,7 @@ window.useBonfire = b => {
       for (const u of NUCLEO.vivos(X.grupo)) u.vida = Math.min(u.vidaMax, u.vida + Math.round(u.vidaMax * D.mazmorra.santuario.cura));
       closeMenu(); sfx('oil'); log('El grupo descansa junto al fuego.', 'em'); updateHUD();
     } },
+    { label: 'Personajes', sub: 'Cambiar equipo y habilidades.', fn: () => abrirPersonajes(X.grupo, true) },
     { label: 'Volver al Hogar', sub: 'Los vivos conservan su nivel. La expedición termina acá.', fn: retirarse },
     { label: 'Seguir', fn: closeMenu },
   ];
@@ -1522,6 +1532,7 @@ function dibujarBatalla(c) {
     }
   }
   dibujarFx(c);
+  dibujarFxHabilidad(c);
   if (Bt.fase === 'menu' || Bt.fase === 'objetivo') dibujarMenu(c);
   if (Bt.ini >= Bt.entrada * 0.8 && Bt.fase !== 'botin') dibujarLinea(capaNitida());
   // las tarjetas suben desde abajo
@@ -1551,6 +1562,7 @@ window.onAction = (act, pad) => {
   if (S.mode === 'xbat') return batallaAction(act);
   if (S.mode === 'xcharla') return charlaAction(act);
   if (S.mode === 'xsal') return;
+  if (S.mode === 'xpj') return pjAction(act);
   if (S.mode === 'xtrans') { if (act === 'ok' && Tr) Tr.t = Math.max(Tr.t, Tr.cierre + Tr.negro); return; }
   return baseX.onAction(act, pad);
 };
@@ -1558,10 +1570,11 @@ window.update = dt => {
   baseX.update(dt);
   if (S.mode === 'xtrans' && Tr) actualizarTransicion(dt);
   if (S.mode === 'xsal' && Sal) actualizarSalida(dt);
-  if (S.mode === 'xbat' && Bt) { Bt.t += dt; Bt.ini += dt; for (const u of Bt.b.unidades) u.golpeado = Math.max(0, (u.golpeado || 0) - dt); actualizarFx(dt); }
+  if (S.mode === 'xbat' && Bt) { Bt.t += dt; Bt.ini += dt; for (const u of Bt.b.unidades) u.golpeado = Math.max(0, (u.golpeado || 0) - dt); actualizarFx(dt); actualizarFxHabilidad(dt); }
 };
 window.draw = () => {
   limpiarCapa();
+  if (S.mode === 'xpj') { $('stage').dataset.mode = 'xpj'; ctx.fillStyle = '#000'; ctx.fillRect(0, 0, 480, 270); return; }
   if (S.mode === 'menu' && S.menuBg === 'hogar') { Object.assign($('stage').dataset, { mode: 'menu', bg: 'hogar' }); dibujarHogar(ctx); return; }
   marcoDelPiso();
   if ((S.mode === 'xbat' || S.mode === 'xsal') && Bt) {
