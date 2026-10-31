@@ -1116,7 +1116,7 @@ function terminarPelea(gano) {
   }
   guardarX();
   b.actual = null;
-  Object.assign(Bt, { fase: 'botin', listo: false, msg: `Victoria · +${exp} de experiencia${hallado ? ` · ${hallado}` : ''}`, velXp: Math.max(exp / 1.3, 6) });
+  Object.assign(Bt, { fase: 'botin', listo: false, msg: `+${exp} de experiencia${hallado ? ` · ${hallado}` : ''}`, velXp: Math.max(exp / 1.3, 6) });
   sfx('level');
   pintarBatalla();
 }
@@ -1140,7 +1140,7 @@ function actualizarBotin(dt) {
     while (a.exp >= a.nivel * D.mazmorra.exp_por_nivel) { a.exp -= a.nivel * D.mazmorra.exp_por_nivel; a.nivel++; a.subio = 1; sfx('level'); }
     if (a.falta > 0) queda = true;
   }
-  if (!queda && !Bt.listo) { Bt.listo = true; Bt.msg += ' · Enter para seguir'; pintarBatalla(); }
+  if (!queda && !Bt.listo) Bt.listo = true;
 }
 
 // Al salir la oscuridad se cierra sobre la pelea y se abre sobre el mapa, como al entrar pero al revés
