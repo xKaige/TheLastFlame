@@ -1368,6 +1368,7 @@ function pollGamepad() {
   const pads = navigator.getGamepads ? navigator.getGamepads() : [];
   for (const gp of pads) {
     if (!gp) continue;
+    if (S.mode === 'xpj') gatillosPersonajes(gp);
     // cambiando un botón: el primero que se apriete es el nuevo, y no hace nada más
     if (REBIND_PAD) {
       gp.buttons.forEach((bt, b) => {
@@ -1563,6 +1564,7 @@ function boot() {
   const resumed = window.nativeDisplay && nativeDisplay.takeResume();
   if (resumed) resumeDisplay(JSON.parse(resumed));
   else if (FIRST_RUN) openLanguagePick(openTitleMenu); else openTitleMenu();
+  aplicarDaltonismo();
   fit();
   addEventListener('resize', fit);
   $('combatMenu').addEventListener('click', ev => {

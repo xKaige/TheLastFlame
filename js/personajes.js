@@ -105,10 +105,12 @@ function pintarPj() {
     const o = id && D.objetos[id];
     return `<div class="pitem${i === PJ.sel ? ' sel' : ''}"><span>${o ? o.nombre : 'Dejar vacío'}</span><em>${o ? textoBonos(o) : ''}</em></div>`;
   }).join('')}</div>` : '';
-  const personaje = PJ.lista.length > 1 ? ` · ${glyph('strafeL')}${glyph('strafeR')} personaje` : '';
+  const pad = promptStyle() !== 'kb', pestana = pad ? `${glyph('strafeL')}${glyph('strafeR')}` : '<span class="k">Q</span><span class="k">E</span>';
+  const otro = pad ? `<span class="pg bump">${promptStyle() === 'ps' ? 'L2' : 'LT'}</span><span class="pg bump">${promptStyle() === 'ps' ? 'R2' : 'RT'}</span>` : '<span class="k">Z</span><span class="k">C</span>';
+  const personaje = PJ.lista.length > 1 ? ` · ${otro} personaje` : '';
   $('personajes').innerHTML = `<div class="ptop"><div class="ptabs">${pestanas}</div><div class="pgrupo"><span>Grupo</span>${grupo}</div></div>
     <div class="pcuerpo">${ficha}<div class="pder">${centro}</div></div>${sub}
-    <div class="pinfo">${PJ.msg || ''}</div><div class="payuda">${glyph('change')} pestaña${personaje} · ${glyph('ok')} aceptar · ${glyph('cancel')} volver</div>`;
+    <div class="pinfo">${PJ.msg || ''}</div><div class="payuda">${pestana} pestaña${personaje} · ${glyph('ok')} aceptar · ${glyph('cancel')} volver</div>`;
   PJ.msg = '';
   const sel = $('personajes').querySelector('.pitem.sel');
   if (sel) sel.scrollIntoView({ block: 'nearest' });
@@ -143,18 +145,57 @@ function equiparElegido() {
   pintarPj();
 }
 
-function pjAction(act) {
+const cambiarPestana = d => { PJ.tab = (PJ.tab + d + 3) % 3; PJ.sel = 0; sfx('select'); };
+const cambiarPersonaje = d => { PJ.i = (PJ.i + d + PJ.lista.length) % PJ.lista.length; sfx('select'); };
+
+// En Estado hay dos columnas: arriba y abajo se mueven dentro de una, izquierda y derecha pasan a la otra
+const COLUMNAS_ESTADO = 5;
+function moverVertical(d) {
   const n = filasPj().length;
-  if (act === 'fwd' || act === 'back') { if (n) { PJ.sel = (PJ.sel + (act === 'fwd' ? n - 1 : 1)) % n; sfx('select'); } }
+  if (!n) return;
+  if (PJ.tab === 0 && !PJ.sub) {
+    const enAtr = PJ.sel < COLUMNAS_ESTADO, tam = enAtr ? COLUMNAS_ESTADO : n - COLUMNAS_ESTADO, ini = enAtr ? 0 : COLUMNAS_ESTADO;
+    PJ.sel = ini + (PJ.sel - ini + d + tam) % tam;
+  } else PJ.sel = (PJ.sel + d + n) % n;
+  sfx('select');
+}
+function moverHorizontal() {
+  if (PJ.tab !== 0 || PJ.sub) return;
+  const lugares = filasPj().length - COLUMNAS_ESTADO;
+  PJ.sel = PJ.sel < COLUMNAS_ESTADO ? COLUMNAS_ESTADO + Math.min(PJ.sel, lugares - 1) : PJ.sel - COLUMNAS_ESTADO;
+  sfx('select');
+}
+
+function pjAction(act, pad) {
+  if (act === 'fwd' || act === 'back') moverVertical(act === 'fwd' ? -1 : 1);
   else if (PJ.sub) {
     if (act === 'ok') return equiparElegido();
     if (act === 'cancel') { PJ.sel = PJ.sub.volver; PJ.sub = null; }
   }
-  else if (act === 'turnL' || act === 'turnR') { PJ.tab = (PJ.tab + (act === 'turnL' ? 2 : 1)) % 3; PJ.sel = 0; sfx('select'); }
-  else if (act === 'strafeL' || act === 'strafeR') { PJ.i = (PJ.i + (act === 'strafeL' ? PJ.lista.length - 1 : 1)) % PJ.lista.length; PJ.sel = 0; sfx('select'); }
+  else if (act === 'turnL' || act === 'turnR') moverHorizontal();
+  else if (act === 'strafeL' || act === 'strafeR') { if (pad) cambiarPestana(act === 'strafeL' ? -1 : 1); else moverHorizontal(); }
   else if (act === 'ok') { const f = filasPj()[PJ.sel]; if (f) return accionPj(f); }
   else if (act === 'cancel' || act === 'inv') return cerrarPersonajes();
   pintarPj();
+}
+
+// Q E cambian de pestaña y Z C de personaje; las flechas y A D son sólo para moverse dentro de la pantalla
+const TECLAS_PJ = { KeyQ: () => cambiarPestana(-1), KeyE: () => cambiarPestana(1), KeyZ: () => cambiarPersonaje(-1), KeyC: () => cambiarPersonaje(1) };
+addEventListener('keydown', ev => {
+  if (S.mode !== 'xpj' || PJ.sub || ev.repeat || !TECLAS_PJ[ev.code]) return;
+  ev.stopImmediatePropagation(); ev.preventDefault();
+  TECLAS_PJ[ev.code]();
+  pintarPj();
+}, true);
+
+// En el joystick, LT y RT cambian de personaje
+const gatillosAntes = {};
+function gatillosPersonajes(gp) {
+  for (const [b, d] of [[6, -1], [7, 1]]) {
+    const k = `${gp.index}:${b}`, apretado = gp.buttons[b] && gp.buttons[b].pressed;
+    if (apretado && !gatillosAntes[k] && !PJ.sub && PJ.lista.length > 1) { cambiarPersonaje(d); pintarPj(); }
+    gatillosAntes[k] = apretado;
+  }
 }
 
 window.openInv = () => abrirPersonajes(X.grupo, false);

@@ -3,7 +3,7 @@
 
 const SETTINGS_KEY = 'laultimallama.opciones';
 const SETTINGS = (() => {
-  const base = { master: 0.8, music: 0.7, sfx: 0.9, shake: true, lang: 'es', keys: {}, pad: {}, prompts: 'auto' };
+  const base = { master: 0.8, music: 0.7, sfx: 0.9, shake: true, lang: 'es', keys: {}, pad: {}, prompts: 'auto', daltonismo: 'no' };
   try { return { ...base, ...JSON.parse(STORE.get(SETTINGS_KEY) || '{}') }; } catch (e) { return base; }
 })();
 const saveSettings = () => STORE.set(SETTINGS_KEY, JSON.stringify(SETTINGS));
@@ -92,6 +92,12 @@ function finishRebind(code) {
   renderMenu();
 }
 
+// ---------- Daltonismo ----------
+// Un filtro de color sobre toda la pantalla (definidos en index.html)
+const DALTONISMO = ['no', 'protanopia', 'deuteranopia', 'tritanopia'];
+const DALTONISMO_NOMBRE = { no: 'No', protanopia: 'Protanopia (rojo)', deuteranopia: 'Deuteranopia (verde)', tritanopia: 'Tritanopia (azul)' };
+const aplicarDaltonismo = () => { document.getElementById('stage').style.filter = SETTINGS.daltonismo && SETTINGS.daltonismo !== 'no' ? `url(#${SETTINGS.daltonismo})` : ''; };
+
 // ---------- Menús ----------
 const pct = v => `${Math.round(v * 100)}%`;
 function openOptionsMenu(focus) {
@@ -118,6 +124,10 @@ function openOptionsMenu(focus) {
         fn: () => { SETTINGS.lang = SETTINGS.lang === 'en' ? 'es' : 'en'; saveSettings(); applyStaticTr(); m.refresh(); refreshPrompts(); } },
       { label: `${tr('Temblor de pantalla')} <small>· ${SETTINGS.shake ? tr('sí') : tr('no')}</small>`, sub: tr('Sacudidas al golpear y al recibir golpes.'),
         fn: () => { SETTINGS.shake = !SETTINGS.shake; saveSettings(); m.refresh(); renderMenu(); } },
+      (() => {
+        const step = d => { const i = DALTONISMO.indexOf(SETTINGS.daltonismo || 'no'); SETTINGS.daltonismo = DALTONISMO[(i + d + DALTONISMO.length) % DALTONISMO.length]; saveSettings(); aplicarDaltonismo(); sfx('select'); m.refresh(); renderMenu(); };
+        return { label: `${tr('Daltonismo')} <small>· ◂ ${tr(DALTONISMO_NOMBRE[SETTINGS.daltonismo || 'no'])} ▸</small>`, sub: tr('Ajusta los colores de todo el juego.'), adjust: step, fn: () => step(1) };
+      })(),
       { label: tr('Controles'), sub: tr('Teclado, joystick e iconos de botones.'), fn: openControlsMenu },
     ];
   };

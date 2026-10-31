@@ -1556,6 +1556,16 @@ function dibujarReparto(c, u, x, y) {
 // Cuánto emergió cada enemigo (0..1): entran de a uno
 const aparicion = e => clamp((Bt.ini - (0.1 + e.i * 0.14) * Bt.entrada) / (0.3 * Bt.entrada), 0, 1);
 
+// El personaje que juega: su marco titila para encontrarlo de un vistazo
+function marcoDeTurno(n, x, y) {
+  const p = Math.sin(Bt.t * 9) > 0 ? 1 : 0.15;
+  n.save();
+  n.strokeStyle = '#ffe9b0'; n.lineWidth = 1.5; n.globalAlpha = p;
+  n.shadowColor = '#ff9a3c'; n.shadowBlur = 10 * p;
+  n.strokeRect(x - 0.75, y - 0.75, 47.5, 47.5);
+  n.restore();
+}
+
 // El aliado elegido como objetivo: el marco de su retrato late con esquinas de fuego
 function marcoApuntado(n, x, y) {
   const p = 0.5 + 0.5 * Math.sin(Bt.t * 7), f = 1.5 + p * 1.5, l = 9, L = 46 + f * 2, x0 = x - f, y0 = y - f;
@@ -1608,6 +1618,7 @@ function dibujarBatalla(c) {
     c.fillStyle = MARCO.fondo; c.fillRect(x + 1, y + 1, 44, 44);
     const n = capaNitida();
     n.drawImage(retratoX(u.modelo, LADO_RETRATO), x + 1, y + 1, 44, 44);
+    if (b.actual === u && Bt.fase !== 'objetivo') marcoDeTurno(n, x, y);
     if (Bt.fase === 'objetivo' && Bt.lista[Bt.tsel] === u) marcoApuntado(n, x, y);
     if (u.vida <= 0) ditherFill(n, x + 1, y + 1, 44, 44, 0.7, R[0]);
     else if (u.golpeado > 0.12) ditherFill(n, x + 1, y + 1, 44, 44, 0.45, '#b52a2a');
@@ -1623,7 +1634,7 @@ window.onAction = (act, pad) => {
   if (S.mode === 'xbat') return batallaAction(act);
   if (S.mode === 'xcharla') return charlaAction(act);
   if (S.mode === 'xsal') return;
-  if (S.mode === 'xpj') return pjAction(act);
+  if (S.mode === 'xpj') return pjAction(act, pad);
   if (S.mode === 'xtrans') { if (act === 'ok' && Tr) Tr.t = Math.max(Tr.t, Tr.cierre + Tr.negro); return; }
   return baseX.onAction(act, pad);
 };
