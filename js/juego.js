@@ -255,6 +255,7 @@ window.openTitleMenu = () => {
   if (hay) items.push({ label: 'Continuar', sub: `${X.ceniza} de Ceniza · ${X.plantel.length} en el plantel · ${X.corridas} expedicion${X.corridas === 1 ? '' : 'es'}`, fn: abrirHogar });
   items.push({ label: 'Nueva partida', fn: () => (hay ? confirmMenu('¿Empezar de nuevo? Se borra todo el progreso.', nuevaPartida) : nuevaPartida()) });
   items.push({ label: 'Opciones', fn: openOptionsMenu });
+  if (PRUEBA) items.push({ label: 'Peleas de prueba', sub: 'Va directo a una pelea. No se guarda nada.', fn: abrirPeleasDePrueba });
   if (/Electron/i.test(navigator.userAgent)) items.push({ label: 'Salir', fn: () => window.close() });
   openMenu({ back: false, cls: 'compact', items }, 'title');
 };
@@ -264,6 +265,31 @@ function nuevaPartida() {
   Object.assign(X, { ceniza: 0, caidos: [], corridas: 0, plantel: [], candidatos: [], leyendas: [], grimorio: [], mochila: [], sel: [], memoria: { hondo: 1, reveladas: [], ultimoCaido: null, habitante: null, finales: {} } });
   guardarX();
   verIntro();
+}
+
+// Sólo en modo prueba: elegís una pelea y arranca, sin pasar por la expedición
+function abrirPeleasDePrueba() {
+  const nombre = ids => ids.map(id => D.enemigos[id].nombre).join(' + ');
+  const items = [];
+  for (const piso of [1, 2, 3]) {
+    const jefes = D.mazmorra.jefes[piso];
+    items.push({ label: `Jefe del piso ${piso}`, sub: nombre(jefes), fn: () => pelearDePrueba(jefes, piso, true) });
+    for (const ids of D.mazmorra.grupos_por_piso[piso]) items.push({ label: `Piso ${piso} <small>· ${nombre(ids)}</small>`, fn: () => pelearDePrueba(ids, piso, false) });
+  }
+  openMenu({ title: 'Peleas de prueba', cls: 'altar', items });
+}
+
+function pelearDePrueba(ids, piso, jefe) {
+  prepararHogar();
+  while (X.plantel.length < MAX_GRUPO) X.plantel.push(...NUCLEO.sortearCandidatos(D, azarX).slice(0, MAX_GRUPO - X.plantel.length));
+  X.sel = X.plantel.slice(0, MAX_GRUPO);
+  partir();
+  $('xCharla').classList.add('hidden'); CH = null;      // sin los diálogos de la bajada
+  S.floor = piso; S.mode = 'explore';
+  const ent = { type: 'enemy', def: jefe ? ENEMIES[FLOOR_BOSS[piso]] : ENEMIES.rata, x: 1, y: 1, vx: 1.5, vy: 1.5, hp: 1 };
+  W_().ents.push(ent);
+  setMusic(jefe ? temaDeJefe() : 'pelea');
+  iniciarTransicion(ent, ids, jefe ? 'jefe' : 'comun');
 }
 
 // La pausa de la expedición: lo demás del menú del juego base no corre acá
