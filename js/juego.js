@@ -825,14 +825,14 @@ function siguiente() {
   mostrar(eventos);
   if (u.vida <= 0) return later(500, siguiente);
   if (u.enemigo) {
-    Bt.fase = 'espera'; Bt.msg = `Turno de ${u.nombre}.`; pintarBatalla();
+    Bt.fase = 'espera'; Bt.msg = ''; pintarBatalla();
     later(600, () => { if (Bt) { mostrar(NUCLEO.turnoEnemigo(Bt.b, u, azarX)); later(450, () => { if (Bt) Bt.fase = 'cambio'; }); later(800, siguiente); } });
   } else {
     Bt.ops = [{ id: 'atk', nombre: 'Atacar', descripcion: D.clases[u.clase].doble_golpe ? 'Dos golpes: el segundo, más flojo. +1 Ímpetu.' : 'Golpe común. +1 Ímpetu.', objetivo: 'enemigo' },
       ...NUCLEO.opciones(D, u),
       { id: 'def', nombre: 'Defender', descripcion: 'Mitad de daño hasta tu próximo turno. +1 Ímpetu.' },
       { id: 'pot', nombre: 'Poción', descripcion: `Cura un 40% al aliado más herido. Quedan ${P.potions}.`, apagada: !P.potions }];
-    Bt.sel = 0; Bt.fase = 'menu'; Bt.msg = `Turno de ${u.nombre}.`; pintarBatalla();
+    Bt.sel = 0; Bt.fase = 'menu'; Bt.msg = ''; pintarBatalla();
   }
 }
 
