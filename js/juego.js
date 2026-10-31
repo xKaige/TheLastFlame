@@ -291,8 +291,8 @@ function prepararHogar() {
   X.sel = X.sel.filter(p => X.plantel.includes(p));
   guardarX();
 }
-// Sin nadie en el plantel y sin Ceniza, siempre hay un voluntario gratis: la partida nunca queda trabada
-const costoRecluta = p => (p.condicion ? p.condicion.ceniza || 0 : !X.plantel.length && X.ceniza < REGLAS_HOGAR.costo_recluta ? 0 : REGLAS_HOGAR.costo_recluta);
+// Mientras el plantel no alcance para bajar de a dos, los reclutas son gratis: la partida nunca queda trabada
+const costoRecluta = p => (p.condicion ? p.condicion.ceniza || 0 : X.plantel.length < REGLAS_HOGAR.plantel_gratis ? 0 : REGLAS_HOGAR.costo_recluta);
 const fichaDe = p => `<img class="xr" src="${retratoX(p.modelo, 40, 'crypt').toDataURL()}" alt="">`;
 const datosDe = p => `${p.nombre} <small>· ${D.clases[p.clase].nombre} nv ${p.nivel}, ${D.modelos[p.modelo].titulo}${p.caido ? ' · caído' : ''}${p.marcado ? ' · marcado' : ''}</small>`;
 const detalleDe = p => `${D.historia.modelos[p.modelo].motivo} ${D.modelos[p.modelo].rasgo}. Vida ${p.vidaMax} · Ataque ${p.ataque} · Velocidad ${p.velocidad}. ${D.clases[p.clase].rol}.`;
