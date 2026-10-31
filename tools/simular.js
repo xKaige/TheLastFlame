@@ -28,7 +28,7 @@ function pelear(grupo, ids) {
 
 const veces = +process.argv[2] || 500, G = D.mazmorra;
 for (const tam of [4, 3, 2, 1]) {
-  const tot = { gana: 0, turnos: 0, peleas: 0, muertos: 0, piso: [0, 0, 0, 0], jefes: [0, 0, 0] };
+  const tot = { gana: 0, turnos: 0, peleas: 0, muertos: 0, piso: [0, 0, 0, 0], jefes: [0, 0, 0], turnos1: 0, peleas1: 0 };
   for (let v = 0; v < veces; v++) {
     const grupo = MEZCLA.slice(0, tam).map(c => N.crearPersonaje(D, Object.keys(D.modelos)[Math.floor(azar() * 10)], c, azar));
     let vivo = true;
@@ -39,6 +39,7 @@ for (const tam of [4, 3, 2, 1]) {
       for (let k = 0; k < 6 && vivo; k++) {
         const { r, turnos } = pelear(grupo, pool[Math.floor(azar() * pool.length)]);
         tot.peleas++; tot.turnos += turnos; vivo = r === 'victoria';
+        if (piso === 1) { tot.peleas1++; tot.turnos1 += turnos; }
         const exp = 8;
         for (const u of N.vivos(grupo)) N.ganarExp(D, u, exp);
         descanso(G.descanso);
@@ -54,5 +55,5 @@ for (const tam of [4, 3, 2, 1]) {
     if (vivo) tot.gana++;
     tot.muertos += grupo.filter(u => u.vida <= 0).length;
   }
-  console.log(`grupo de ${tam}:`, { ganadas: (tot.gana / veces * 100).toFixed(0) + '%', jefes: tot.jefes.map(j => (j / veces * 100).toFixed(0) + '%').join(' '), turnos_por_pelea: (tot.turnos / tot.peleas).toFixed(1), muertos: (tot.muertos / veces).toFixed(1) });
+  console.log(`grupo de ${tam}:`, { ganadas: (tot.gana / veces * 100).toFixed(0) + '%', jefes: tot.jefes.map(j => (j / veces * 100).toFixed(0) + '%').join(' '), turnos_por_pelea: (tot.turnos / tot.peleas).toFixed(1), turnos_piso_1: (tot.turnos1 / tot.peleas1).toFixed(1), muertos: (tot.muertos / veces).toFixed(1) });
 }

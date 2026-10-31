@@ -2,10 +2,10 @@
   "rata": {
     "nombre": "Rata de Osario",
     "sprite": "rat",
-    "vida": 20,
+    "vida": 30,
     "ataque": [
-      5,
-      9
+      4,
+      7
     ],
     "defensa": 0,
     "velocidad": 12,
@@ -16,10 +16,10 @@
   "kobold": {
     "nombre": "Kobold No-Muerto",
     "sprite": "kobold",
-    "vida": 32,
+    "vida": 48,
     "ataque": [
-      7,
-      12
+      5,
+      9
     ],
     "defensa": 1,
     "velocidad": 9,
@@ -29,10 +29,10 @@
   "soplo": {
     "nombre": "El Soplo",
     "sprite": "wisp",
-    "vida": 22,
+    "vida": 33,
     "ataque": [
-      5,
-      10
+      4,
+      8
     ],
     "defensa": 0,
     "velocidad": 14,
@@ -55,10 +55,10 @@
   "reyOsario": {
     "nombre": "El Rey del Osario",
     "sprite": "boneKing",
-    "vida": 210,
+    "vida": 290,
     "ataque": [
-      12,
-      18
+      10,
+      15
     ],
     "defensa": 3,
     "velocidad": 10,
@@ -68,8 +68,8 @@
       "cada": 3,
       "nombre": "descarga su pico sobre todo el grupo",
       "dano": [
-        10,
-        15
+        8,
+        12
       ]
     },
     "imagen": "rey_osario"
