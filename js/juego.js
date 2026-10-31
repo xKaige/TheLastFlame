@@ -210,6 +210,45 @@ function fondoHogar() {
   }
   return HOGAR.c;
 }
+// Fuego simulado: el calor nace abajo, sube, se corre al azar y se enfría. Las lenguas salen solas de ahí.
+function crearFuego(w, h, tope) {
+  const c = document.createElement('canvas'); c.width = w; c.height = h;
+  const g = c.getContext('2d'), img = g.createImageData(w, h);
+  return { w, h, tope, c, g, img, out: new Uint32Array(img.data.buffer), calor: new Float32Array(w * h), viento: 0, t: 0, ultimo: -1 };
+}
+const FOGATA = crearFuego(96, 96, 84);
+function avanzarFuego(f) {
+  const { w, h, tope, calor } = f;
+  f.t += 1 / 30;
+  f.viento += (Math.sin(f.t * 0.7) * Math.sin(f.t * 1.9) * 0.25 - f.viento) * 0.1;      // una brisa lenta, no un vaivén parejo
+  for (let x = 0; x < w; x++) {
+    const d = Math.abs(x - w / 2) / (w * 0.3), borde = Math.max(0, 1 - d * d);
+    // focos de brasa que se prenden y se apagan a lo largo de la base
+    const foco = 0.55 + 0.45 * vnoise(x * 0.09, f.t * 1.6, 4) + 0.3 * (Math.random() - 0.5);
+    calor[(h - 1) * w + x] = tope * borde * clamp(foco, 0, 1);
+  }
+  // cada fila se recorre al revés que la anterior, para que el fuego no se incline hacia un lado
+  for (let y = 0; y < h - 1; y++) for (let k = 0; k < w; k++) {
+    const x = y & 1 ? k : w - 1 - k, a = calor[(y + 1) * w + x], azar = Math.random();
+    const nx = clamp(x + Math.round((azar - 0.5) * 3 + f.viento), 0, w - 1);
+    calor[y * w + nx] = Math.max(0, a - azar * 2);
+  }
+}
+function dibujarFuego(c, f, x, y) {
+  const paso = Math.floor(T * 30);
+  if (paso !== f.ultimo) {
+    f.ultimo = paso; avanzarFuego(f);
+    if (!f.pal) f.pal = packRamp(RAMPS.fuegoX);
+    const { w, h, tope, calor, out, pal } = f, n = pal.length - 1;
+    for (let py = 0; py < h; py++) for (let px = 0; px < w; px++) {
+      const v = Math.min(1, calor[py * w + px] / (tope * 0.62)), t = v * n + (BAYER[((py & 3) << 2) | (px & 3)] - 0.5) * 0.9;
+      out[py * w + px] = v < 0.07 || t < 0.3 ? 0 : pal[clamp(Math.round(t), 1, n)];
+    }
+    f.g.putImageData(f.img, 0, 0);
+  }
+  c.drawImage(f.c, x - f.w / 2, y - f.h);
+}
+
 function dibujarHogar(c) {
   const f = fondoHogar(), { x, y } = HOGAR.fuego;
   c.fillStyle = '#000'; c.fillRect(0, 0, 480, 270);
@@ -219,8 +258,7 @@ function dibujarHogar(c) {
     c.drawImage(f[1], 0, 0, 480, 270, 0, 0, 480, 270);
     c.globalAlpha = 1;
   }
-  drawFlame(c, x, y, 80, 82, T, 0.95, 'fuegoX');
-  drawFlame(c, x, y + 2, 46, 46, T + 2.7, 0.95, 'fuegoX');
+  dibujarFuego(c, FOGATA, x, y + 8);
   for (let n = 0; n < 7; n++) {
     const u = (T * (0.3 + n * 0.05) + n * 0.31) % 1;
     c.fillStyle = RAMPS.fuegoX[n % 2 ? 4 : 5];
