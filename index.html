@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>La Última Llama</title>
+<link rel="stylesheet" href="css/fonts.css">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div id="stage">
+  <canvas id="screen" width="480" height="270"></canvas>
+
+  <div id="title">
+    <div class="t1">La Última Llama</div>
+    <div class="t2" data-tr="Un descenso a la Cripta de Vel’Ombra">Un descenso a la Cripta de Vel’Ombra</div>
+    <div class="tver">v0.2<span id="tPrueba"></span></div>
+    <div class="t4" data-kb="WASD / flechas: moverse · Q E: girar · Enter: interactuar · I: inventario · P: poción · O: aceite · F11: pantalla completa">WASD / flechas: moverse · Q E: girar · Enter: interactuar · I: inventario · P: poción · O: aceite · F11: pantalla completa</div>
+  </div>
+
+  <div id="create">
+    <div class="ctitle" data-tr="Forja tu leyenda">Forja tu leyenda</div>
+    <div class="crow" data-row="0">
+      <div class="clabel" data-tr="Nombre">Nombre</div>
+      <input id="cName" maxlength="14" spellcheck="false" autocomplete="off"><span class="dice" id="cDice" title="Nombre al azar">⚄</span>
+    </div>
+    <div class="crow" data-row="1">
+      <div class="clabel" data-tr="Raza">Raza</div><div class="chips" id="cRace"></div>
+      <div class="cdesc" id="cRaceDesc"></div>
+    </div>
+    <div class="crow" data-row="2">
+      <div class="clabel" data-tr="Clase">Clase</div><div class="chips" id="cCls"></div>
+      <div class="cdesc" id="cClsDesc"></div>
+    </div>
+    <div class="csum" id="cSum"></div>
+    <div class="crow cgo" data-row="3"><span class="gobtn" id="cGo" data-tr="Descender a la cripta ✠">Descender a la cripta ✠</span></div>
+    <div class="chint">↑↓ elegir · ←→ cambiar · Enter confirmar · Esc volver</div>
+  </div>
+
+  <div id="cAttrs">
+    <div id="cAttrHead"></div>
+    <div id="cAttrRows"></div>
+  </div>
+
+  <div id="hud">
+    <div id="stName"></div>
+    <div id="stLvl"></div>
+    <div id="stHp" class="srow"></div>
+    <div id="stFuel" class="srow"></div>
+    <div id="stXp" class="srow"></div>
+    <div id="stStats"></div>
+    <div id="stItems"></div>
+    <div id="stKeys"></div>
+    <div id="stMap" data-tr="Mapa">Mapa</div>
+  </div>
+
+  <div id="log"></div>
+  <div id="fx"></div>
+
+  <div id="combat" class="hidden">
+    <div id="cpanel">
+      <div id="foeName"></div>
+      <div id="foeInfo"><span id="foeTags"></span><span id="foeHp"></span></div>
+      <div id="cturn"></div>
+      <div id="combatMenu"></div>
+      <div id="cdesc"></div>
+    </div>
+  </div>
+
+  <div id="inv" class="hidden">
+    <div class="ihead"><span data-tr="Inventario">Inventario</span> <span id="iWho"></span></div>
+    <div class="icol ileft">
+      <div class="isec" data-tr="Equipo">Equipo</div><div id="iEquip"></div>
+      <div class="isec" data-tr="Consumibles">Consumibles</div><div id="iCons"></div>
+    </div>
+    <div class="icol iright">
+      <div class="isec" id="iBagTitle" data-tr="Mochila">Mochila</div><div id="iBag"></div>
+    </div>
+    <div id="iStats"></div>
+    <div id="iDetail"></div>
+    <div class="ihint" id="iHint"></div>
+  </div>
+
+  <div id="battle" class="hidden"><div id="bLog"></div><div id="bMenu" class="hidden"></div><div id="bCards"></div></div>
+
+  <div id="toast" class="hidden"></div>
+  <div id="dialog" class="hidden"></div>
+  <div id="screenMsg" class="hidden"></div>
+  <div id="menu" class="hidden"></div>
+  <div id="cine" class="hidden">
+    <div id="cineText"></div>
+    <div id="cineHint">Enter avanzar · Esc saltar</div>
+  </div>
+</div>
+
+<script src="assets/voz/voces.js"></script>
+<script src="js/util.js"></script>
+<script src="js/store.js"></script>
+<script src="js/settings.js"></script>
+<script src="js/i18n.js"></script>
+<script src="js/prompts.js"></script>
+<script src="js/icons.js"></script>
+<script src="js/marquee.js"></script>
+<script src="js/items.js"></script>
+<script src="js/skills.js"></script>
+<script src="js/runes.js"></script>
+<script src="js/events.js"></script>
+<script src="js/relics.js"></script>
+<script src="js/shrine.js"></script>
+<script src="js/art.js"></script>
+<script src="js/themes.js"></script>
+<script src="js/render.js"></script>
+<script src="js/combatfx.js"></script>
+<script src="js/heroes.js"></script>
+<script src="js/cinematic.js"></script>
+<script src="js/endings.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/music.js"></script>
+<script src="js/menus.js"></script>
+<script src="js/save.js"></script>
+<script src="js/profile.js"></script>
+<script src="js/meta.js"></script>
+<script src="js/codex.js"></script>
+<script src="js/daily.js"></script>
+<script src="js/batalla.js"></script>
+<script src="js/pruebas.js"></script>
+<script src="js/i18n-en.js"></script>
+<script src="js/game.js"></script>
+</body>
+</html>

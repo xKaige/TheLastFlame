@@ -1,0 +1,106 @@
+{
+  "tamano_grupo": 4,
+  "candidatos": 8,
+  "pociones_iniciales": 2,
+  "niveles": [
+    1,
+    2,
+    5
+  ],
+  "grupos_por_nivel": {
+    "1": [
+      [
+        "rata"
+      ],
+      [
+        "rata",
+        "kobold"
+      ],
+      [
+        "kobold",
+        "kobold"
+      ]
+    ],
+    "2": [
+      [
+        "kobold",
+        "soplo"
+      ],
+      [
+        "rata",
+        "rata",
+        "kobold"
+      ],
+      [
+        "centinela",
+        "rata"
+      ]
+    ],
+    "5": [
+      [
+        "kobold",
+        "soplo"
+      ],
+      [
+        "centinela",
+        "kobold"
+      ]
+    ]
+  },
+  "jefe": [
+    "kobold",
+    "reyOsario",
+    "kobold"
+  ],
+  "exp_por_nivel": 10,
+  "mejora_nivel": {
+    "vida": 5,
+    "ataque": 1
+  },
+  "ceniza": {
+    "por_grupo": 3,
+    "por_jefe": 15
+  },
+  "caidos": {
+    "probabilidad": 0.6,
+    "maximo": 2,
+    "condiciones": [
+      {
+        "id": "ofrenda",
+        "texto": "Ofrenda: 12 de Ceniza para traerlo entero.",
+        "ceniza": 12
+      },
+      {
+        "id": "marcado",
+        "texto": "Marcado: vuelve gratis, con 25% menos de vida máxima.",
+        "vida": 0.75
+      }
+    ]
+  },
+  "descanso": 0.1,
+  "accesorios": {
+    "densidad": 0.14,
+    "separacion": 3,
+    "lista": [
+      { "id": "antorcha_apagada", "imagen": "antorcha_apagada", "y": 8, "alto": 44 },
+      { "id": "grillete", "imagen": "grillete", "y": 6, "alto": 40 },
+      { "id": "estandarte", "imagen": "estandarte", "y": 2, "alto": 54 },
+      { "id": "nicho_craneo", "imagen": "nicho_craneo", "y": 14, "alto": 42 }
+    ],
+    "piso": {
+      "densidad": 0.14,
+      "separacion": 4,
+      "lista": [
+        { "imagen": "columna_rota", "escala": 0.72 },
+        { "imagen": "barril_roto", "escala": 0.42 },
+        { "imagen": "altar", "escala": 0.55 },
+        { "imagen": "pila_huesos", "escala": 0.4, "reemplaza": "bones" }
+      ]
+    },
+    "techo": {
+      "densidad": 0.06,
+      "separacion": 5,
+      "lista": ["jaula", "cadena_gancho", "raices", "arana"]
+    }
+  }
+}

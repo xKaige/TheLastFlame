@@ -1,0 +1,81 @@
+/* Expedición: pantallas propias sobre el estilo del juego base */
+#stage[data-mode=battle] #hud, #stage[data-mode=battle] #log { display: none; }
+#stage:not([data-mode=battle]) #battle { display: none; }
+#battle { position: absolute; inset: 0; color: var(--c4); font-size: 8.5px; line-height: 10px; text-shadow: 0 0 2px #000; }
+#bLog { position: absolute; top: 24px; left: 0; right: 0; text-align: center; color: var(--c5); font-size: 9.5px; }
+/* tarjeta flotante: el marco y las barras se dibujan en el canvas; acá van los textos y estados */
+#bCards .bcard { position: absolute; top: 216px; width: 106px; height: 46px; padding-left: 49px; box-sizing: border-box; }
+#bCards .bcard.on { top: 213px; }
+#bCards .bcard.down { opacity: 0.45; }
+#bCards .bn { display: flex; justify-content: space-between; align-items: flex-start; height: 11px; font-family: var(--f-title); font-size: 9.5px; line-height: 11px; color: var(--c5); white-space: nowrap; overflow: hidden; }
+#bCards .bn small { font-family: var(--f-body); font-size: 6px; line-height: 11px; color: var(--c4); margin: 0 4px 0 2px; }
+#bCards .bfila { position: absolute; left: 51px; right: 5px; height: 9px; display: flex; justify-content: space-between; font-size: 7px; line-height: 9px; color: var(--c5); text-shadow: 0 1px 0 #000, 0 0 2px #000; }
+#bCards .bfila b { font-weight: 600; }
+#bCards .bfila.hp { top: 12px; }
+#bCards .bestados { position: absolute; left: 48px; top: 33px; display: flex; gap: 2px; }
+#bCards .bestados i { width: 11px; height: 11px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; font-style: normal; font-size: 7px; background: var(--c0); box-shadow: inset 0 0 0 0.5px var(--c3); }
+#bCards .bestados .ic { width: 8px; height: 8px; margin: 0; }
+#bCards .bestados .escudo { color: var(--c5); }
+#bCards .bestados .mas { color: var(--c5); }
+#bCards .bestados .ira { color: #e0605a; }
+#bCards .bestados .marca { color: var(--c4); }
+/* barra de acciones flotante, arriba de las tarjetas: deja libres a los enemigos */
+#bMenu { position: absolute; left: 30px; right: 30px; width: auto; display: block; top: 176px; height: 24px; box-sizing: border-box; padding: 1px 2px; background: rgba(0, 0, 0, 0.82); box-shadow: 0 0 0 0.5px var(--c3); }
+#bMenu.hidden { display: none; }
+#bMenu .bopts { display: flex; justify-content: center; gap: 2px; width: auto; }
+#bMenu .bopt { padding: 0 5px; line-height: 12px; font-size: 9px; white-space: nowrap; }
+#bMenu .bopt span { font-size: 6px; color: var(--c5); }
+#bMenu .bopt.sel { background: var(--c5); color: var(--c0); }
+#bMenu .bopt.sel span { color: var(--c1); }
+#bMenu .bopt.off { opacity: 0.4; }
+#bMenu .bdesc { padding: 0; text-align: center; font-size: 7.5px; line-height: 9px; color: var(--c5); white-space: nowrap; overflow: hidden; }
+
+/* exploración a pantalla completa: sin panel lateral */
+#hud { display: none !important; }
+#stage[data-mode=title] #xEsq, #stage[data-mode=battle] #xEsq, #stage[data-bg=title] #xEsq, #stage[data-mode=cine] #xEsq { display: none; }
+#xEsq { position: absolute; left: 382px; top: 98px; width: 92px; font-size: 8px; line-height: 10px; color: var(--c5); text-align: center; text-shadow: 0 1px 0 #000, 0 0 3px #000; }
+#xEsq .zona { font-family: var(--f-title); font-size: 9.5px; line-height: 12px; }
+#xEsq .zona small { display: block; font-family: var(--f-body, inherit); font-size: 7.5px; line-height: 9px; color: var(--c4); }
+/* objetos abajo a la izquierda, tres opciones (F8) */
+#xEsq .fila { position: absolute; left: -372px; top: 148px; display: flex; gap: 9px; align-items: center; text-align: left; }
+#xEsq .obj { display: flex; align-items: center; gap: 2px; font-size: 9px; line-height: 12px; }
+#xEsq .obj i { display: block; width: 15px; height: 13px; background-position: center; background-size: 23px 21px; image-rendering: pixelated; }
+#xEsq .obj b { font-weight: 600; }
+#xEsq .fila.cinto { padding: 2px 6px; gap: 7px; background: var(--c0); box-shadow: 0 0 0 1px #000, 0 0 0 2px var(--c3); }
+#xEsq .fila.texto { top: 134px; flex-direction: column; align-items: flex-start; gap: 0; font-size: 9.5px; color: var(--c4); }
+#xEsq .fila.texto b { color: var(--c5); }
+#xEsq .alerta { margin-top: 9px; color: #e0605a; font-size: 7.5px; }
+/* registro arriba a la izquierda, sin caja: aparece con cada novedad y se apaga solo */
+#log { left: 10px; top: 8px; bottom: auto; width: 260px; height: auto; min-height: 0; padding: 0; font-size: 9.5px; line-height: 11.5px; color: var(--c5); background: none; box-shadow: none; text-shadow: 0 1px 0 #000, 0 0 3px #000; transition: opacity 0.2s; }
+#log.apagado { opacity: 0; transition: opacity 1.2s; }
+#menu.bg-game { left: 120px; }
+#menu.altar { left: 70px; }
+
+#xCharla { position: absolute; left: 26px; width: 292px; bottom: 20px; }
+#xCharla.hidden { display: none; }
+#xCharla .cb { background: rgba(0, 0, 0, 0.9); box-shadow: 0 0 0 1px var(--c3); padding: 6px 10px; color: var(--c5); font-size: 10.5px; line-height: 13px; }
+#xCharla .cq { font-family: var(--f-title); font-size: 12px; line-height: 14px; color: var(--c4); margin-bottom: 2px; }
+#xCharla .cs { text-align: right; font-size: 7.5px; color: var(--c3); }
+#xCharla .co { margin-top: 2px; padding: 0 4px; color: var(--c4); }
+#xCharla .co.sel { background: var(--c5); color: var(--c0); }
+
+/* retrato en la lista de la reunión */
+#menu .mopt .xr { width: 11px; height: 11px; margin-right: 3px; vertical-align: -2px; image-rendering: pixelated; }
+#menu .mopt.sel .xr { width: 20px; height: 20px; float: left; margin: 0 5px 0 -2px; }
+
+/* cartel de la transición a la pelea */
+#stage[data-mode=xtrans] #xEsq, #stage[data-mode=xtrans] #log { display: none; }
+#xBanner { position: absolute; left: 0; right: 0; top: 112px; text-align: center; z-index: 3; font-family: var(--f-title); font-weight: 700; font-size: 24px; line-height: 28px; color: var(--c5); text-shadow: 0 2px 0 #000, 0 0 8px #000; }
+#xBanner.hidden { display: none; }
+
+/* menú de acciones: sólo palabras, juntas; la llama del elegido se dibuja en el canvas */
+#bMenu { top: 183px; height: 14px; left: 30px; right: 30px; width: auto; background: none; box-shadow: none; padding: 0; }
+#bMenu .bopts { gap: 3px; }
+#bMenu .bopt { padding: 0 2px 0 7px; font-size: 10px; line-height: 13px; color: var(--c4); background: none; text-shadow: 0 1px 0 #000, 0 0 3px #000; }
+#bMenu .bopt.sel { background: none; color: var(--c5); font-family: var(--f-title); font-weight: 700; }
+#bMenu .bopt span, #bMenu .bopt.sel span { color: var(--c4); }
+
+/* números de daño por estado */
+.fnum.est-veneno { color: #b6e36a; }
+.fnum.est-quemadura { color: #fbbf5a; }
+.fnum.est-estallido { color: #e0605a; font-size: 14px; }

@@ -1,0 +1,132 @@
+{
+  "golpe_brutal": {
+    "nombre": "Golpe Brutal",
+    "costo": 2,
+    "objetivo": "enemigo",
+    "efectos": [
+      {
+        "tipo": "dano",
+        "mult": 2
+      },
+      {
+        "tipo": "sangrado",
+        "estallido": 0.15
+      }
+    ],
+    "descripcion": "Daño doble que hace sangrar."
+  },
+  "provocar": {
+    "nombre": "Provocar",
+    "costo": 1,
+    "objetivo": "propio",
+    "efectos": [
+      {
+        "tipo": "provocar",
+        "turnos": 2
+      }
+    ],
+    "descripcion": "Los enemigos te atacan a ti durante 2 turnos."
+  },
+  "punalada": {
+    "nombre": "Puñalada",
+    "costo": 2,
+    "objetivo": "enemigo",
+    "efectos": [
+      {
+        "tipo": "dano",
+        "mult": 1.5,
+        "critico_seguro": true,
+        "ignora_defensa": true
+      },
+      {
+        "tipo": "sangrado",
+        "estallido": 0.2
+      }
+    ],
+    "descripcion": "Crítico seguro que ignora la defensa y hace sangrar."
+  },
+  "hoja_envenenada": {
+    "nombre": "Hoja Envenenada",
+    "costo": 1,
+    "objetivo": "enemigo",
+    "efectos": [
+      {
+        "tipo": "dano",
+        "mult": 0.5
+      },
+      {
+        "tipo": "veneno",
+        "por_turno": 4,
+        "min": 3,
+        "max": 5
+      }
+    ],
+    "descripcion": "Corta y envenena unos turnos."
+  },
+  "llama_arcana": {
+    "nombre": "Llama Arcana",
+    "costo": 2,
+    "objetivo": "enemigo",
+    "efectos": [
+      {
+        "tipo": "dano_fijo",
+        "min": 14,
+        "max": 20
+      },
+      {
+        "tipo": "quemadura",
+        "por_turno": 3,
+        "min": 2,
+        "max": 4
+      }
+    ],
+    "descripcion": "Fuego puro que deja al enemigo ardiendo."
+  },
+  "tormenta": {
+    "nombre": "Tormenta de Fuego",
+    "costo": 3,
+    "objetivo": "enemigos",
+    "efectos": [
+      {
+        "tipo": "dano_fijo",
+        "min": 9,
+        "max": 14
+      },
+      {
+        "tipo": "quemadura",
+        "por_turno": 2,
+        "min": 2,
+        "max": 3
+      }
+    ],
+    "descripcion": "Fuego sobre todos los enemigos."
+  },
+  "sanar": {
+    "nombre": "Sanar",
+    "costo": 2,
+    "objetivo": "aliado",
+    "efectos": [
+      {
+        "tipo": "cura",
+        "porcentaje": 0.3
+      }
+    ],
+    "descripcion": "Devuelve el 30% de la vida a un aliado."
+  },
+  "bendicion": {
+    "nombre": "Bendición",
+    "costo": 3,
+    "objetivo": "aliados",
+    "efectos": [
+      {
+        "tipo": "cura",
+        "porcentaje": 0.15
+      },
+      {
+        "tipo": "defensa",
+        "valor": 2
+      }
+    ],
+    "descripcion": "Cura un poco a todos y les da +2 de defensa en esta pelea."
+  }
+}

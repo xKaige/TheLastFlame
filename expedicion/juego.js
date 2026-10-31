@@ -1,0 +1,1111 @@
+'use strict';
+// Expedición: capa sobre el juego base, que se carga sin modificar. Reemplaza el título, la creación de
+// personaje y el combate; reutiliza la mazmorra, el arte y el sonido. Las reglas están en nucleo.js y los
+// contenidos en datos/: acá sólo hay presentación y el flujo de la partida.
+
+// ---------- Datos y estado ----------
+const D = {};
+for (const f of ['clases', 'habilidades', 'modelos', 'enemigos', 'mazmorra', 'dialogos']) {
+  const x = new XMLHttpRequest();
+  x.open('GET', `expedicion/datos/${f}.json`, false); x.send();
+  D[f] = JSON.parse(x.responseText);
+}
+const CLAVE = 'expedicion.estado';
+const X = { ceniza: 0, caidos: [], corridas: 0, grupo: [], cands: [], sel: [], ganada: 0 };
+try { Object.assign(X, JSON.parse(localStorage.getItem(CLAVE) || '{}')); } catch (e) { /* sin progreso */ }
+X.caidos = X.caidos.filter(c => D.modelos[c.modelo] && D.clases[c.clase]);   // caídos de modelos que ya no existen
+const guardarX = () => { try { localStorage.setItem(CLAVE, JSON.stringify({ ceniza: X.ceniza, caidos: X.caidos, corridas: X.corridas })); } catch (e) { /* sin almacenamiento */ } };
+const azarX = () => Math.random();
+const baseX = { draw, update, onAction, updateHUD, enterLevel, afterStep };
+
+// Retratos de cada modelo: el PNG se pasa por la paleta del piso, como todo lo demás
+const RET = {};
+for (const [id, m] of Object.entries(D.modelos)) RET[id] = { img: Object.assign(new Image(), { src: `expedicion/interfaz/retratos/${m.retrato}.png` }), c: {} };
+function retratoX(id, size, ramp = S.env) {
+  const r = RET[id], k = ramp + size;
+  if (!r.c[k] && r.img.complete && r.img.naturalWidth) r.c[k] = spriteCanvas(spriteDesdeImagen(r.img, 128), size, ramp, 1.05);
+  return r.c[k] || document.createElement('canvas');
+}
+
+// Texturas propias de la mazmorra: reemplazan las procedurales del juego base sólo en esta página
+const TEXTURAS_X = [
+  { tema: 'crypt', clave: 'walls', src: 'expedicion/interfaz/mazmorra/cripta/muro_1.png' },
+  { tema: 'crypt', clave: 'floor', src: 'expedicion/interfaz/mazmorra/cripta/piso_1.png' },
+  { tema: 'crypt', clave: 'ceil', src: 'expedicion/interfaz/mazmorra/cripta/techo_1.png' },
+];
+for (const t of TEXTURAS_X) { t.img = new Image(); t.img.src = t.src; }
+// Los dibujos propios de enemigos también van en la mazmorra: se pasan al formato de sprite del motor
+// (brillo y máscara), así reciben la luz de la antorcha y la paleta del piso como todo lo demás.
+function spriteDesdeImagen(img, size) {
+  const c = document.createElement('canvas'); c.width = c.height = size;
+  const g = c.getContext('2d', { willReadFrequently: true });
+  g.drawImage(img, 0, 0, size, size);
+  const d = g.getImageData(0, 0, size, size).data, n = size * size, lum = new Float32Array(n), a = new Uint8Array(n);
+  let tope = 0.01;
+  for (let i = 0; i < n; i++) {
+    a[i] = d[i * 4 + 3] > 110 ? 1 : 0;
+    lum[i] = (d[i * 4] * 0.35 + d[i * 4 + 1] * 0.5 + d[i * 4 + 2] * 0.15) / 255;
+    if (a[i] && lum[i] > tope) tope = lum[i];
+  }
+  for (let i = 0; i < n; i++) lum[i] = Math.pow(lum[i] / tope, 0.8);   // usa todo el rango: el motor pone la luz
+  return { size, lum, a };
+}
+
+function aplicarEnemigosEnMapa() {
+  for (const [id, d] of Object.entries(D.enemigos)) {
+    const img = IMG_ENEMIGOS[d.imagen];
+    if (!img || img.enMapa || !img.complete || !img.naturalWidth) continue;
+    SPRITES[d.sprite].w = spriteDesdeImagen(img, 96);
+    if (d.escala_mapa) ENEMIES[id].scale = d.escala_mapa;
+    img.enMapa = true;
+  }
+}
+
+function aplicarTexturas() {
+  aplicarEnemigosEnMapa();
+  for (const t of TEXTURAS_X) {
+    if (t.hecha || !t.img.complete || !t.img.naturalWidth) continue;
+    const c = document.createElement('canvas'); c.width = c.height = TEX;
+    const g = c.getContext('2d', { willReadFrequently: true }); g.drawImage(t.img, 0, 0, TEX, TEX);
+    const d = g.getImageData(0, 0, TEX, TEX).data;
+    const tex = makeTex((x, y) => d[(y * TEX + x) * 4] / 255), T = TEXTURES[t.tema];
+    if (t.clave === 'walls') { T.walls[0] = T.walls[1] = T.walls[2] = tex; T.walls[4] = crackTex(tex); }
+    else T[t.clave] = tex;
+    t.hecha = true;
+  }
+}
+
+// Accesorios de pared: cada uno es una variante del muro, así reciben la perspectiva y la luz del motor.
+// Se eligen por posición, para que un nivel quede siempre igual.
+const ACC_BASE = 10, ACCESORIOS = D.mazmorra.accesorios;
+for (const a of ACCESORIOS.lista) a.img = Object.assign(new Image(), { src: `expedicion/interfaz/mazmorra/cripta/accesorios/${a.imagen}.png` });
+function muroConAccesorio(base, a) {
+  const c = document.createElement('canvas'); c.width = c.height = TEX;
+  // el motor ensancha los muros (el ancho de pantalla rinde más que el alto): se compensa para que el dibujo no se deforme
+  const g = c.getContext('2d', { willReadFrequently: true }), ancho = Math.round(a.alto * 1.32 * VH / VW);
+  g.drawImage(a.img, (TEX - ancho) >> 1, a.y, ancho, a.alto);
+  const d = g.getImageData(0, 0, TEX, TEX).data, alfa = (x, y) => x >= 0 && y >= 0 && d[(y * TEX + x) * 4 + 3] > 128;
+  const gris = i => (d[i] * 0.35 + d[i + 1] * 0.5 + d[i + 2] * 0.15) / 255;
+  let tope = 0.01;
+  for (let i = 0; i < d.length; i += 4) if (d[i + 3] > 128) tope = Math.max(tope, gris(i));
+  return makeTex((x, y) => {
+    const i = (y * TEX + x) * 4;
+    if (alfa(x, y)) return Math.pow(gris(i) / tope, 0.7);                                // que se despegue del muro oscuro
+    return base[y * TEX + x] * (alfa(x - 1, y - 1) || alfa(x - 2, y - 2) ? 0.4 : 1);       // sombra sobre el muro
+  });
+}
+function decorarMuros(w, nivel) {
+  const T = TEXTURES[w.theme || 'crypt'], lista = ACCESORIOS.lista.filter(a => a.img.complete && a.img.naturalWidth), puestos = [];
+  if (!lista.length) return;
+  lista.forEach(a => { const k = ACC_BASE + ACCESORIOS.lista.indexOf(a); if (!T.walls[k]) T.walls[k] = muroConAccesorio(T.walls[0], a); });
+  const muro = (x, y) => x < 0 || y < 0 || x >= MW || y >= MH || w.map[y * MW + x] === 1;
+  const azar = (x, y, s) => { let h = Math.imul(x + 1, 73856093) ^ Math.imul(y + 1, 19349663) ^ Math.imul(nivel + s, 83492791); h = Math.imul(h ^ (h >>> 13), 1274126177); return ((h ^ (h >>> 16)) >>> 0) / 4294967296; };
+  for (let y = 1; y < MH - 1; y++) for (let x = 1; x < MW - 1; x++) {
+    const i = y * MW + x;
+    if (w.map[i] !== 1 || w.wtype[i] > 2) continue;
+    // sólo en pared plana: una cara libre y sus dos costados también muro
+    const libres = [[1, 0], [-1, 0], [0, 1], [0, -1]].filter(([ax, ay]) => !muro(x + ax, y + ay));
+    if (libres.length !== 1 || !muro(x + libres[0][1], y + libres[0][0]) || !muro(x - libres[0][1], y - libres[0][0])) continue;
+    if (azar(x, y, 1) > ACCESORIOS.densidad || puestos.some(p => Math.abs(p[0] - x) + Math.abs(p[1] - y) < ACCESORIOS.separacion)) continue;
+    w.wtype[i] = ACC_BASE + ACCESORIOS.lista.indexOf(lista[Math.floor(azar(x, y, 2) * lista.length)]);
+    puestos.push([x, y]);
+  }
+}
+
+// Accesorios de techo: sprites de la altura del muro con el dibujo arriba, así siempre tocan el techo.
+// Nunca bajan de la línea de los ojos: el grupo pasa por debajo y no chocan con nada.
+const TECHO = ACCESORIOS.techo, IMG_TECHO = TECHO.lista.map(n => Object.assign(new Image(), { src: `expedicion/interfaz/mazmorra/cripta/accesorios/${n}.png` }));
+const SPR_TECHO = [];
+function spriteTecho(n) {
+  const img = IMG_TECHO[n];
+  if (!SPR_TECHO[n] && img.complete && img.naturalWidth) SPR_TECHO[n] = spriteDesdeImagen(img, img.naturalWidth);
+  return SPR_TECHO[n];
+}
+function colgarDelTecho(w, nivel) {
+  w.colgantes = [];
+  const azar = (x, y, s) => { let h = Math.imul(x + 3, 19349663) ^ Math.imul(y + 5, 73856093) ^ Math.imul(nivel + s, 83492791); h = Math.imul(h ^ (h >>> 13), 1274126177); return ((h ^ (h >>> 16)) >>> 0) / 4294967296; };
+  for (let y = 1; y < MH - 1; y++) for (let x = 1; x < MW - 1; x++) {
+    if (w.map[y * MW + x] !== 0 || azar(x, y, 7) > TECHO.densidad) continue;
+    if (w.colgantes.some(p => Math.abs(p.x - x - 0.5) + Math.abs(p.y - y - 0.5) < TECHO.separacion)) continue;
+    w.colgantes.push({ x: x + 0.5, y: y + 0.5, n: Math.floor(azar(x, y, 8) * TECHO.lista.length) });
+  }
+}
+// Accesorios de piso: sprites sólidos que se esquivan. Sólo van en salas, nunca en pasillos ni frente a su boca,
+// y donde no dejan nada aislado.
+const PISO = ACCESORIOS.piso;
+for (const a of PISO.lista) a.img = Object.assign(new Image(), { src: `expedicion/interfaz/mazmorra/cripta/accesorios/${a.imagen}.png` });
+function zonaAlcanzable(w, tapado) {
+  const pila = [w.start[1] * MW + w.start[0]], visto = new Set(pila);
+  while (pila.length) {
+    const i = pila.pop(), x = i % MW;
+    for (const n of [x < MW - 1 ? i + 1 : -1, x > 0 ? i - 1 : -1, i + MW, i - MW]) if (n >= 0 && n < MW * MH && n !== tapado && w.map[n] !== 1 && !visto.has(n) && !w.solidos.has(n)) { visto.add(n); pila.push(n); }
+  }
+  return visto.size;
+}
+function lugarDeSala(w, x, y) {
+  const muro = (a, b) => a < 0 || b < 0 || a >= MW || b >= MH || w.map[b * MW + a] === 1;
+  const pasillo = (a, b) => (muro(a - 1, b) && muro(a + 1, b)) || (muro(a, b - 1) && muro(a, b + 1));
+  if (pasillo(x, y) || pasillo(x + 1, y) || pasillo(x - 1, y) || pasillo(x, y + 1) || pasillo(x, y - 1)) return false;
+  let libres = 0;
+  for (let b = y - 1; b <= y + 1; b++) for (let a = x - 1; a <= x + 1; a++) if (!muro(a, b)) libres++;
+  return libres >= 6;
+}
+function ponerEnElPiso(w, nivel) {
+  w.adornos = []; w.solidos = new Set();
+  const lista = PISO.lista.filter(a => a.img.complete && a.img.naturalWidth);
+  if (!lista.length) return;
+  const azar = (x, y, s) => { let h = Math.imul(x + 7, 83492791) ^ Math.imul(y + 11, 19349663) ^ Math.imul(nivel + s, 73856093); h = Math.imul(h ^ (h >>> 13), 1274126177); return ((h ^ (h >>> 16)) >>> 0) / 4294967296; };
+  for (const a of lista) {
+    if (!a.spr) a.spr = spriteDesdeImagen(a.img, a.img.naturalWidth);
+    if (a.reemplaza) SPRITES[a.reemplaza].w = a.spr;      // el adorno viejo del juego base usa el dibujo nuevo
+  }
+  let total = zonaAlcanzable(w, -1);
+  for (let y = 1; y < MH - 1; y++) for (let x = 1; x < MW - 1; x++) {
+    const i = y * MW + x;
+    if (w.map[i] !== 0 || !lugarDeSala(w, x, y) || azar(x, y, 3) > PISO.densidad || Math.abs(x - w.start[0]) + Math.abs(y - w.start[1]) < 3) continue;
+    if (w.ents.some(e => e.x === x && e.y === y) || w.adornos.some(p => Math.abs(p.x - x - 0.5) + Math.abs(p.y - y - 0.5) < PISO.separacion)) continue;
+    if (zonaAlcanzable(w, i) !== total - 1) continue;
+    const a = lista[Math.floor(azar(x, y, 4) * lista.length)];
+    w.adornos.push({ x: x + 0.5, y: y + 0.5, spr: a.spr, scale: a.escala, ramp: 0, glow: 0.3 });
+    w.solidos.add(i); total--;
+  }
+}
+const baseIsWall = isWall;
+window.isWall = (x, y) => baseIsWall(x, y) || !!W_().solidos?.has(y * MW + x);
+
+const baseRenderScene = renderScene;
+window.renderScene = (w, v, sprites, h) => {
+  const extra = [];
+  for (const c of w.colgantes || []) { const spr = spriteTecho(c.n); if (spr) extra.push({ x: c.x, y: c.y, spr, scale: 1, ramp: 0, glow: 0.3 * flick }); }
+  baseRenderScene(w, v, sprites.concat(extra, w.adornos || []), h);
+};
+
+// ---------- Título ----------
+window.openLanguagePick = then => then();
+window.openTitleMenu = () => {
+  closeAllMenus(); runId++; C = null;
+  for (const id of ['combat', 'inv', 'dialog', 'battle', 'xCharla']) $(id).classList.add('hidden');
+  showScreen(null); setPalette('castle'); setMusic('intro');
+  S.mode = 'title';
+  openMenu({ back: false, cls: 'compact', items: [
+    { label: 'Reunir el grupo', sub: `${X.ceniza} de Ceniza · ${X.caidos.length} caído${X.caidos.length === 1 ? '' : 's'} · ${X.corridas} expedicion${X.corridas === 1 ? '' : 'es'}`, fn: abrirReunion },
+    { label: 'Los caídos', sub: 'Quienes quedaron en la cripta.', fn: abrirCaidos, off: !X.caidos.length },
+    { label: 'Borrar progreso', sub: 'Ceniza y caídos de esta prueba.', fn: () => confirmMenu('¿Borrar la Ceniza y los caídos?', () => { X.ceniza = 0; X.caidos = []; X.corridas = 0; guardarX(); openTitleMenu(); }) },
+    { label: 'Volver al juego base', fn: () => { location.href = new URL('index.html', document.baseURI).href; } },
+  ] }, 'title');
+};
+
+function abrirCaidos() {
+  openMenu({ title: 'Los caídos', cls: 'altar', items: X.caidos.map(c => ({
+    label: `${c.nombre} <small>· ${D.clases[c.clase].nombre}, ${D.modelos[c.modelo].titulo}</small>`,
+    sub: `Cayó en el nivel ${c.cayo}. Puede volver a aparecer en la reunión.`, fn: () => {} })) });
+}
+
+// ---------- Reunión del grupo ----------
+function abrirReunion() {
+  X.cands = [...NUCLEO.sortearCaidos(D, X.caidos, azarX), ...NUCLEO.sortearCandidatos(D, azarX)];
+  X.sel = [];
+  const max = D.mazmorra.tamano_grupo;
+  const m = { title: 'Reunir el grupo', cls: 'altar', items: [] };
+  m.refresh = () => {
+    m.text = `Elige ${max} portadores: ${X.sel.length}/${max}. Ceniza: ${X.ceniza - costoSel()}.`;
+    m.items = X.cands.map(p => {
+      const on = X.sel.includes(p), c = p.condicion, caro = c && c.ceniza > X.ceniza - costoSel() && !on;
+      return {
+        label: `<img class="xr" src="${retratoX(p.modelo, 40, 'castle').toDataURL()}" alt="">${on ? '◆' : '◇'} ${p.nombre} <small>· ${D.clases[p.clase].nombre}, ${D.modelos[p.modelo].titulo}${p.caido ? ' · caído' : ''}</small>`,
+        sub: c ? c.texto : `${D.modelos[p.modelo].rasgo}. Vida ${p.vidaMax} · Ataque ${p.ataque} · Velocidad ${p.velocidad}. ${D.clases[p.clase].rol}.`,
+        off: caro || (!on && X.sel.length >= max),
+        fn: () => { if (on) X.sel.splice(X.sel.indexOf(p), 1); else X.sel.push(p); m.refresh(); renderMenu(); },
+      };
+    });
+    m.items.push({ label: 'Descender ✠', sub: X.sel.length < max ? `Faltan ${max - X.sel.length}.` : 'Una sola antorcha para todos.', off: X.sel.length < max, fn: partir });
+  };
+  m.refresh();
+  openMenu(m);
+}
+const costoSel = () => X.sel.reduce((n, p) => n + ((p.condicion && p.condicion.ceniza) || 0), 0);
+
+function partir() {
+  for (const p of X.sel) if (p.caido) {
+    X.ceniza -= NUCLEO.aplicarCondicion(p);
+    X.caidos = X.caidos.filter(c => c.id !== p.id);
+    delete p.caido; delete p.condicion;
+  }
+  X.grupo = X.sel.slice();
+  for (const p of X.grupo) { p.vida = p.vidaMax; delete p.cayo; }
+  X.corridas++; X.ganada = 0; guardarX();
+  const l = X.grupo[0];
+  closeAllMenus();
+  CR.cls = D.clases[l.clase].arte; CR.race = D.modelos[l.modelo].raza; CR.name = l.nombre;
+  EXP.mods = []; EXP.seed = null; EXP.daily = null;
+  // el diálogo de bienvenida del juego base no corre acá
+  const dialogoBase = window.showDialog;
+  window.showDialog = () => {};
+  newGame();
+  window.showDialog = dialogoBase;
+  S.flags.lowFuel = 1;   // el aviso de antorcha baja del base le habla a un solo héroe
+  P.potions = D.mazmorra.pociones_iniciales + X.grupo.filter(p => D.modelos[p.modelo].bonos.pociones).length;
+  logLines.length = 0;
+  log('El grupo baja con una sola antorcha.', 'em');
+  updateHUD();
+  charla('inicio');
+}
+
+// ---------- Mazmorra (la del juego base) ----------
+window.enterLevel = (floor, level) => {
+  // la expedición de prueba es corta: dos niveles y la guarida
+  if (floor === 1 && !D.mazmorra.niveles.includes(level)) level = D.mazmorra.niveles.find(n => n > level);
+  aplicarTexturas();
+  baseX.enterLevel(floor, level);
+  const w = W_();
+  w.ents = w.ents.filter(e => e.type !== 'event' && e.type !== 'reliquary');
+  decorarMuros(w, level);
+  colgarDelTecho(w, level);
+  ponerEnElPiso(w, level);
+  if (level === 2) {
+    const q = w.ents.find(e => e.type === 'prop');
+    if (q) Object.assign(q, { type: 'event', ev: 'peregrino', done: false, rescate: true });
+  }
+  w.ents = w.ents.filter(e => e.type !== 'prop' || lugarDeSala(w, e.x, e.y));     // los adornos del juego base tampoco van en el camino
+};
+
+window.openEvent = e => {
+  // el portador se va del mapa, se quede o no con el grupo
+  W_().ents.splice(W_().ents.indexOf(e), 1);
+  charla('rescate');
+};
+
+window.openChest = c => {
+  if (c.open) { log('El cofre está vacío.'); sfx('bump'); return; }
+  c.open = true; sfx('chest');
+  const r = azarX();
+  if (r < 0.35 && P.potions < BAL.maxPotions) { P.potions++; log('Encuentras una poción de sangre.', 'good'); }
+  else if (r < 0.65 && P.oil < BAL.maxOil) { P.oil++; log('Encuentras un frasco de aceite.', 'good'); }
+  else { X.ceniza += 3; log('Ceniza tibia en el fondo del cofre (+3).', 'good'); }
+  updateHUD();
+};
+
+window.usePotion = () => {
+  if (!P.potions) { log('No te quedan pociones.'); return; }
+  const t = NUCLEO.vivos(X.grupo).sort((a, b) => a.vida / a.vidaMax - b.vida / b.vidaMax)[0];
+  P.potions--; const v = Math.round(t.vidaMax * 0.4); t.vida = Math.min(t.vidaMax, t.vida + v);
+  sfx('heal'); log(`${t.nombre} recupera ${v} de vida.`, 'good'); updateHUD();
+};
+
+// El inventario del base no aplica: se muestra el grupo
+window.openInv = () => openMenu({ title: 'El grupo', cls: 'altar', items: X.grupo.map(p => ({
+  label: `${p.nombre} <small>· ${D.clases[p.clase].nombre} nv ${p.nivel}${p.vida <= 0 ? ' · caído' : ''}${p.marcado ? ' · marcado' : ''}</small>`,
+  sub: `${D.modelos[p.modelo].titulo}. Vida ${Math.max(0, p.vida)}/${p.vidaMax} · Ataque ${p.ataque} · Defensa ${p.defensa} · Velocidad ${p.velocidad}.`, fn: () => {} })) }, 'game');
+
+// La oscuridad le pega a todo el grupo, no al P del juego base
+window.afterStep = () => {
+  P.hp = P.maxhp;
+  baseX.afterStep();
+  if (P.fuel === 0 && S.steps % 3 === 0 && S.mode === 'explore') {
+    for (const u of NUCLEO.vivos(X.grupo)) u.vida--;
+    registrarCaidos();
+    if (!NUCLEO.vivos(X.grupo).length) finExpedicion(false);
+  }
+  updateHUD();
+};
+
+// Exploración a pantalla completa: sin panel; mapa, zona y objetos
+const CASILLEROS = {};
+for (const n of ['pocion', 'aceite', 'antorcha']) CASILLEROS[n] = { img: Object.assign(new Image(), { src: `expedicion/interfaz/hud/casillero_${n}.png` }), c: {} };
+function casilleroX(n) {
+  const k = CASILLEROS[n];
+  if (!k.c[S.env] && k.img.complete && k.img.naturalWidth) k.c[S.env] = spriteCanvas(spriteDesdeImagen(k.img, k.img.naturalWidth), k.img.naturalWidth, S.env, 1).toDataURL();
+  return k.c[S.env] || k.img.src;
+}
+
+window.updateHUD = () => {
+  baseX.updateHUD();
+  const heridos = NUCLEO.vivos(X.grupo).filter(p => p.vida < p.vidaMax * 0.3).length;
+  const objeto = (img, nombre, n) => HUD_X.objetos === 'texto'
+    ? `<div class="obj">${nombre} <b>${n}</b></div>`
+    : `<div class="obj"><i style="background-image:url(${casilleroX(img)})"></i><b>${n}</b></div>`;
+  const i = D.mazmorra.niveles.indexOf(S.level), total = D.mazmorra.niveles.length;
+  const nivel = { hondo: `<small>${i === total - 1 ? 'El fondo' : ['Primer', 'Segundo', 'Tercer'][i] + ' descenso'}</small>`, romano: ` · ${['I', 'II', 'III', 'IV'][i]}`,
+    rombos: `<small>${'◆'.repeat(i + 1)}${'◇'.repeat(total - i - 1)}</small>` }[HUD_X.nivel];
+  $('xEsq').innerHTML = `<div class="zona">La Cripta${nivel}</div>` +
+    `<div class="fila ${HUD_X.objetos}">${objeto('pocion', 'Pociones', P.potions)}${objeto('aceite', 'Aceite', P.oil)}${objeto('antorcha', 'Antorcha', Math.ceil(P.fuel))}</div>` +
+    (heridos ? `<div class="alerta">${heridos} en peligro · ${glyph('inv')}</div>` : '');
+};
+
+// Opciones a prueba: F8 cambia los objetos y F9 cómo se nombra el nivel
+const HUD_X = { objetos: 'sueltos', nivel: 'hondo' };
+try { Object.assign(HUD_X, JSON.parse(localStorage.getItem('expedicion.hud'))); } catch (e) { /* sin almacenamiento */ }
+window.addEventListener('keydown', ev => {
+  const lista = { F8: ['objetos', ['sueltos', 'cinto', 'texto']], F9: ['nivel', ['hondo', 'romano', 'rombos']] }[ev.code];
+  if (!lista || S.mode !== 'explore') return;
+  ev.preventDefault();
+  const [campo, ops] = lista;
+  HUD_X[campo] = ops[(ops.indexOf(HUD_X[campo]) + 1) % ops.length];
+  try { localStorage.setItem('expedicion.hud', JSON.stringify(HUD_X)); } catch (e) { /* sin almacenamiento */ }
+  updateHUD();
+});
+
+// El panel del juego base no se dibuja: sus barras quedan sin efecto y el mapa va arriba a la derecha
+window.drawBar = () => {};
+const MAPA = { x: 386, y: 9, cs: 3 };
+window.drawMinimap = (c, R, w, p) => {
+  const { x: ox, y: oy, cs } = MAPA, { map, explored, ents } = w;
+  // lo recorrido brilla y lo cercano se insinúa: 3 pisado, 2 y 1 piso a uno o dos pasos, 9 muro que lo bordea
+  const luz = new Uint8Array(MW * MH), pasos = [[1, 0], [-1, 0], [0, 1], [0, -1]];
+  const vecinos = (x, y, fn) => { for (const [ax, ay] of pasos) { const nx = x + ax, ny = y + ay; if (nx >= 0 && ny >= 0 && nx < MW && ny < MH) fn(ny * MW + nx); } };
+  for (let i = 0; i < luz.length; i++) if (explored[i] && map[i] !== 1) luz[i] = 3;
+  for (const n of [3, 2]) for (let y = 0; y < MH; y++) for (let x = 0; x < MW; x++) if (luz[y * MW + x] === n) vecinos(x, y, i => { if (!luz[i] && map[i] !== 1) luz[i] = n - 1; });
+  for (let y = 0; y < MH; y++) for (let x = 0; x < MW; x++) if (luz[y * MW + x] && luz[y * MW + x] !== 9) vecinos(x, y, i => { if (map[i] === 1) luz[i] = 9; });
+  c.fillStyle = R[0];
+  for (let y = 0; y < MH; y++) for (let x = 0; x < MW; x++) if (luz[y * MW + x]) c.fillRect(ox + x * cs - 1, oy + y * cs - 1, cs + 2, cs + 2);
+  for (let y = 0; y < MH; y++) for (let x = 0; x < MW; x++) {
+    const i = y * MW + x, l = luz[i];
+    if (!l) continue;
+    c.fillStyle = l === 3 ? (map[i] === 2 ? R[5] : R[3]) : l === 2 ? R[2] : l === 1 ? ((x + y) & 1 ? R[2] : R[1]) : R[1];
+    c.fillRect(ox + x * cs, oy + y * cs, cs, cs);
+  }
+  for (const e of ents) if (explored[e.y * MW + e.x] && ((e.type === 'chest' && !e.open) || (e.type === 'event' && !e.done))) {
+    c.fillStyle = e.type === 'chest' ? R[4] : R[5]; c.fillRect(ox + e.x * cs + 1, oy + e.y * cs + 1, cs - 1, cs - 1);
+  }
+  // el jugador, como una flecha que marca hacia dónde mira
+  const [dx, dy] = DIRS[p.dir], cx = ox + p.x * cs + 1.5, cy = oy + p.y * cs + 1.5;
+  c.fillStyle = MARCO.luz; c.beginPath();
+  c.moveTo(cx + dx * 4.5, cy + dy * 4.5); c.lineTo(cx - dx * 3 - dy * 3.5, cy - dy * 3 + dx * 3.5); c.lineTo(cx - dx * 3 + dy * 3.5, cy - dy * 3 - dx * 3.5);
+  c.closePath(); c.fill();
+};
+
+// La mano con la antorcha: el dibujo pasa por la paleta del piso y se apaga junto con el combustible;
+// el fuego es la llama animada del juego, que crece o baja con lo que queda.
+window.renderTorch = () => {};
+const MANO = { img: Object.assign(new Image(), { src: 'expedicion/interfaz/hud/mano_antorcha.png' }), x: 326, y: 152, lado: 136, cache: {} };
+RAMPS.fuegoX = ['#3a0d06', '#7c1f0a', '#c9440c', '#ee7d1a', '#fab634', '#ffeeb0'];
+function manoIluminada(nivel) {
+  const clave = S.env + nivel;
+  if (!MANO.cache[clave]) MANO.cache[clave] = spriteCanvas(spriteDesdeImagen(MANO.img, MANO.lado), MANO.lado, S.env, 0.5 + nivel * 0.15);
+  return MANO.cache[clave];
+}
+function dibujarAntorcha(c) {
+  if (!MANO.img.complete || !MANO.img.naturalWidth) return;
+  const paso = anim && !anim.bump ? Math.sin(clamp(anim.t / anim.dur, 0, 1) * Math.PI) * 3 : 0;
+  const x = MANO.x, y = MANO.y + Math.round(Math.sin(T * 1.7) + paso), k = 0.3 + 0.7 * P.fuel / 100;
+  c.globalAlpha = S.mode === 'fade' ? 1 - fx.fade : 1;
+  // el fuego abraza la cabeza: una llama detrás, los trapos, y lenguas y brasas por delante
+  if (P.fuel > 0) drawFlame(c, x + 31, y + 34, 72, 70, T, k, 'fuegoX');
+  c.drawImage(manoIluminada(Math.ceil(P.fuel / 25)), x, y);
+  if (P.fuel > 0) {
+    drawFlame(c, x + 31, y + 24, 44, 40, T + 2.7, k, 'fuegoX');
+    for (let n = 0; n < 9; n++) {
+      const u = (T * (0.5 + n * 0.07) + n * 0.37) % 1;
+      c.fillStyle = RAMPS.fuegoX[n % 2 ? 4 : 5];
+      if (n < 5) { if (Math.sin(T * 6 + n * 2) > 0) c.fillRect(x + 20 + n * 5, y + 16 + (n * 7) % 13, 1, 1); }   // brasas en los trapos
+      else if (k > 0.3) c.fillRect(x + 28 + Math.round(Math.sin(u * 7 + n) * 7), y + 4 - Math.round(u * 44), 1, 1);    // chispas
+    }
+  }
+  c.globalAlpha = 1;
+}
+
+function registrarCaidos() {
+  let nuevo = false;
+  for (const p of X.grupo) if (p.vida <= 0 && !p.cayo) {
+    p.cayo = S.level; nuevo = true;
+    X.caidos.push({ ...p, vida: p.vidaMax, exp: 0 });
+  }
+  if (nuevo) guardarX();
+  return nuevo;
+}
+
+// El registro se muestra un rato y se apaga solo; no ocupa pantalla si no hay novedades
+const baseRenderLog = renderLog;
+let apagarLog = 0;
+window.renderLog = () => {
+  baseRenderLog();
+  $('log').classList.remove('apagado');
+  clearTimeout(apagarLog);
+  apagarLog = setTimeout(() => $('log').classList.add('apagado'), 5000);
+};
+
+// ---------- Diálogos ----------
+const QUIEN = { sombra: ['shade', 'shade', 'La Sombra'], rey: ['boneKing', 'blood', 'El Rey del Osario'], narrador: [null, null, ''] };
+let CH = null;
+function charla(id, luego) {
+  const n = D.dialogos[id];
+  CH = { n, i: 0, luego, sel: 0, vuelve: S.mode === 'xbat' ? 'xbat' : 'explore' };
+  S.mode = 'xcharla';
+  $('xCharla').classList.remove('hidden');
+  pintarCharla();
+}
+function pintarCharla() {
+  const { n, i, sel } = CH, q = QUIEN[n.quien], ops = i >= n.lineas.length - 1 && n.opciones ? n.opciones.filter(o => o.requiere !== 'pocion' || P.potions > 0) : null;
+  CH.ops = ops;
+  $('xCharla').innerHTML = `<div class="cb">${q[2] ? `<div class="cq">${q[2]}</div>` : ''}<div class="ct">${n.lineas[i]}</div>` +
+    (ops ? ops.map((o, k) => `<div class="co${k === sel ? ' sel' : ''}">${o.texto}</div>`).join('') : '<div class="cs">Enter</div>') + '</div>';
+}
+function charlaAction(act) {
+  if (CH.ops && (act === 'fwd' || act === 'back')) { CH.sel = (CH.sel + (act === 'fwd' ? CH.ops.length - 1 : 1)) % CH.ops.length; sfx('select'); pintarCharla(); return; }
+  if (act !== 'ok') return;
+  sfx('select');
+  if (!CH.ops && CH.i < CH.n.lineas.length - 1) { CH.i++; pintarCharla(); return; }
+  const o = CH.ops && CH.ops[CH.sel], { luego, vuelve } = CH;
+  $('xCharla').classList.add('hidden');
+  S.mode = vuelve; CH = null;
+  if (o) efecto(o);
+  if (luego) luego();
+}
+function efecto(o) {
+  if (o.efecto === 'ceniza') { P.potions--; X.ceniza += o.valor; log(`El portador se aleja. +${o.valor} de Ceniza.`, 'good'); }
+  if (o.efecto === 'reclutar') {
+    if (NUCLEO.vivos(X.grupo).length >= D.mazmorra.tamano_grupo) { X.ceniza += 4; log('El grupo está completo: te da su Ceniza y sigue solo (+4).', 'good'); }
+    else {
+      const ms = Object.keys(D.modelos), cs = Object.keys(D.clases);
+      const p = NUCLEO.crearPersonaje(D, ms[Math.floor(azarX() * ms.length)], cs[Math.floor(azarX() * cs.length)], azarX);
+      X.grupo.push(p); log(`${p.nombre} se suma al grupo.`, 'good');
+    }
+  }
+  updateHUD();
+}
+
+// ---------- Batalla ----------
+// tarjetas flotantes: separadas entre sí y del borde inferior
+const MENU_Y = 183;
+const CX = [10, 128, 246, 364], CY = 216, CW = 106, FX3 = [145, 240, 335], FBASE = 168, FTAM = 74;
+let Bt = null;
+window.startCombat = (e, emboscada) => {
+  if (Bt || S.mode !== 'explore') return;
+  const jefe = e.def.boss, tipo = jefe ? 'jefe' : emboscada ? 'emboscada' : 'comun';
+  const ids = jefe ? D.mazmorra.jefe : (p => p[Math.floor(azarX() * p.length)])(D.mazmorra.grupos_por_nivel[S.level] || D.mazmorra.grupos_por_nivel[1]);
+  const go = () => iniciarTransicion(e, ids, tipo);
+  if (jefe) charla('jefe', go); else go();
+};
+
+// ---------- Transición a la pelea ----------
+// La oscuridad se cierra desde los bordes; después la pelea se enciende y entran enemigos y tarjetas.
+const TRANS = { comun: { cierre: 0.42, negro: 0.1, entrada: 0.95 }, emboscada: { cierre: 0.2, negro: 0.06, entrada: 0.5 }, jefe: { cierre: 0.7, negro: 1.1, entrada: 1.3 } };
+let Tr = null;
+function iniciarTransicion(ent, ids, tipo) {
+  Tr = { ent, ids, tipo, t: 0, ...TRANS[tipo], rojo: tipo === 'emboscada' ? 0.8 : 0, sono: false };
+  S.mode = 'xtrans';
+  sfx(tipo === 'jefe' ? 'whisper' : 'whoosh');
+  if (tipo === 'emboscada') banner('¡Emboscada!');
+  if (!LUZ.c) prepararLuz();
+}
+
+function banner(texto) {
+  const b = $('xBanner');
+  b.textContent = texto || '';
+  b.classList.toggle('hidden', !texto);
+}
+
+function actualizarTransicion(dt) {
+  Tr.t += dt; Tr.rojo = Math.max(0, Tr.rojo - dt * 2.5);
+  if (!Tr.sono && Tr.t >= Tr.cierre) {
+    Tr.sono = true; sfx('encounter');
+    if (Tr.tipo === 'jefe') banner(D.enemigos[Tr.ids.find(id => D.enemigos[id].jefe)].nombre);
+  }
+  if (Tr.t >= Tr.cierre + Tr.negro) { const { ent, ids, tipo, entrada } = Tr; Tr = null; banner(tipo === 'emboscada' ? '¡Emboscada!' : ''); iniciarPelea(ent, ids, entrada); }
+}
+
+// El círculo de luz se achica con el mismo tramado de la mazmorra
+function dibujarCierre(c) {
+  const k = clamp(Tr.t / Tr.cierre, 0, 1), r = 330 * (1 - k * k) - 40;
+  const { px, cen, w, h } = LUZ, negro = 0xff020104 >>> 0;
+  for (let y = 0, i = 0; y < h; y++) for (let x = 0; x < w; x++, i++) {
+    const v = (cen[i] - r) / 46;
+    px[i] = (v >= 1 || (v > 0 && v > BAYER[((y & 3) << 2) | (x & 3)])) ? negro : 0;
+  }
+  LUZ.g.putImageData(LUZ.img, 0, 0);
+  c.drawImage(LUZ.c, 0, 0);
+  if (Tr.rojo) { c.fillStyle = `rgba(150, 20, 20, ${Tr.rojo * 0.6})`; c.fillRect(0, 0, 480, 270); }
+}
+
+// Fondo pintado de cada zona; si no cargó, el procedural
+const FONDOS = { crypt: Object.assign(new Image(), { src: 'expedicion/interfaz/batalla/cripta.png' }) };
+const ANTORCHAS = { crypt: [[25, 77], [454, 77]] };
+// Dibujos propios de enemigos (campo "imagen" de enemigos.json); los demás usan el sprite del juego base
+const IMG_ENEMIGOS = {};
+for (const d of Object.values(D.enemigos)) if (d.imagen) IMG_ENEMIGOS[d.imagen] = Object.assign(new Image(), { src: `expedicion/interfaz/enemigos/${d.imagen}.png` });
+
+function fondoBatalla() {
+  const f = FONDOS[S.env], n = 480 * 270, g = new Float32Array(n).fill(0.14);
+  if (!f || !f.complete || !f.naturalWidth) return g;
+  const c = document.createElement('canvas'); c.width = 480; c.height = 270;
+  const x = c.getContext('2d', { willReadFrequently: true }); x.drawImage(f, 0, 0, 480, 270);
+  const d = x.getImageData(0, 0, 480, 270).data;
+  for (let i = 0; i < n; i++) g[i] = d[i * 4] / 255 * 0.8;   // un poco más oscuro, para que resalten los enemigos
+  return g;
+}
+
+// El enemigo como brillo y máscara, con un borde oscuro que lo separa del fondo
+function topeVisible(e) {
+  const { a, size } = e.gris;
+  if (e.tope === undefined) e.tope = Math.floor(Math.max(0, a.indexOf(1)) / size);
+  return e.tope;
+}
+
+function grisDeEnemigo(e) {
+  const g = spriteDesdeImagen(e.img, e.tam), w = g.size, borde = new Uint8Array(w * w);
+  for (let i = 0; i < g.lum.length; i++) g.lum[i] = Math.min(1, g.lum[i] * 1.15 + 0.12);
+  for (let y = 0; y < w; y++) for (let x = 0; x < w; x++) {
+    if (g.a[y * w + x]) continue;
+    if ((x && g.a[y * w + x - 1]) || (x < w - 1 && g.a[y * w + x + 1]) || (y && g.a[(y - 1) * w + x]) || (y < w - 1 && g.a[(y + 1) * w + x])) borde[y * w + x] = 1;
+  }
+  g.borde = borde;
+  return g;
+}
+
+function iniciarPelea(ent, ids, entrada = 0.95) {
+  const b = NUCLEO.iniciarBatalla(D, X.grupo, ids);
+  const fx = ids.length === 1 ? [240] : ids.length === 2 ? [190, 290] : FX3;
+  for (const e of b.enemigos) { e.x = fx[e.i]; const propia = IMG_ENEMIGOS[e.imagen], lista = propia && propia.complete && propia.naturalWidth; const tam = lista ? propia.naturalWidth : e.jefe ? FTAM + 14 : FTAM; e.tam = tam; e.img = lista ? propia : spriteCanvas(SPRITES[e.sprite].p, tam, S.env, 1); e.golpeado = 0; e.luz = luzDeEnemigo(e); e.gris = grisDeEnemigo(e); e.icono = spriteCanvas(e.gris, LINEA.tam * 2, S.env, 1); }
+  for (const u of b.aliados) u.golpeado = 0;
+  Bt = { b, ent, fase: 'espera', sel: 0, tsel: 0, ops: [], msg: 'Te cierran el paso.', t: 0, gris: fondoBatalla(), fx: [], part: [], temblor: 0, destello: 0, golpe: 'tajo', ini: 0, entrada };
+  S.mode = 'xbat';
+  $('battle').classList.remove('hidden');
+  $('bMenu').classList.add('hidden');
+  if (ent.def.boss) setMusic('boss');
+  sfx('fire');
+  pintarBatalla();
+  later(Math.round(entrada * 1000) + 100, () => { banner(''); siguiente(); });
+}
+
+function siguiente() {
+  if (!Bt) return;
+  const r = NUCLEO.haTerminado(Bt.b);
+  if (r) return terminarPelea(r === 'victoria');
+  const { unidad: u, eventos } = NUCLEO.proximoTurno(Bt.b);
+  mostrar(eventos);
+  if (u.vida <= 0) return later(500, siguiente);
+  if (u.enemigo) {
+    Bt.fase = 'espera'; Bt.msg = `Turno de ${u.nombre}.`; pintarBatalla();
+    later(600, () => { if (Bt) { mostrar(NUCLEO.turnoEnemigo(Bt.b, u, azarX)); later(450, () => { if (Bt) Bt.fase = 'cambio'; }); later(800, siguiente); } });
+  } else {
+    Bt.ops = [{ id: 'atk', nombre: 'Atacar', descripcion: D.clases[u.clase].doble_golpe ? 'Dos golpes: el segundo, más flojo. +1 Ímpetu.' : 'Golpe común. +1 Ímpetu.', objetivo: 'enemigo' },
+      ...NUCLEO.opciones(D, u),
+      { id: 'def', nombre: 'Defender', descripcion: 'Mitad de daño hasta tu próximo turno. +1 Ímpetu.' },
+      { id: 'pot', nombre: 'Poción', descripcion: `Cura un 40% al aliado más herido. Quedan ${P.potions}.`, apagada: !P.potions }];
+    Bt.sel = 0; Bt.fase = 'menu'; Bt.msg = `Turno de ${u.nombre}.`; pintarBatalla();
+  }
+}
+
+// Convierte los eventos del núcleo en números, mensajes y efectos. Cada golpe a un enemigo se muestra
+// por separado, así el doble golpe del Pícaro se ve como dos impactos.
+function mostrar(eventos) {
+  let espera = 0;
+  for (const e of eventos) {
+    const uno = () => { if (Bt) { mostrarEvento(e); pintarBatalla(); } };
+    if (espera) later(espera, uno); else uno();
+    if (e.tipo === 'dano' && e.quien.enemigo) espera += 260;
+  }
+  pintarBatalla();
+  return espera;
+}
+
+function mostrarEvento(e) {
+  const q = e.quien, x = q.enemigo ? q.x : CX[q.i] + 26, y = q.enemigo ? FBASE - 60 : CY - 6;
+  if (e.tipo === 'dano') {
+    q.golpeado = 0.3; golpeBarra(q);
+    numero(x, y, q.enemigo ? String(e.valor) : `−${e.valor}`, e.estado ? `est-${e.estado}` : e.critico ? 'crit' : q.enemigo ? 'hit' : 'hurt');
+    if (e.estado) efectoEstado(q, e.estado);
+    else if (q.enemigo) { efectoGolpe(q, Bt.golpe, e.critico); sfx('hit'); } else { Bt.temblor = Math.max(Bt.temblor, 2); sfx('hurt'); }
+    Bt.msg = e.estado === 'estallido' ? '¡La herida se abre!' : '';       // el daño ya se ve en el número que salta
+  }
+  if (e.tipo === 'cura') { numero(x, y, `+${e.valor}`, 'heal'); sfx('heal'); chispas(x, CY - 6, 10, [RAMPS[S.env][5], RAMPS[S.env][4]], -30); Bt.msg = `${q.nombre} recupera ${e.valor}.`; }
+  if (e.tipo === 'esquiva') { sfx('miss'); Bt.msg = `${q.nombre} esquiva.`; }
+  if (e.tipo === 'muerte') {
+    Bt.msg = q.enemigo ? `${q.nombre} cae.` : `${q.nombre} cae. Su chispa se apaga.`;
+    if (q.enemigo) { q.muriendo = 0.6; chispas(q.x, FBASE - q.tam * 0.45, 24, [RAMPS[S.env][2], RAMPS[S.env][3], RAMPS[S.env][4]], -18); }
+  }
+  if (e.tipo === 'texto' && e.clave === 'resiste') Bt.msg = `${q.nombre} ya tiene ese efecto: no se renueva.`;
+  if (e.tipo === 'texto' && e.clave === 'especial') { Bt.msg = `${q.nombre} ${e.texto}.`; Bt.temblor = 5; Bt.destello = 0.5; }
+  if (e.tipo === 'texto' && e.clave === 'roba') Bt.msg = `El Soplo le roba Ímpetu a ${q.nombre}.`;
+}
+
+// ---------- Efectos de golpe ----------
+// Los efectos usan los tonos del piso; sólo el fuego y la sangre conservan su color
+const coloresFx = t => { const R = RAMPS[S.env]; return t === 'fuego' ? ['#ffd27a', '#ee7d1a', '#a3281f'] : [R[5], R[4], R[3]]; };
+function chispas(x, y, n, cols, vy = -40, fuerza = 70) {
+  for (let i = 0; i < n; i++) {
+    const a = azarX() * Math.PI * 2, v = fuerza * (0.3 + azarX() * 0.7);
+    Bt.part.push({ x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v + vy, t: 0, dur: 0.3 + azarX() * 0.4, col: cols[Math.floor(azarX() * cols.length)] });
+  }
+}
+
+function efectoEstado(q, estado) {
+  const y = FBASE - q.tam * 0.5;
+  if (estado === 'estallido') {
+    chispas(q.x, y, 30, COLOR_ESTADO.sangrado, -20, 110);
+    Bt.temblor = 5; sfx('slash');
+  } else {
+    chispas(q.x, y, 10, COLOR_ESTADO[estado], -45, 35);
+    sfx(estado === 'quemadura' ? 'fire' : 'sputter');
+  }
+}
+
+function efectoGolpe(q, tipo = 'tajo', critico = false) {
+  const x = q.x, y = FBASE - q.tam * 0.5, cols = coloresFx(tipo), m = critico ? 1.5 : 1;
+  q.retro = critico ? 9 : 5; q.dir = azarX() < 0.5 ? -1 : 1;
+  Bt.fx.push({ tipo, x, y, t: 0, dur: tipo === 'fuego' ? 0.4 : 0.22, m, giro: azarX() * 0.8 - 0.4 });
+  chispas(x, y, Math.round((tipo === 'fuego' ? 22 : 12) * m), cols, tipo === 'fuego' ? -50 : -30);
+  Bt.temblor = Math.max(Bt.temblor, critico ? 4 : 2);
+  Bt.destello = Math.max(Bt.destello, tipo === 'fuego' ? 0.45 : critico ? 0.35 : 0.15);
+  if (critico) { Bt.fx.push({ tipo: 'anillo', x, y, t: 0, dur: 0.28, m }); sfx('slash'); }
+}
+
+function dibujarFx(c) {
+  for (const f of Bt.fx) {
+    const k = clamp(f.t / f.dur, 0, 1), cols = coloresFx(f.tipo);
+    c.save(); c.translate(f.x, f.y); c.rotate(f.giro || 0); c.lineCap = 'butt';
+    if (f.tipo === 'tajo' || f.tipo === 'golpe') {
+      // medialuna que cruza al enemigo en diagonal
+      const r = 34 * f.m;
+      c.strokeStyle = cols[1]; c.lineWidth = (1 - k) * 7 * f.m; c.beginPath(); c.arc(-r * 0.7, -r * 0.2, r, -0.9 + k * 0.5, 0.9 + k * 0.5); c.stroke();
+      c.strokeStyle = cols[0]; c.lineWidth = (1 - k) * 3 * f.m; c.beginPath(); c.arc(-r * 0.7, -r * 0.2, r, -0.8 + k * 0.5, 0.8 + k * 0.5); c.stroke();
+    } else if (f.tipo === 'estocada') {
+      const l = 40 * f.m * (0.4 + k * 0.6);
+      c.fillStyle = cols[0]; c.beginPath(); c.moveTo(-l, -1); c.lineTo(l, 0); c.lineTo(-l, 2 * (1 - k) + 1); c.closePath(); c.fill();
+    } else if (f.tipo === 'fuego') {
+      for (let n = 0; n < 3; n++) { c.fillStyle = cols[n]; const r = (10 + 26 * k) * (1 - n * 0.28) * f.m; c.beginPath(); c.arc(0, 0, r * (1 - k * 0.3), 0, Math.PI * 2); c.globalAlpha = 1 - k; c.fill(); }
+    } else if (f.tipo === 'veneno') {
+      c.fillStyle = cols[0]; c.globalAlpha = 1 - k;
+      for (let n = 0; n < 6; n++) c.fillRect(Math.round(Math.sin(n * 2.4) * 16), Math.round(10 - n * 4 - k * 18), 2, 2);
+    } else if (f.tipo === 'anillo') {
+      c.strokeStyle = RAMPS[S.env][5]; c.lineWidth = (1 - k) * 3; c.beginPath(); c.arc(0, 0, 10 + 34 * k, 0, Math.PI * 2); c.stroke();
+    }
+    c.restore();
+  }
+  for (const p of Bt.part) { const q = p.t / p.dur > 0.6 ? 1 : 2; c.fillStyle = p.col; c.fillRect(Math.round(p.x), Math.round(p.y), q, q); }
+}
+
+function actualizarFx(dt) {
+  Bt.temblor = Math.max(0, Bt.temblor - dt * 22);
+  Bt.destello = Math.max(0, Bt.destello - dt * 2.2);
+  for (const f of Bt.fx) f.t += dt;
+  Bt.fx = Bt.fx.filter(f => f.t < f.dur);
+  for (const p of Bt.part) { p.t += dt; p.x += p.vx * dt; p.y += p.vy * dt; p.vy += 120 * dt; }
+  Bt.part = Bt.part.filter(p => p.t < p.dur);
+  actualizarLinea(dt);
+  for (const u of Bt.b.unidades) actualizarBarra(u, dt);
+  if (Bt.fase === 'botin') actualizarBotin(dt);
+  for (const e of Bt.b.enemigos) { if (e.retro) e.retro = Math.max(0, e.retro - dt * 34); if (e.muriendo) e.muriendo = Math.max(0, e.muriendo - dt); }
+}
+
+function numero(x, y, text, kind) {
+  const el = document.createElement('div');
+  el.className = 'fnum ' + kind; el.textContent = text;
+  el.style.left = x + 'px'; el.style.top = y + 'px';
+  $('fx').appendChild(el);
+  setTimeout(() => el.remove(), 1000);
+}
+
+function batallaAction(act) {
+  if (!Bt) return;
+  if (Bt.fase === 'botin') {
+    if (act !== 'ok') return;
+    if (Bt.listo) salirDelBotin(); else Bt.velXp = 1e6;
+    return;
+  }
+  if (Bt.ini < Bt.entrada) { if (act === 'ok') Bt.ini = Bt.entrada; return; }
+  const b = Bt.b, u = b.actual;
+  if (Bt.fase === 'menu') {
+    const n = Bt.ops.length;
+    if (act === 'fwd' || act === 'turnL' || act === 'strafeL') { Bt.sel = (Bt.sel + n - 1) % n; sfx('select'); }
+    else if (act === 'back' || act === 'turnR' || act === 'strafeR') { Bt.sel = (Bt.sel + 1) % n; sfx('select'); }
+    else if (act === 'ok') {
+      const o = Bt.ops[Bt.sel];
+      if (o.apagada) { sfx('bump'); return; }
+      if (o.objetivo === 'enemigo' || o.objetivo === 'aliado') { Bt.fase = 'objetivo'; Bt.lista = NUCLEO.vivos(o.objetivo === 'enemigo' ? b.enemigos : b.aliados); Bt.tsel = 0; sfx('select'); }
+      else ejecutar(o);
+    }
+  } else if (Bt.fase === 'objetivo') {
+    const n = Bt.lista.length;
+    if (act === 'turnL' || act === 'strafeL' || act === 'fwd') { Bt.tsel = (Bt.tsel + n - 1) % n; sfx('select'); }
+    else if (act === 'turnR' || act === 'strafeR' || act === 'back') { Bt.tsel = (Bt.tsel + 1) % n; sfx('select'); }
+    else if (act === 'cancel') Bt.fase = 'menu';
+    else if (act === 'ok') ejecutar(Bt.ops[Bt.sel], Bt.lista[Bt.tsel]);
+  }
+  if (Bt) pintarBatalla();
+}
+
+function ejecutar(o, t) {
+  const b = Bt.b, u = b.actual;
+  Bt.fase = 'espera';
+  sfx('swing');
+  // el efecto depende de quién pega y con qué
+  const h = D.habilidades[o.id], fuego = h && h.efectos.some(x => x.tipo === 'dano_fijo');
+  Bt.golpe = fuego ? 'fuego' : u.clase === 'picaro' ? 'estocada' : u.clase === 'guerrero' ? 'tajo' : 'golpe';
+  let ev;
+  if (o.id === 'atk') ev = NUCLEO.atacar(D, u, t, azarX);
+  else if (o.id === 'def') ev = NUCLEO.defender(u);
+  else if (o.id === 'pot') {
+    const h = NUCLEO.vivos(b.aliados).sort((x, y) => x.vida / x.vidaMax - y.vida / y.vidaMax)[0], v = Math.round(h.vidaMax * 0.4);
+    P.potions--; h.vida = Math.min(h.vidaMax, h.vida + v); ev = [{ tipo: 'cura', quien: h, valor: v }];
+  } else ev = NUCLEO.usarHabilidad(D, b, u, o.id, t, azarX);
+  const espera = mostrar(ev);
+  later(450 + espera, () => { if (Bt) Bt.fase = 'cambio'; });
+  later(800 + espera, siguiente);
+}
+
+function terminarPelea(gano) {
+  const { b, ent } = Bt, nuevo = registrarCaidos();
+  if (!gano) { cerrarPelea(); return finExpedicion(false); }
+  W_().ents.splice(W_().ents.indexOf(ent), 1);
+  const exp = b.enemigos.reduce((n, e) => n + e.exp, 0);
+  X.ceniza += ent.def.boss ? D.mazmorra.ceniza.por_jefe : D.mazmorra.ceniza.por_grupo;
+  for (const u of NUCLEO.vivos(X.grupo)) {
+    // lo que se anima en pantalla sale de los valores de antes del reparto
+    u.reparto = { exp: u.exp, nivel: u.nivel, falta: exp, subio: 0 };
+    NUCLEO.ganarExp(D, u, exp);
+    u.vida = Math.min(u.vidaMax, u.vida + Math.round(u.vidaMax * D.mazmorra.descanso));
+  }
+  guardarX();
+  b.actual = null;
+  Object.assign(Bt, { fase: 'botin', listo: false, nuevo, msg: `Victoria · +${exp} de experiencia`, velXp: Math.max(exp / 1.3, 6) });
+  sfx('level');
+  pintarBatalla();
+}
+
+function cerrarPelea() {
+  $('battle').classList.add('hidden');
+  Bt = null;
+  S.mode = 'explore';
+}
+
+function actualizarBotin(dt) {
+  let queda = false;
+  for (const u of NUCLEO.vivos(Bt.b.aliados)) {
+    const a = u.reparto;
+    if (!a) continue;
+    a.subio = Math.max(0, a.subio - dt * 0.5);
+    if (a.falta <= 0) continue;
+    const paso = Math.min(a.falta, dt * Bt.velXp);
+    a.exp += paso; a.falta -= paso;
+    while (a.exp >= a.nivel * D.mazmorra.exp_por_nivel) { a.exp -= a.nivel * D.mazmorra.exp_por_nivel; a.nivel++; a.subio = 1; sfx('level'); }
+    if (a.falta > 0) queda = true;
+  }
+  if (!queda && !Bt.listo) { Bt.listo = true; Bt.msg += ' · Enter para seguir'; pintarBatalla(); }
+}
+
+function salirDelBotin() {
+  const { ent, nuevo } = Bt, jefe = ent.def.boss;
+  for (const u of X.grupo) delete u.reparto;
+  cerrarPelea();
+  updateHUD();
+  if (jefe) return finExpedicion(true);
+  if (nuevo) charla('muerte');
+}
+
+function finExpedicion(gano) {
+  if (gano) X.ganada = 1;
+  guardarX();
+  charla(gano ? 'victoria' : 'derrota', () => {
+    const vivos = NUCLEO.vivos(X.grupo).length;
+    openMenu({ title: gano ? 'Expedición cumplida' : 'El grupo cayó', back: false, text: `Sobrevivieron ${vivos} de ${X.grupo.length}. Ceniza acumulada: ${X.ceniza}. Quienes cayeron pueden volver a aparecer en la reunión.`,
+      items: [{ label: 'Volver a la superficie', fn: openTitleMenu }] }, 'game');
+  });
+}
+
+function pintarBatalla() {
+  if (!Bt) return;
+  const b = Bt.b, u = b.actual, pct = q => Math.round(Math.max(0, q.vida) / q.vidaMax * 100);
+  $('bLog').textContent = Bt.fase === 'objetivo' ? '' : Bt.msg;
+  $('bCards').innerHTML = b.aliados.map(q => `<div class="bcard${u === q ? ' on' : ''}${q.vida <= 0 ? ' down' : ''}" style="left:${CX[q.i]}px">
+    <div class="bn">${q.nombre}<small>${D.clases[q.clase].nombre}</small></div>
+    <div class="bfila hp"><span>HP</span><b>${Math.max(0, q.vida)}/${q.vidaMax}</b></div>
+    <div class="bestados">${Bt.fase === 'botin' ? '' : estadosDe(q)}</div></div>`).join('');
+  const m = $('bMenu'), ver = Bt.fase === 'menu' || Bt.fase === 'objetivo';
+  m.classList.toggle('hidden', !ver);
+  if (ver) {
+    m.innerHTML = `<div class="bopts">${Bt.ops.map((o, i) => `<div class="bopt${i === Bt.sel ? ' sel' : ''}${o.apagada ? ' off' : ''}">${o.nombre}${o.costo ? ` <span>${'◆'.repeat(o.costo)}</span>` : ''}</div>`).join('')}</div>`;
+    // el canvas dibuja velas y llamas en la posición real de cada palabra
+    Bt.menuX = [...m.querySelectorAll('.bopt')].map(e => ({ x: m.offsetLeft + e.parentNode.offsetLeft + e.offsetLeft, w: e.offsetWidth }));
+  }
+}
+
+// La interfaz toma los tonos del piso; sólo el rojo de la vida es fijo, como acento
+const MARCO = { piedra: '', luz: '', fondo: '', vida: ['#6a1518', '#b52a2a', '#e0605a'], impetu: [] };
+function marcoDelPiso() { const R = RAMPS[S.env] || RAMPS.crypt; Object.assign(MARCO, { piedra: R[3], luz: R[5], fondo: R[0], impetu: [R[2], R[4], R[5]] }); }
+
+// Barra con punta a la derecha, como una placa flotante
+function placa(c, x, y, w, h, frac, col, luz, resto = 0) {
+  const fin = x + w, tip = Math.floor(h / 2);
+  const forma = (ins) => { c.beginPath(); c.moveTo(x + ins, y + ins); c.lineTo(fin - tip - ins, y + ins); c.lineTo(fin - ins - 1, y + tip + 0.5); c.lineTo(fin - tip - ins, y + h - ins); c.lineTo(x + ins, y + h - ins); c.closePath(); };
+  forma(0); c.fillStyle = luz ? MARCO.luz : MARCO.piedra; c.fill();
+  forma(1); c.fillStyle = MARCO.fondo; c.fill();
+  c.save(); forma(1); c.clip();
+  const iw = w - 3, lleno = Math.round(iw * frac);
+  if (resto > frac) { c.fillStyle = RAMPS[S.env][5]; c.fillRect(x + 1, y + 1, Math.round(iw * resto), h - 2); }
+  c.fillStyle = col[1]; c.fillRect(x + 1, y + 1, lleno, h - 2);
+  c.fillStyle = col[2]; c.fillRect(x + 1, y + 1, lleno, 1);
+  c.fillStyle = col[0]; c.fillRect(x + 1, y + h - 2, lleno, 1);
+  c.restore();
+}
+
+// Un punto de Ímpetu: rombo de 7×7 píxeles, lleno o sólo el contorno
+function rombo(c, x, y, lleno) {
+  for (let k = 0; k < 7; k++) {
+    const a = 3 - Math.abs(3 - k), f = y + k;
+    c.fillStyle = lleno ? (k < 3 ? MARCO.impetu[2] : MARCO.impetu[1]) : MARCO.fondo;
+    c.fillRect(x + 3 - a, f, a * 2 + 1, 1);
+    c.fillStyle = lleno ? MARCO.impetu[0] : MARCO.piedra;
+    c.fillRect(x + 3 - a, f, 1, 1); c.fillRect(x + 3 + a, f, 1, 1);
+  }
+}
+
+// Fila de estados: lo que afecta a cada personaje ahora
+function estadosDe(q) {
+  const on = [q.guardia && ['escudo', icon('shield'), 'En guardia'], q.provoca > 0 && ['ira', icon('cross'), 'Provocando'],
+    q.defensaExtra > 0 && ['mas', '▲', `Defensa +${q.defensaExtra}`], q.marcado && ['marca', icon('ash'), 'Marcado']].filter(Boolean);
+  return Array.from({ length: 4 }, (_, i) => (on[i] ? `<i class="${on[i][0]}" title="${on[i][2]}">${on[i][1]}</i>` : '<i></i>')).join('');
+}
+
+// ---------- Escena de la batalla ----------
+// Igual que la mazmorra: fondo y enemigos se juntan como brillo en gris, se les aplica la luz y recién al
+// final pasan a los 6 tonos del piso con tramado Bayer. Así todo comparte la misma grilla y paleta.
+// Suman las antorchas de la pared, la del grupo (su alcance depende del combustible) y un resplandor propio
+// de cada enemigo, para que nunca se pierda en la oscuridad.
+const LUZ = { w: 480, h: 270, ambiente: 0.2, pal: {} };
+function prepararLuz() {
+  const c = document.createElement('canvas'); c.width = LUZ.w; c.height = LUZ.h;
+  const g = c.getContext('2d'), img = g.createImageData(LUZ.w, LUZ.h), n = LUZ.w * LUZ.h;
+  Object.assign(LUZ, { c, g, img, px: new Uint32Array(img.data.buffer), lum: new Float32Array(n), lat: new Float32Array(n), cen: new Float32Array(n) });
+  for (let y = 0, i = 0; y < LUZ.h; y++) for (let x = 0; x < LUZ.w; x++, i++) {
+    LUZ.lat[i] = Math.min(Math.hypot(x - 25, y - 66), Math.hypot(x - 454, y - 66));
+    LUZ.cen[i] = Math.hypot(x - 240, (y - 120) * 1.4);
+  }
+}
+
+// El resplandor de un enemigo se calcula una vez, al empezar la pelea
+function luzDeEnemigo(e) {
+  if (!LUZ.c) prepararLuz();
+  const d = new Float32Array(LUZ.w * LUZ.h), cy = FBASE - e.tam * 0.45;
+  for (let y = 0, i = 0; y < LUZ.h; y++) for (let x = 0; x < LUZ.w; x++, i++) d[i] = Math.hypot(x - e.x, (y - cy) * 0.8);
+  return d;
+}
+
+function ponerEnemigo(e, x0, y0) {
+  const { lum, w, h } = LUZ, g = e.gris, t = g.size, muere = e.vida <= 0, corte = muere ? Math.round(t * (1 - e.muriendo / 0.6)) : 0;
+  const extra = e.golpeado > 0.2 ? 0.5 : 0;
+  // sombra en el piso
+  for (let y = FBASE - 4; y <= FBASE + 3; y++) for (let x = e.x - 30; x <= e.x + 30; x++) {
+    const a = (x - e.x) / (t * 0.34), b = (y - FBASE + 1) / 4;
+    if (a * a + b * b < 1) lum[y * w + x] *= 0.5;
+  }
+  for (let y = corte; y < t; y++) {
+    const Y = y0 + y; if (Y < 0 || Y >= h) continue;
+    for (let x = 0; x < t; x++) {
+      const X = x0 + x; if (X < 0 || X >= w) continue;
+      const i = y * t + x;
+      if (g.a[i]) lum[Y * w + X] = Math.min(1, g.lum[i] + extra); else if (g.borde[i]) lum[Y * w + X] = 0;
+    }
+  }
+}
+
+function dibujarEscena(c, ex, ey) {
+  if (!LUZ.c) prepararLuz();
+  const { lum, px, lat: dl, cen: dc, w, h, ambiente } = LUZ, bg = Bt.gris;
+  if (ex || ey) { for (let y = 0; y < h; y++) { const Y = clamp(y - ey, 0, h - 1); for (let x = 0; x < w; x++) lum[y * w + x] = bg[Y * w + clamp(x - ex, 0, w - 1)]; } }
+  else lum.set(bg);
+  for (const e of Bt.b.enemigos) {
+    if (e.vida <= 0 && !e.muriendo) continue;
+    const sale = aparicion(e);
+    if (sale > 0) ponerEnemigo(e, Math.round(e.x + ex + (e.retro || 0) * (e.dir || 1) - e.tam / 2), FBASE - e.tam + ey + Math.round((1 - sale) * 12));
+  }
+  const f = clamp(flick, 0.7, 1.05), alcance = (110 + 170 * P.fuel / 100) * (0.94 + f * 0.06), lat = 120 * (0.86 + f * 0.14);
+  const entra = clamp(Bt.ini / (Bt.entrada * 0.75), 0, 1), focos = Bt.b.enemigos.filter(e => e.vida > 0 && e.luz).map(e => e.luz);
+  const pal = LUZ.pal[S.env] || (LUZ.pal[S.env] = packRamp(RAMPS[S.env])), n = pal.length - 1;
+  for (let y = 0, i = 0; y < h; y++) for (let x = 0; x < w; x++, i++) {
+    let l = ambiente + Bt.destello + Math.max(0, 1 - dc[i] / alcance) * 0.8 + Math.max(0, 1 - dl[i] / lat) * 0.95;
+    for (const d of focos) { const q = 1 - d[i] / 52; if (q > 0) l += q * 0.5; }
+    const b = lum[i] * l * entra, v = (b > 1 ? 1 : b) * n;
+    let k = v | 0;
+    if (v - k > BAYER[((y & 3) << 2) | (x & 3)]) k++;
+    px[i] = pal[k];
+  }
+  LUZ.g.putImageData(LUZ.img, 0, 0);
+  c.drawImage(LUZ.c, 0, 0);
+}
+
+// Brasas que suben de las antorchas y polvo suspendido
+function dibujarParticulas(c) {
+  const t = Bt.t, R = RAMPS[S.env];
+  for (let i = 0; i < 12; i++) {
+    const ph = (t * 0.3 + i * 0.083) % 1, lado = i % 2 ? 25 : 454;
+    if (ph > 0.75) continue;
+    c.fillStyle = ph < 0.4 ? '#f5c98a' : '#b4562a';
+    c.fillRect(Math.round(lado + Math.sin(t * 2 + i * 1.7) * (3 + ph * 8)), Math.round(58 - ph * 44), 1, 1);
+  }
+  c.fillStyle = R[3];
+  for (let i = 0; i < 16; i++) {
+    const ph = (t * 0.05 + i * 0.0625) % 1;
+    if (Math.sin(t * 1.5 + i) > 0.2) c.fillRect(Math.round(70 + hash2(i, 3, 71) * 340 + Math.sin(t * 0.7 + i) * 6), Math.round(150 - ph * 110), 1, 1);
+  }
+}
+
+// ---------- Menú de acciones ----------
+// Sólo palabras sobre la oscuridad; una llama marca la acción elegida.
+function dibujarMenu(c) {
+  const p = (Bt.menuX || [])[Bt.sel];
+  if (p) drawFlame(c, p.x - 2, MENU_Y + 11, 11, 15, Bt.t, 0.9, 'fuegoX');
+}
+
+// ---------- Vida y estados de los enemigos ----------
+const COLOR_ESTADO = { veneno: ['#2f6a2a', '#5fbf4a', '#b6e36a'], quemadura: ['#8a3a10', '#e8761c', '#fbbf5a'], sangrado: ['#6a1518', '#b52a2a', '#e0605a'] };
+const ICONOS = {
+  veneno: ['.#####.', '#######', '#.###.#', '#######', '.#####.', '.#.#.#.', '.......'],
+  quemadura: ['...#...', '..##...', '..###..', '.#####.', '.##.##.', '.#####.', '..###..'],
+  sangrado: ['...#...', '...#...', '..###..', '.#####.', '.#####.', '.#####.', '..###..'],
+};
+function dibujarIcono(c, tipo, x, y) {
+  c.fillStyle = MARCO.fondo; c.fillRect(x - 1, y - 1, 9, 9);
+  c.fillStyle = COLOR_ESTADO[tipo][2];
+  ICONOS[tipo].forEach((f, j) => { for (let i = 0; i < 7; i++) if (f[i] === '#') c.fillRect(x + i, y + j, 1, 1); });
+}
+
+// Marca un golpe: la barra tiembla y lo perdido queda claro un momento antes de vaciarse
+function golpeBarra(u) { u.sacude = 0.25; u.espera = 0.28; if (u.fantasma === undefined) u.fantasma = u.vidaMax; }
+function actualizarBarra(u, dt) {
+  if (u.fantasma === undefined) { u.fantasma = u.vida; return; }
+  u.sacude = Math.max(0, (u.sacude || 0) - dt);
+  if ((u.espera = Math.max(0, (u.espera || 0) - dt)) > 0) return;
+  u.fantasma = u.fantasma > u.vida ? Math.max(Math.max(0, u.vida), u.fantasma - u.vidaMax * dt * 0.9) : Math.max(0, u.vida);
+}
+
+function dibujarVidaEnemigo(c, e) {
+  const est = e.estados.find(v => v.tipo !== 'sangrado'), col = est ? COLOR_ESTADO[est.tipo] : MARCO.vida;
+  const x = e.x - 22 + (e.sacude ? Math.round(Math.sin(Bt.t * 70) * 1.5) : 0), y = FBASE + 3, w = 42;
+  const vida = Math.round(w * Math.max(0, e.vida) / e.vidaMax), resto = Math.round(w * Math.max(0, e.fantasma ?? e.vida) / e.vidaMax);
+  c.fillStyle = MARCO.fondo; c.fillRect(x, y, w + 2, 4);
+  if (resto > vida) { c.fillStyle = RAMPS[S.env][5]; c.fillRect(x + 1 + vida, y + 1, resto - vida, 2); }
+  c.fillStyle = col[1]; c.fillRect(x + 1, y + 1, vida, 2);
+  c.fillStyle = col[2]; c.fillRect(x + 1, y + 1, vida, 1);
+  if (e.sacude > 0.15) { c.fillStyle = RAMPS[S.env][5]; c.fillRect(x + 1, y + 1, vida, 2); }
+  // estados debajo: parpadean cuando les queda el último turno
+  e.estados.forEach((v, n) => {
+    const ix = e.x - 4 - (e.estados.length - 1) * 5 + n * 10, iy = FBASE + 9;
+    if (v.turnos === 1 && Math.sin(Bt.t * 12) < 0) return;
+    dibujarIcono(c, v.tipo, ix, iy);
+    if (v.tipo === 'sangrado') { c.fillStyle = COLOR_ESTADO.sangrado[2]; for (let k = 0; k < v.pilas; k++) c.fillRect(ix + k * 2, iy + 8, 1, 1); }
+  });
+}
+
+// ---------- Línea de turnos ----------
+// Corre de derecha a izquierda: quien juega ocupa el lugar de Turno y los demás esperan en fila, una vez
+// cada uno. Al gastar el turno, su retrato pasa por debajo de la fila y vuelve al fondo.
+const LINEA = { turno: 166, primero: 188, paso: 16, y: 6, tam: 13 };
+function ordenLinea() {
+  const b = Bt.b, act = b.actual && b.actual.vida > 0 && Bt.fase !== 'cambio' ? b.actual : null;
+  return { act, fila: b.unidades.filter(u => u.vida > 0 && u !== act).sort((x, y) => x.reloj - y.reloj) };
+}
+const destinoLinea = (u, act, fila) => (u === act ? LINEA.turno : LINEA.primero + fila.indexOf(u) * LINEA.paso);
+
+function actualizarLinea(dt) {
+  const { act, fila } = ordenLinea(), fin = LINEA.primero + fila.length * LINEA.paso + 20;
+  for (const u of Bt.b.unidades) {
+    if (u.vida <= 0) continue;
+    if (u.lx === undefined) u.lx = fin;
+    const d = destinoLinea(u, act, fila);
+    u.ly = d > u.lx + 6 ? Math.min(9, (u.ly || 0) + dt * 70) : Math.max(0, (u.ly || 0) - dt * 60);   // vuelve por debajo
+    u.lx += (d - u.lx) * Math.min(1, dt * (d > u.lx ? 5 : 9));
+  }
+}
+
+function dibujarLinea(c) {
+  const b = Bt.b, L = LINEA, { act, fila } = ordenLinea(), fin = L.primero + Math.max(0, fila.length - 1) * L.paso + L.tam + 8;
+  const cy = L.y + L.tam / 2;
+  c.fillStyle = MARCO.piedra; c.fillRect(L.turno + L.tam + 6, cy, fin - L.turno - L.tam - 6, 1);
+  // lugar de Turno
+  c.fillStyle = MARCO.fondo; c.fillRect(L.turno - 3, L.y - 3, L.tam + 6, L.tam + 6);
+  c.strokeStyle = MARCO.luz; c.lineWidth = 1; c.strokeRect(L.turno - 2.5, L.y - 2.5, L.tam + 5, L.tam + 5);
+  c.font = '700 7px "Grenze Gotisch", serif'; c.textAlign = 'right'; c.fillStyle = MARCO.luz;
+  c.fillText('Turno', L.turno - 6, cy + 3);
+  c.textAlign = 'left';
+  // los que vuelven pasan por debajo de la fila
+  const orden = b.unidades.filter(u => u.vida > 0 && u.lx !== undefined).sort((x, y) => (y.ly || 0) - (x.ly || 0));
+  for (const u of orden) {
+    const x = Math.round(u.lx), y = L.y + Math.round(u.ly || 0);
+    c.fillStyle = u === act ? MARCO.luz : u.enemigo ? MARCO.vida[0] : MARCO.piedra; c.fillRect(x - 1, y - 1, L.tam + 2, L.tam + 2);
+    c.fillStyle = MARCO.fondo; c.fillRect(x, y, L.tam, L.tam);
+    c.drawImage(u.enemigo ? u.icono : retratoX(u.modelo, L.tam * 2), x, y, L.tam, L.tam);
+  }
+}
+
+// Barra de experiencia del reparto: se llena, y si sube de nivel vuelve a empezar con una flecha al final
+function dibujarReparto(c, u, x, y) {
+  const a = u.reparto, w = 46, frac = clamp(a.exp / (a.nivel * D.mazmorra.exp_por_nivel), 0, 1);
+  c.fillStyle = MARCO.piedra; c.fillRect(x, y, w, 4);
+  c.fillStyle = MARCO.fondo; c.fillRect(x + 1, y + 1, w - 2, 2);
+  c.fillStyle = MARCO.luz; c.fillRect(x + 1, y + 1, Math.round((w - 2) * frac), 2);
+  c.font = '700 7px "Grenze Gotisch", serif'; c.textAlign = 'left'; c.fillStyle = MARCO.luz;
+  c.fillText(`Nv ${a.nivel}`, x, y + 13);
+  if (a.nivel > (a.nivel0 ?? (a.nivel0 = a.nivel))) {
+    // flecha hacia arriba al final de la barra
+    const ax = x + w + 2, ay = y - 1 - Math.round(a.subio * 3);
+    c.fillStyle = '#ffd27a';
+    c.fillRect(ax + 2, ay, 1, 1); c.fillRect(ax + 1, ay + 1, 3, 1); c.fillRect(ax, ay + 2, 5, 1); c.fillRect(ax + 2, ay + 3, 1, 3);
+  }
+}
+
+// Cuánto emergió cada enemigo (0..1): entran de a uno
+const aparicion = e => clamp((Bt.ini - (0.1 + e.i * 0.14) * Bt.entrada) / (0.3 * Bt.entrada), 0, 1);
+
+function dibujarBatalla(c) {
+  const R = RAMPS[S.env], b = Bt.b, tm = SETTINGS.shake ? Bt.temblor : 0;
+  const ex = Math.round((azarX() - 0.5) * tm), ey = Math.round((azarX() - 0.5) * tm);
+  dibujarEscena(c, ex, ey);
+  // lo que da luz o informa va por encima de la oscuridad: llamas, brasas, vida y marca de turno
+  for (const [x, y] of ANTORCHAS[S.env] || []) drawFlame(c, x, y, 18, 26, Bt.t, 0.75 * clamp(Bt.ini / (Bt.entrada * 0.5), 0, 1), 'fuegoX');
+  dibujarParticulas(c);
+  for (const e of b.enemigos) {
+    if (e.vida <= 0 || aparicion(e) < 1) continue;
+    dibujarVidaEnemigo(c, e);
+    if ((Bt.fase === 'objetivo' && Bt.lista[Bt.tsel] === e) || b.actual === e) {
+      // la flecha va sobre la cabeza real del sprite y el nombre arriba de ella
+      const y = FBASE - e.tam + topeVisible(e) - 9;
+      c.font = '700 10px "Grenze Gotisch", serif'; c.textAlign = 'center';
+      c.fillStyle = '#000'; c.fillText(e.nombre, e.x + 1, y - 3);
+      c.fillStyle = R[5]; c.fillText(e.nombre, e.x, y - 4);
+      if (Math.sin(Bt.t * 8) > -0.4) for (let k = 0; k < 5; k++) c.fillRect(e.x - 4 + k, y + k, 9 - k * 2, 1);
+    }
+  }
+  dibujarFx(c);
+  if (Bt.fase === 'menu' || Bt.fase === 'objetivo') dibujarMenu(c);
+  if (Bt.ini >= Bt.entrada * 0.8 && Bt.fase !== 'botin') dibujarLinea(c);
+  // las tarjetas suben desde abajo
+  const sube = 1 - clamp((Bt.ini - Bt.entrada * 0.45) / (Bt.entrada * 0.4), 0, 1), bajan = Math.round(sube * sube * 70);
+  $('bCards').style.transform = bajan ? `translateY(${bajan}px)` : '';
+  $('bLog').style.visibility = Bt.ini < Bt.entrada * 0.8 ? 'hidden' : '';
+  for (const u of b.aliados) {
+    const marcado = b.actual === u || (Bt.fase === 'objetivo' && Bt.lista[Bt.tsel] === u);
+    const x = Math.round(CX[u.i] + (u.golpeado ? Math.sin(Bt.t * 60) * 2 : 0)), y = (marcado ? CY - 3 : CY) + bajan;
+    // retrato en su marco
+    c.fillStyle = marcado ? MARCO.luz : MARCO.piedra; c.fillRect(x, y, 46, 46);
+    c.fillStyle = MARCO.fondo; c.fillRect(x + 1, y + 1, 44, 44);
+    c.drawImage(retratoX(u.modelo, 44), x + 1, y + 1, 44, 44);
+    if (u.vida <= 0) ditherFill(c, x + 1, y + 1, 44, 44, 0.7, R[0]);
+    else if (u.golpeado > 0.12) ditherFill(c, x + 1, y + 1, 44, 44, 0.45, '#b52a2a');
+    placa(c, x + 48 + (u.sacude ? Math.round(Math.sin(Bt.t * 70)) : 0), y + 12, CW - 48, 9, Math.max(0, u.vida) / u.vidaMax, MARCO.vida, marcado, Math.max(0, u.fantasma ?? u.vida) / u.vidaMax);
+    if (Bt.fase === 'botin' && u.reparto) dibujarReparto(c, u, x + 49, y + 24);
+    else if (Bt.fase !== 'botin') for (let k = 0; k < NUCLEO.IMP_TOPE; k++) rombo(c, x + 50 + k * 10, y + 23, k < u.impetu);
+  }
+}
+
+// ---------- Conexión con el bucle del juego base ----------
+window.onAction = (act, pad) => {
+  if (S.mode === 'xbat') return batallaAction(act);
+  if (S.mode === 'xcharla') return charlaAction(act);
+  if (S.mode === 'xtrans') { if (act === 'ok' && Tr) Tr.t = Math.max(Tr.t, Tr.cierre + Tr.negro); return; }
+  return baseX.onAction(act, pad);
+};
+window.update = dt => {
+  baseX.update(dt);
+  if (S.mode === 'xtrans' && Tr) actualizarTransicion(dt);
+  if (S.mode === 'xbat' && Bt) { Bt.t += dt; Bt.ini += dt; for (const u of Bt.b.unidades) u.golpeado = Math.max(0, (u.golpeado || 0) - dt); actualizarFx(dt); }
+};
+window.draw = () => {
+  marcoDelPiso();
+  if (S.mode === 'xbat' && Bt) { $('stage').dataset.mode = 'battle'; $('stage').dataset.bg = ''; dibujarBatalla(ctx); return; }
+  // el base marca la antorcha baja con un recuadro en su panel, que acá no existe
+  if (!ctx.strokeBase) { ctx.strokeBase = ctx.strokeRect; ctx.strokeRect = function (x, y, w, h) { if (x !== 343.5) this.strokeBase(x, y, w, h); }; }
+  baseX.draw();
+  if (['explore', 'fade', 'xcharla', 'xtrans'].includes(S.mode)) dibujarAntorcha(ctx);
+  if (S.mode === 'xtrans' && Tr) dibujarCierre(ctx);
+};

@@ -1,0 +1,6 @@
+{
+  "guerrero": { "nombre": "Guerrero", "rol": "Aguanta y protege", "arte": "guerrero", "vida": 46, "ataque": 8, "defensa": 4, "velocidad": 8, "critico": 0.08, "esquiva": 0.03, "habilidades": ["golpe_brutal", "provocar"] },
+  "picaro": { "nombre": "Pícaro", "rol": "Daño veloz y críticos", "arte": "picaro", "vida": 34, "ataque": 8, "defensa": 2, "velocidad": 13, "critico": 0.2, "esquiva": 0.15, "doble_golpe": 0.3, "habilidades": ["punalada", "hoja_envenenada"] },
+  "mago": { "nombre": "Mago", "rol": "Fuego contra todos", "arte": "hechicero", "vida": 30, "ataque": 4, "defensa": 1, "velocidad": 10, "critico": 0.08, "esquiva": 0.05, "habilidades": ["llama_arcana", "tormenta"] },
+  "sanador": { "nombre": "Sanador", "rol": "Cura y sostiene", "arte": "hechicero", "vida": 32, "ataque": 4, "defensa": 2, "velocidad": 9, "critico": 0.05, "esquiva": 0.05, "habilidades": ["sanar", "bendicion"] }
+}

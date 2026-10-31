@@ -1,0 +1,145 @@
+{
+  "viuda": {
+    "titulo": "La Viuda",
+    "raza": "humano",
+    "nombres": [
+      "Isolde",
+      "Maren",
+      "Oda"
+    ],
+    "rasgo": "Serena",
+    "bonos": {
+      "vida": 4
+    },
+    "retrato": "viuda"
+  },
+  "desertor": {
+    "titulo": "El Desertor",
+    "raza": "humano",
+    "nombres": [
+      "Garrick",
+      "Tobías",
+      "Ulrich"
+    ],
+    "rasgo": "Huidizo",
+    "bonos": {
+      "velocidad": 2
+    },
+    "retrato": "desertor"
+  },
+  "cantora": {
+    "titulo": "La Cantora",
+    "raza": "elfo",
+    "nombres": [
+      "Sabela",
+      "Lirien",
+      "Aune"
+    ],
+    "rasgo": "Afinada",
+    "bonos": {
+      "critico": 0.05
+    },
+    "retrato": "cantora"
+  },
+  "minero": {
+    "titulo": "El Minero",
+    "raza": "humano",
+    "nombres": [
+      "Dagna",
+      "Borin",
+      "Hilde"
+    ],
+    "rasgo": "Terco",
+    "bonos": {
+      "defensa": 1,
+      "vida": 2
+    },
+    "retrato": "minero"
+  },
+  "ladrona": {
+    "titulo": "La Ladrona",
+    "raza": "humano",
+    "nombres": [
+      "Pip",
+      "Nessa",
+      "Rilla"
+    ],
+    "rasgo": "Escurridiza",
+    "bonos": {
+      "esquiva": 0.06
+    },
+    "retrato": "ladrona"
+  },
+  "penitente": {
+    "titulo": "El Penitente",
+    "raza": "humano",
+    "nombres": [
+      "Aldric",
+      "Severo",
+      "Ansel"
+    ],
+    "rasgo": "Sufrido",
+    "bonos": {
+      "vida": 8,
+      "velocidad": -1
+    },
+    "retrato": "penitente"
+  },
+  "guardabosque": {
+    "titulo": "La Guardabosque",
+    "raza": "elfo",
+    "nombres": [
+      "Fenna",
+      "Merek",
+      "Ilse"
+    ],
+    "rasgo": "Atenta",
+    "bonos": {
+      "velocidad": 1,
+      "critico": 0.03
+    },
+    "retrato": "guardabosque"
+  },
+  "novicia": {
+    "titulo": "La Novicia",
+    "raza": "humano",
+    "nombres": [
+      "Caelan",
+      "Lucía",
+      "Tessa"
+    ],
+    "rasgo": "Devota",
+    "bonos": {
+      "impetu_inicial": 1
+    },
+    "retrato": "novicia"
+  },
+  "buhonero": {
+    "titulo": "El Buhonero",
+    "raza": "humano",
+    "nombres": [
+      "Wim",
+      "Bartolo",
+      "Eirik"
+    ],
+    "rasgo": "Previsor",
+    "bonos": {
+      "pociones": 1
+    },
+    "retrato": "buhonero"
+  },
+  "exiliado": {
+    "titulo": "El Exiliado",
+    "raza": "elfo",
+    "nombres": [
+      "Sorel",
+      "Ilián",
+      "Varek"
+    ],
+    "rasgo": "Implacable",
+    "bonos": {
+      "ataque": 2
+    },
+    "retrato": "exiliado"
+  }
+}

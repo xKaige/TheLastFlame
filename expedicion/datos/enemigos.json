@@ -1,0 +1,77 @@
+{
+  "rata": {
+    "nombre": "Rata de Osario",
+    "sprite": "rat",
+    "vida": 20,
+    "ataque": [
+      5,
+      9
+    ],
+    "defensa": 0,
+    "velocidad": 12,
+    "exp": 2,
+    "imagen": "rata",
+    "escala_mapa": 0.8
+  },
+  "kobold": {
+    "nombre": "Kobold No-Muerto",
+    "sprite": "kobold",
+    "vida": 32,
+    "ataque": [
+      7,
+      12
+    ],
+    "defensa": 1,
+    "velocidad": 9,
+    "exp": 4,
+    "imagen": "kobold"
+  },
+  "soplo": {
+    "nombre": "El Soplo",
+    "sprite": "wisp",
+    "vida": 22,
+    "ataque": [
+      5,
+      10
+    ],
+    "defensa": 0,
+    "velocidad": 14,
+    "exp": 4,
+    "roba_impetu": true
+  },
+  "centinela": {
+    "nombre": "Centinela del Osario",
+    "sprite": "sentinel",
+    "vida": 46,
+    "ataque": [
+      10,
+      16
+    ],
+    "defensa": 3,
+    "velocidad": 6,
+    "exp": 6,
+    "imagen": "centinela"
+  },
+  "reyOsario": {
+    "nombre": "El Rey del Osario",
+    "sprite": "boneKing",
+    "vida": 240,
+    "ataque": [
+      14,
+      20
+    ],
+    "defensa": 3,
+    "velocidad": 10,
+    "exp": 30,
+    "jefe": true,
+    "especial": {
+      "cada": 3,
+      "nombre": "descarga su pico sobre todo el grupo",
+      "dano": [
+        10,
+        15
+      ]
+    },
+    "imagen": "rey_osario"
+  }
+}
