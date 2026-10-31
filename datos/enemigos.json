@@ -11,7 +11,130 @@
     "velocidad": 12,
     "exp": 2,
     "imagen": "rata",
-    "escala_mapa": 0.8
+    "escala_mapa": 0.8,
+    "animacion": {
+      "base": 78,
+      "cintura": 90,
+      "pies": 200,
+      "partes": [
+        {
+          "nombre": "cola",
+          "rects": [
+            [
+              57,
+              38,
+              78,
+              72
+            ]
+          ],
+          "pivote": [
+            57,
+            50
+          ]
+        },
+        {
+          "nombre": "cabeza",
+          "rects": [
+            [
+              8,
+              38,
+              31,
+              66
+            ]
+          ],
+          "pivote": [
+            31,
+            52
+          ],
+          "tapar": true
+        }
+      ],
+      "reposo": {
+        "pecho": 0.5,
+        "partes": {
+          "cola": {
+            "giro": 0.13
+          },
+          "cabeza": {
+            "y": 0.6
+          }
+        }
+      },
+      "ataque": [
+        {
+          "cabeza": {
+            "x": 0.7,
+            "y": -0.35
+          },
+          "cola": {
+            "giro": 0.087
+          },
+          "todo": {
+            "x": 1.05
+          }
+        },
+        {
+          "cabeza": {
+            "x": 1.4,
+            "y": -0.7
+          },
+          "cola": {
+            "giro": 0.175
+          },
+          "todo": {
+            "x": 2.1
+          }
+        },
+        {
+          "cabeza": {
+            "x": 2,
+            "y": -1
+          },
+          "cola": {
+            "giro": 0.25
+          },
+          "todo": {
+            "x": 3
+          }
+        },
+        {
+          "cabeza": {
+            "x": -2.1,
+            "y": 1.05
+          },
+          "cola": {
+            "giro": -0.14
+          },
+          "todo": {
+            "x": -4.2
+          }
+        },
+        {
+          "cabeza": {
+            "x": -3,
+            "y": 1.5
+          },
+          "cola": {
+            "giro": -0.2
+          },
+          "todo": {
+            "x": -6
+          }
+        },
+        {
+          "cabeza": {
+            "x": -1.2,
+            "y": 0.6
+          },
+          "cola": {
+            "giro": -0.08
+          },
+          "todo": {
+            "x": -2.4
+          }
+        }
+      ]
+    }
   },
   "kobold": {
     "nombre": "Kobold No-Muerto",
@@ -24,7 +147,140 @@
     "defensa": 1,
     "velocidad": 9,
     "exp": 4,
-    "imagen": "kobold"
+    "imagen": "kobold",
+    "animacion": {
+      "base": 88,
+      "cintura": 48,
+      "pies": 66,
+      "partes": [
+        {
+          "nombre": "cabeza",
+          "rects": [
+            [
+              26,
+              8,
+              50,
+              26
+            ]
+          ],
+          "pivote": [
+            38,
+            26
+          ],
+          "tapar": true
+        },
+        {
+          "nombre": "espada",
+          "rects": [
+            [
+              0,
+              34,
+              25,
+              54
+            ]
+          ],
+          "pivote": [
+            26,
+            50
+          ]
+        },
+        {
+          "nombre": "cola",
+          "rects": [
+            [
+              60,
+              67,
+              88,
+              74
+            ]
+          ],
+          "pivote": [
+            60,
+            70
+          ]
+        }
+      ],
+      "reposo": {
+        "pecho": 0.7,
+        "capa": 0.7,
+        "partes": {
+          "cabeza": {
+            "y": -0.7
+          },
+          "espada": {
+            "giro": 0.05
+          },
+          "cola": {
+            "giro": 0.05
+          }
+        }
+      },
+      "ataque": [
+        {
+          "espada": {
+            "giro": 0.245
+          },
+          "cabeza": {
+            "y": -0.35
+          },
+          "pecho": 0.35
+        },
+        {
+          "espada": {
+            "giro": 0.49
+          },
+          "cabeza": {
+            "y": -0.7
+          },
+          "pecho": 0.7
+        },
+        {
+          "espada": {
+            "giro": 0.7
+          },
+          "cabeza": {
+            "y": -1
+          },
+          "pecho": 1
+        },
+        {
+          "espada": {
+            "giro": -0.315
+          },
+          "cabeza": {
+            "y": 0.7
+          },
+          "pecho": -0.7,
+          "todo": {
+            "x": -2.8
+          }
+        },
+        {
+          "espada": {
+            "giro": -0.45
+          },
+          "cabeza": {
+            "y": 1
+          },
+          "pecho": -1,
+          "todo": {
+            "x": -4
+          }
+        },
+        {
+          "espada": {
+            "giro": -0.18
+          },
+          "cabeza": {
+            "y": 0.4
+          },
+          "pecho": -0.4,
+          "todo": {
+            "x": -1.6
+          }
+        }
+      ]
+    }
   },
   "soplo": {
     "nombre": "El Soplo",
@@ -38,7 +294,155 @@
     "velocidad": 14,
     "exp": 4,
     "roba_impetu": true,
-    "imagen": "soplo"
+    "imagen": "soplo",
+    "animacion": {
+      "base": 118,
+      "cintura": 66,
+      "pies": 200,
+      "partes": [
+        {
+          "nombre": "cabeza",
+          "rects": [
+            [
+              42,
+              56,
+              62,
+              90
+            ]
+          ],
+          "pivote": [
+            55,
+            88
+          ],
+          "tapar": true
+        },
+        {
+          "nombre": "brazo",
+          "rects": [
+            [
+              0,
+              84,
+              40,
+              100
+            ]
+          ],
+          "pivote": [
+            42,
+            92
+          ]
+        },
+        {
+          "nombre": "mano",
+          "rects": [
+            [
+              28,
+              100,
+              52,
+              118
+            ]
+          ],
+          "pivote": [
+            54,
+            98
+          ]
+        }
+      ],
+      "reposo": {
+        "capa": 2.6,
+        "flota": 2.2,
+        "partes": {
+          "cabeza": {
+            "giro": 0.05
+          },
+          "brazo": {
+            "giro": 0.07
+          },
+          "mano": {
+            "giro": 0.08
+          }
+        }
+      },
+      "ataque": [
+        {
+          "brazo": {
+            "giro": 0.122
+          },
+          "mano": {
+            "giro": -0.105
+          },
+          "todo": {
+            "x": 1.4,
+            "y": -1.05
+          },
+          "capa": 0.7
+        },
+        {
+          "brazo": {
+            "giro": 0.245
+          },
+          "mano": {
+            "giro": -0.21
+          },
+          "todo": {
+            "x": 2.8,
+            "y": -2.1
+          },
+          "capa": 1.4
+        },
+        {
+          "brazo": {
+            "giro": 0.35
+          },
+          "mano": {
+            "giro": -0.3
+          },
+          "todo": {
+            "x": 4,
+            "y": -3
+          },
+          "capa": 2
+        },
+        {
+          "brazo": {
+            "giro": -0.175
+          },
+          "mano": {
+            "giro": 0.175
+          },
+          "todo": {
+            "x": -5.6,
+            "y": 1.4
+          },
+          "capa": -2.8
+        },
+        {
+          "brazo": {
+            "giro": -0.25
+          },
+          "mano": {
+            "giro": 0.25
+          },
+          "todo": {
+            "x": -8,
+            "y": 2
+          },
+          "capa": -4
+        },
+        {
+          "brazo": {
+            "giro": -0.1
+          },
+          "mano": {
+            "giro": 0.1
+          },
+          "todo": {
+            "x": -3.2,
+            "y": 0.8
+          },
+          "capa": -1.6
+        }
+      ]
+    }
   },
   "centinela": {
     "nombre": "Centinela del Osario",
@@ -51,7 +455,140 @@
     "defensa": 3,
     "velocidad": 6,
     "exp": 6,
-    "imagen": "centinela"
+    "imagen": "centinela",
+    "animacion": {
+      "base": 100,
+      "cintura": 50,
+      "pies": 76,
+      "partes": [
+        {
+          "nombre": "cabeza",
+          "rects": [
+            [
+              40,
+              10,
+              56,
+              26
+            ]
+          ],
+          "pivote": [
+            48,
+            26
+          ],
+          "tapar": true
+        },
+        {
+          "nombre": "lanza",
+          "rects": [
+            [
+              15,
+              0,
+              26,
+              42
+            ],
+            [
+              22,
+              42,
+              36,
+              52
+            ],
+            [
+              26,
+              52,
+              31,
+              76
+            ]
+          ],
+          "pivote": [
+            37,
+            46
+          ]
+        }
+      ],
+      "reposo": {
+        "pecho": 0.7,
+        "capa": 0.5,
+        "partes": {
+          "cabeza": {
+            "y": -0.7
+          },
+          "lanza": {
+            "giro": 0.025
+          }
+        }
+      },
+      "ataque": [
+        {
+          "lanza": {
+            "giro": 0.122,
+            "x": 1.05
+          },
+          "cabeza": {
+            "y": -0.35
+          },
+          "pecho": 0.35
+        },
+        {
+          "lanza": {
+            "giro": 0.245,
+            "x": 2.1
+          },
+          "cabeza": {
+            "y": -0.7
+          },
+          "pecho": 0.7
+        },
+        {
+          "lanza": {
+            "giro": 0.35,
+            "x": 3
+          },
+          "cabeza": {
+            "y": -1
+          },
+          "pecho": 1
+        },
+        {
+          "lanza": {
+            "giro": -0.28,
+            "x": -3.5
+          },
+          "cabeza": {
+            "y": 0.7
+          },
+          "pecho": -0.7,
+          "todo": {
+            "x": -2.1
+          }
+        },
+        {
+          "lanza": {
+            "giro": -0.4,
+            "x": -5
+          },
+          "cabeza": {
+            "y": 1
+          },
+          "pecho": -1,
+          "todo": {
+            "x": -3
+          }
+        },
+        {
+          "lanza": {
+            "giro": -0.16,
+            "x": -2.0
+          },
+          "cabeza": {
+            "y": 0.4
+          },
+          "pecho": -0.4,
+          "todo": {
+            "x": -1.2
+          }
+        }
+      ]
+    }
   },
   "reyOsario": {
     "nombre": "El Rey del Osario",
@@ -102,12 +639,18 @@
             [
               0,
               0,
+              33,
+              40
+            ],
+            [
+              26,
+              40,
               41,
-              60
+              52
             ],
             [
               29,
-              60,
+              52,
               37,
               102
             ]
@@ -133,30 +676,45 @@
           ]
         }
       ],
+      "reposo": {
+        "pecho": 0.9,
+        "capa": 1.8,
+        "partes": {
+          "cabeza": {
+            "y": -0.9
+          },
+          "arma": {
+            "giro": 0.025
+          },
+          "garra": {
+            "giro": 0.09
+          }
+        }
+      },
       "ataque": [
         {
           "arma": {
-            "giro": 0.14
+            "giro": 0.147
           },
           "garra": {
-            "giro": -0.12
+            "giro": -0.105
           },
           "cabeza": {
-            "y": -0.6
+            "y": -0.42
           },
-          "pecho": 0.6
+          "pecho": 0.42
         },
         {
           "arma": {
-            "giro": 0.3
+            "giro": 0.294
           },
           "garra": {
-            "giro": -0.22
+            "giro": -0.21
           },
           "cabeza": {
-            "y": -1
+            "y": -0.84
           },
-          "pecho": 1
+          "pecho": 0.84
         },
         {
           "arma": {
@@ -172,16 +730,16 @@
         },
         {
           "arma": {
-            "giro": -0.34
+            "giro": -0.35
           },
           "garra": {
-            "giro": 0.2
+            "giro": 0.182
           },
           "cabeza": {
-            "y": 1
+            "y": 0.84
           },
-          "pecho": -1,
-          "capa": -2
+          "pecho": -0.84,
+          "capa": -2.1
         },
         {
           "arma": {
@@ -198,15 +756,16 @@
         },
         {
           "arma": {
-            "giro": -0.22
+            "giro": -0.2
           },
           "garra": {
-            "giro": 0.1
+            "giro": 0.104
           },
           "cabeza": {
-            "y": 0
+            "y": 0.48
           },
-          "capa": -1.5
+          "pecho": -0.48,
+          "capa": -1.2
         }
       ]
     }
@@ -222,7 +781,129 @@
     "defensa": 2,
     "velocidad": 9,
     "exp": 7,
-    "imagen": "necrofago"
+    "imagen": "necrofago",
+    "animacion": {
+      "base": 122,
+      "cintura": 86,
+      "pies": 86,
+      "partes": [
+        {
+          "nombre": "cabeza",
+          "rects": [
+            [
+              26,
+              38,
+              52,
+              74
+            ]
+          ],
+          "pivote": [
+            50,
+            58
+          ],
+          "tapar": true
+        },
+        {
+          "nombre": "brazo",
+          "rects": [
+            [
+              0,
+              92,
+              30,
+              122
+            ]
+          ],
+          "pivote": [
+            30,
+            98
+          ],
+          "tapar": true
+        }
+      ],
+      "reposo": {
+        "pecho": 0.9,
+        "partes": {
+          "cabeza": {
+            "y": 0.8,
+            "giro": 0.03
+          },
+          "brazo": {
+            "giro": 0.03
+          }
+        }
+      },
+      "ataque": [
+        {
+          "cabeza": {
+            "x": 0.7,
+            "y": -0.7
+          },
+          "pecho": 0.525,
+          "todo": {
+            "x": 1.05
+          }
+        },
+        {
+          "cabeza": {
+            "x": 1.4,
+            "y": -1.4
+          },
+          "pecho": 1.05,
+          "todo": {
+            "x": 2.1
+          }
+        },
+        {
+          "cabeza": {
+            "x": 2,
+            "y": -2
+          },
+          "pecho": 1.5,
+          "todo": {
+            "x": 3
+          }
+        },
+        {
+          "cabeza": {
+            "x": -2.8,
+            "y": 1.4
+          },
+          "brazo": {
+            "giro": 0.14
+          },
+          "pecho": -1.05,
+          "todo": {
+            "x": -4.9
+          }
+        },
+        {
+          "cabeza": {
+            "x": -4,
+            "y": 2
+          },
+          "brazo": {
+            "giro": 0.2
+          },
+          "pecho": -1.5,
+          "todo": {
+            "x": -7
+          }
+        },
+        {
+          "cabeza": {
+            "x": -1.6,
+            "y": 0.8
+          },
+          "brazo": {
+            "giro": 0.08
+          },
+          "pecho": -0.6,
+          "todo": {
+            "x": -2.8
+          }
+        }
+      ]
+    }
   },
   "sombra": {
     "nombre": "Sombra Susurrante",
@@ -236,7 +917,106 @@
     "velocidad": 13,
     "exp": 7,
     "roba_impetu": true,
-    "imagen": "sombra"
+    "imagen": "sombra",
+    "animacion": {
+      "base": 104,
+      "cintura": 44,
+      "pies": 200,
+      "partes": [
+        {
+          "nombre": "brazos",
+          "rects": [
+            [
+              0,
+              40,
+              32,
+              56
+            ],
+            [
+              18,
+              46,
+              34,
+              62
+            ]
+          ],
+          "pivote": [
+            36,
+            50
+          ]
+        }
+      ],
+      "reposo": {
+        "capa": 2.4,
+        "flota": 2.4,
+        "partes": {
+          "brazos": {
+            "giro": 0.06
+          }
+        }
+      },
+      "ataque": [
+        {
+          "brazos": {
+            "giro": 0.122
+          },
+          "todo": {
+            "x": 1.05,
+            "y": -1.05
+          },
+          "capa": 0.7
+        },
+        {
+          "brazos": {
+            "giro": 0.245
+          },
+          "todo": {
+            "x": 2.1,
+            "y": -2.1
+          },
+          "capa": 1.4
+        },
+        {
+          "brazos": {
+            "giro": 0.35
+          },
+          "todo": {
+            "x": 3,
+            "y": -3
+          },
+          "capa": 2
+        },
+        {
+          "brazos": {
+            "giro": -0.21
+          },
+          "todo": {
+            "x": -4.9,
+            "y": 1.4
+          },
+          "capa": -2.8
+        },
+        {
+          "brazos": {
+            "giro": -0.3
+          },
+          "todo": {
+            "x": -7,
+            "y": 2
+          },
+          "capa": -4
+        },
+        {
+          "brazos": {
+            "giro": -0.12
+          },
+          "todo": {
+            "x": -2.8,
+            "y": 0.8
+          },
+          "capa": -1.6
+        }
+      ]
+    }
   },
   "acechador": {
     "nombre": "El Acechador",
@@ -249,7 +1029,100 @@
     "defensa": 1,
     "velocidad": 12,
     "exp": 8,
-    "imagen": "acechador"
+    "imagen": "acechador",
+    "animacion": {
+      "base": 136,
+      "cintura": 108,
+      "pies": 108,
+      "partes": [
+        {
+          "nombre": "cabeza",
+          "rects": [
+            [
+              18,
+              78,
+              42,
+              112
+            ]
+          ],
+          "pivote": [
+            42,
+            92
+          ],
+          "tapar": true
+        }
+      ],
+      "reposo": {
+        "pecho": 1,
+        "partes": {
+          "cabeza": {
+            "giro": 0.05
+          }
+        }
+      },
+      "ataque": [
+        {
+          "cabeza": {
+            "giro": 0.052,
+            "y": -0.7
+          },
+          "pecho": 0.7,
+          "todo": {
+            "x": 1.75
+          }
+        },
+        {
+          "cabeza": {
+            "giro": 0.105,
+            "y": -1.4
+          },
+          "pecho": 1.4,
+          "todo": {
+            "x": 3.5
+          }
+        },
+        {
+          "cabeza": {
+            "giro": 0.15,
+            "y": -2
+          },
+          "pecho": 2,
+          "todo": {
+            "x": 5
+          }
+        },
+        {
+          "cabeza": {
+            "giro": -0.084,
+            "x": -2.8
+          },
+          "pecho": -1.05,
+          "todo": {
+            "x": -7.0
+          }
+        },
+        {
+          "cabeza": {
+            "giro": -0.12,
+            "x": -4
+          },
+          "pecho": -1.5,
+          "todo": {
+            "x": -10
+          }
+        },
+        {
+          "cabeza": {
+            "giro": -0.048,
+            "x": -1.6
+          },
+          "pecho": -0.6,
+          "todo": {
+            "x": -4.0
+          }
+        }
+      ]
+    }
   },
   "caballero": {
     "nombre": "Caballero Hueco",
@@ -262,7 +1135,148 @@
     "defensa": 4,
     "velocidad": 7,
     "exp": 10,
-    "imagen": "caballero"
+    "imagen": "caballero",
+    "animacion": {
+      "base": 112,
+      "cintura": 56,
+      "pies": 92,
+      "partes": [
+        {
+          "nombre": "cabeza",
+          "rects": [
+            [
+              50,
+              10,
+              72,
+              24
+            ]
+          ],
+          "pivote": [
+            61,
+            24
+          ]
+        },
+        {
+          "nombre": "espada",
+          "rects": [
+            [
+              0,
+              25,
+              42,
+              62
+            ]
+          ],
+          "pivote": [
+            48,
+            54
+          ]
+        },
+        {
+          "nombre": "manto",
+          "rects": [
+            [
+              85,
+              30,
+              112,
+              100
+            ]
+          ],
+          "pivote": [
+            84,
+            30
+          ]
+        }
+      ],
+      "reposo": {
+        "pecho": 0.7,
+        "capa": 0.3,
+        "partes": {
+          "cabeza": {
+            "y": -0.7
+          },
+          "espada": {
+            "giro": 0.025
+          },
+          "manto": {
+            "giro": 0.025
+          }
+        }
+      },
+      "ataque": [
+        {
+          "espada": {
+            "giro": 0.21
+          },
+          "cabeza": {
+            "y": -0.35
+          },
+          "pecho": 0.35
+        },
+        {
+          "espada": {
+            "giro": 0.42
+          },
+          "cabeza": {
+            "y": -0.7
+          },
+          "pecho": 0.7
+        },
+        {
+          "espada": {
+            "giro": 0.6
+          },
+          "cabeza": {
+            "y": -1
+          },
+          "pecho": 1
+        },
+        {
+          "espada": {
+            "giro": -0.245
+          },
+          "cabeza": {
+            "y": 0.7
+          },
+          "manto": {
+            "giro": 0.049
+          },
+          "pecho": -0.7,
+          "todo": {
+            "x": -2.8
+          }
+        },
+        {
+          "espada": {
+            "giro": -0.35
+          },
+          "cabeza": {
+            "y": 1
+          },
+          "manto": {
+            "giro": 0.07
+          },
+          "pecho": -1,
+          "todo": {
+            "x": -4
+          }
+        },
+        {
+          "espada": {
+            "giro": -0.14
+          },
+          "cabeza": {
+            "y": 0.4
+          },
+          "manto": {
+            "giro": 0.028
+          },
+          "pecho": -0.4,
+          "todo": {
+            "x": -1.6
+          }
+        }
+      ]
+    }
   },
   "cebado": {
     "nombre": "El Cebado",
@@ -275,7 +1289,152 @@
     "defensa": 2,
     "velocidad": 5,
     "exp": 9,
-    "imagen": "cebado"
+    "imagen": "cebado",
+    "animacion": {
+      "base": 112,
+      "cintura": 92,
+      "pies": 92,
+      "partes": [
+        {
+          "nombre": "cabeza",
+          "rects": [
+            [
+              6,
+              26,
+              34,
+              60
+            ]
+          ],
+          "pivote": [
+            34,
+            42
+          ],
+          "tapar": true
+        },
+        {
+          "nombre": "brazo",
+          "rects": [
+            [
+              80,
+              30,
+              105,
+              60
+            ]
+          ],
+          "pivote": [
+            80,
+            38
+          ]
+        },
+        {
+          "nombre": "garra",
+          "rects": [
+            [
+              4,
+              70,
+              26,
+              112
+            ]
+          ],
+          "pivote": [
+            26,
+            74
+          ],
+          "tapar": true
+        }
+      ],
+      "reposo": {
+        "pecho": 1.3,
+        "partes": {
+          "cabeza": {
+            "giro": 0.04
+          },
+          "brazo": {
+            "giro": 0.06
+          },
+          "garra": {
+            "giro": 0.03
+          }
+        }
+      },
+      "ataque": [
+        {
+          "cabeza": {
+            "giro": 0.052
+          },
+          "brazo": {
+            "giro": -0.158
+          },
+          "pecho": 0.7
+        },
+        {
+          "cabeza": {
+            "giro": 0.105
+          },
+          "brazo": {
+            "giro": -0.315
+          },
+          "pecho": 1.4
+        },
+        {
+          "cabeza": {
+            "giro": 0.15
+          },
+          "brazo": {
+            "giro": -0.45
+          },
+          "pecho": 2
+        },
+        {
+          "cabeza": {
+            "giro": -0.105,
+            "x": -2.1
+          },
+          "brazo": {
+            "giro": 0.245
+          },
+          "garra": {
+            "giro": 0.175
+          },
+          "pecho": -1.05,
+          "todo": {
+            "x": -4.2
+          }
+        },
+        {
+          "cabeza": {
+            "giro": -0.15,
+            "x": -3
+          },
+          "brazo": {
+            "giro": 0.35
+          },
+          "garra": {
+            "giro": 0.25
+          },
+          "pecho": -1.5,
+          "todo": {
+            "x": -6
+          }
+        },
+        {
+          "cabeza": {
+            "giro": -0.06,
+            "x": -1.2
+          },
+          "brazo": {
+            "giro": 0.14
+          },
+          "garra": {
+            "giro": 0.1
+          },
+          "pecho": -0.6,
+          "todo": {
+            "x": -2.4
+          }
+        }
+      ]
+    }
   },
   "cazador": {
     "nombre": "El Cazador Gris",

@@ -3,6 +3,7 @@
 // se arma moviéndolas. Las poses se calculan una vez, al empezar la pelea, en el mismo formato que usa ponerEnemigo.
 
 const POSES = { reposo: 12, velReposo: 7, golpe: 0.6, fin: 1.05 };
+const POSES_LISTAS = {};     // varios enemigos iguales comparten las mismas poses
 
 const dentro = (rects, x, y) => rects.some(([a, b, c, d]) => x >= a && y >= b && x < c && y < d);
 
@@ -17,12 +18,13 @@ function armarPose(g, an, mov) {
     lum[i] = g.lum[o]; a[i] = 1;
     return true;
   };
+  const todo = mov.todo || {};
   for (let y = 0; y < t; y++) for (let x = 0; x < t; x++) {
-    const px = x / k, py = y / k, i = y * t + x;
+    const px = x / k - (todo.x || 0), py = y / k - (todo.y || 0), i = y * t + x;
     let listo = false;
     for (const p of an.partes) {
       const m = mov[p.nombre] || {}, c = Math.cos(-(m.giro || 0)), s = Math.sin(-(m.giro || 0));
-      const dx = px - p.pivote[0], dy = py - p.pivote[1] - (m.y || 0);
+      const dx = px - p.pivote[0] - (m.x || 0), dy = py - p.pivote[1] - (m.y || 0);
       const sx = p.pivote[0] + dx * c - dy * s, sy = p.pivote[1] + dx * s + dy * c;
       if (dentro(p.rects, sx, sy) && copiar(i, sx, sy)) { listo = true; break; }
     }
@@ -30,7 +32,10 @@ function armarPose(g, an, mov) {
     // el cuerpo respira de la cintura para arriba y la capa se mece de la cintura para abajo
     const pecho = clamp((an.cintura - py) / 40, 0, 1), capa = py < an.pies ? clamp((py - an.cintura) / 45, 0, 1) : 0;
     const sx = px - (mov.capa || 0) * capa * capa, sy = py + (mov.pecho || 0) * pecho;
-    if (!an.partes.some(p => dentro(p.rects, sx, sy))) copiar(i, sx, sy);
+    const pieza = an.partes.find(p => dentro(p.rects, sx, sy));
+    if (!pieza) copiar(i, sx, sy);
+    // lo que una pieza del cuerpo deja al descubierto se ve como sombra, no como un agujero
+    else if (pieza.tapar && copiar(i, sx, sy)) lum[i] *= 0.35;
   }
   const borde = new Uint8Array(t * t);
   for (let y = 0; y < t; y++) for (let x = 0; x < t; x++) {
@@ -41,14 +46,18 @@ function armarPose(g, an, mov) {
 }
 
 function prepararPoses(e) {
-  const an = D.enemigos[e.tipo].animacion;
-  if (!an) return;
-  const reposo = [];
-  for (let i = 0; i < POSES.reposo; i++) {
-    const f = i / POSES.reposo * Math.PI * 2, s = Math.sin(f);
-    reposo.push(armarPose(e.gris, an, { pecho: s * 0.9, capa: Math.sin(f + 1) * 1.8, cabeza: { y: -s * 0.9 }, arma: { giro: s * 0.025 }, garra: { giro: Math.sin(f + 2) * 0.09 } }));
+  const an = D.enemigos[e.tipo].animacion, clave = `${e.tipo}:${e.tam}`;
+  if (!an || e.gris.size !== e.tam) return;
+  if (!POSES_LISTAS[clave]) {
+    const r = an.reposo, reposo = [];
+    for (let i = 0; i < POSES.reposo; i++) {
+      const f = i / POSES.reposo * Math.PI * 2, s = Math.sin(f), mov = { pecho: s * (r.pecho || 0), capa: Math.sin(f + 1) * (r.capa || 0), todo: { y: Math.sin(f + 0.5) * (r.flota || 0) } };
+      Object.entries(r.partes || {}).forEach(([n, m], j) => { const q = Math.sin(f + j * 0.9 + 1); mov[n] = { giro: q * (m.giro || 0), x: q * (m.x || 0), y: q * (m.y || 0) }; });
+      reposo.push(armarPose(e.gris, an, mov));
+    }
+    POSES_LISTAS[clave] = { reposo, ataque: an.ataque.map(m => armarPose(e.gris, an, m)) };
   }
-  e.poses = { reposo, ataque: an.ataque.map(m => armarPose(e.gris, an, m)) };
+  e.poses = POSES_LISTAS[clave];
 }
 
 function iniciarAtaqueAnimado(e) {
