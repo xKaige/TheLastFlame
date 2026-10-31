@@ -228,6 +228,14 @@
         181.933
       ],
       "volumen": 0.42
+    },
+    "jefe_1": {
+      "archivo": "assets/musica/jefe_piso_1.ogg",
+      "bucle": [
+        18.876,
+        169.733
+      ],
+      "volumen": 0.28
     }
   },
   "max_habilidades": 4,

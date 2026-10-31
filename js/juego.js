@@ -230,6 +230,8 @@ async function iniciarTema(st) {
   st.out.gain.setValueAtTime(0, AC.currentTime);
   st.out.gain.linearRampToValueAtTime(t.volumen, AC.currentTime + 0.25);
 }
+// Cada jefe puede tener su tema en mazmorra.json (jefe_1, jefe_2...); si no, usa el del juego base
+const temaDeJefe = () => (TEMAS[`jefe_${S.floor}`] ? `jefe_${S.floor}` : S.floor === LAST_FLOOR ? 'final' : 'boss');
 const baseSetMusic = setMusic, baseFadeOut = fadeOutTrack;
 window.fadeOutTrack = st => { baseFadeOut(st); if (st.src) setTimeout(() => st.src.stop(), 2500); };
 window.setMusic = name => {
@@ -819,7 +821,7 @@ window.startCombat = (e, emboscada) => {
   const jefe = e.def.boss, tipo = jefe ? 'jefe' : emboscada ? 'emboscada' : 'comun';
   const ids = jefe ? D.mazmorra.jefes[S.floor] : (p => p[Math.floor(azarX() * p.length)])(D.mazmorra.grupos_por_piso[S.floor]);
   const go = () => iniciarTransicion(e, ids, tipo);
-  if (jefe) { setMusic(S.floor === LAST_FLOOR ? 'final' : 'boss'); charla(`jefe_${S.floor}`, go); } else { setMusic('pelea'); go(); }
+  if (jefe) { setMusic(temaDeJefe()); charla(`jefe_${S.floor}`, go); } else { setMusic('pelea'); go(); }
 };
 
 // ---------- Transición a la pelea ----------
@@ -902,14 +904,14 @@ function grisDeEnemigo(e) {
 
 function iniciarPelea(ent, ids, entrada = 0.95) {
   const b = NUCLEO.iniciarBatalla(D, X.grupo, ids);
-  const fx = ids.length === 1 ? [240] : ids.length === 2 ? [190, 290] : FX3;
-  for (const e of b.enemigos) { e.x = fx[e.i]; const propia = IMG_ENEMIGOS[e.imagen], lista = propia && propia.complete && propia.naturalWidth; const tam = lista ? propia.naturalWidth : e.jefe ? FTAM + 14 : FTAM; e.tam = tam; e.img = lista ? propia : spriteCanvas(SPRITES[e.sprite].p, tam, S.env, 1); e.golpeado = 0; e.luz = luzDeEnemigo(e); e.gris = grisDeEnemigo(e); e.icono = spriteCanvas(e.gris, e.tam, S.env, 1); }
+  const fx = ids.length === 1 ? [240] : ids.length === 2 ? [190, 290] : ids.some(id => D.enemigos[id].tam_batalla) ? [92, 240, 388] : FX3;   // un jefe grande necesita lugar
+  for (const e of b.enemigos) { e.x = fx[e.i]; const propia = IMG_ENEMIGOS[e.imagen], lista = propia && propia.complete && propia.naturalWidth; const tam = lista ? D.enemigos[e.tipo].tam_batalla || propia.naturalWidth : e.jefe ? FTAM + 14 : FTAM; e.tam = tam; e.img = lista ? propia : spriteCanvas(SPRITES[e.sprite].p, tam, S.env, 1); e.golpeado = 0; e.luz = luzDeEnemigo(e); e.gris = grisDeEnemigo(e); e.icono = spriteCanvas(e.gris, e.tam, S.env, 1); }
   for (const u of b.aliados) u.golpeado = 0;
   Bt = { b, ent, fase: 'espera', sel: 0, tsel: 0, ops: [], msg: 'Te cierran el paso.', t: 0, gris: fondoBatalla(), fx: [], fxHab: [], part: [], temblor: 0, destello: 0, golpe: 'tajo', ini: 0, entrada };
   S.mode = 'xbat';
   $('battle').classList.remove('hidden');
   $('bMenu').classList.add('hidden');
-  if (ent.def.boss) setMusic(S.floor === LAST_FLOOR ? 'final' : 'boss');
+  if (ent.def.boss) setMusic(temaDeJefe());
   sfx('fire');
   pintarBatalla();
   later(Math.round(entrada * 1000) + 100, () => { banner(''); siguiente(); });
@@ -1440,7 +1442,7 @@ function dibujarVidaEnemigo(c, e) {
 // ---------- Línea de turnos ----------
 // Corre de derecha a izquierda: quien juega ocupa el lugar de Turno y los demás esperan en fila, una vez
 // cada uno. Al gastar el turno, su retrato pasa por debajo de la fila y vuelve al fondo.
-const LINEA = { turno: 166, primero: 188, paso: 16, y: 6, tam: 13 };
+const LINEA = { turno: 34, primero: 56, paso: 16, y: 6, tam: 13 };     // a la izquierda: arriba al centro va el nombre de un jefe grande
 function ordenLinea() {
   const b = Bt.b, act = b.actual && b.actual.vida > 0 && Bt.fase !== 'cambio' ? b.actual : null;
   return { act, fila: b.unidades.filter(u => u.vida > 0 && u !== act).sort((x, y) => x.reloj - y.reloj) };
@@ -1523,7 +1525,7 @@ function dibujarBatalla(c) {
     dibujarVidaEnemigo(c, e);
     if ((Bt.fase === 'objetivo' && Bt.lista[Bt.tsel] === e) || b.actual === e) {
       // la flecha va sobre la cabeza real del sprite y el nombre arriba de ella
-      const y = FBASE - e.tam + topeVisible(e) - 9;
+      const y = Math.max(15, FBASE - e.tam + topeVisible(e) - 9);
       const n = capaNitida();
       n.font = '10px "Jacquard 12", serif'; n.textAlign = 'center';
       n.fillStyle = '#000'; n.fillText(e.nombre, e.x + 0.5, y - 3.5);

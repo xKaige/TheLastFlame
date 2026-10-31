@@ -73,7 +73,9 @@
         12
       ]
     },
-    "imagen": "rey_osario"
+    "imagen": "rey_osario",
+    "tam_batalla": 150,
+    "escala_mapa": 1.6
   },
   "necrofago": {
     "nombre": "Necrófago",
