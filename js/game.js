@@ -554,7 +554,8 @@ function enemiesAct() {
     for (const o of opts) {
       if (o.d >= d + 0.5) break;
       const nx = e.x + o.dx, ny = e.y + o.dy;
-      if (nx === P.x && ny === P.y) { startCombat(e, true); return; }
+      // sólo te sorprende si llega de costado o por la espalda: de frente lo estás viendo venir
+      if (nx === P.x && ny === P.y) { startCombat(e, P.x + DIRS[P.dir][0] !== e.x || P.y + DIRS[P.dir][1] !== e.y); return; }
       if (!blocked(nx, ny)) { e.x = nx; e.y = ny; break; }
     }
   }
