@@ -404,8 +404,8 @@ function dibujarHogar(c) {
     c.fillStyle = RAMPS.fuegoX[n % 2 ? 4 : 5];
     c.fillRect(x + Math.round(Math.sin(u * 6 + n) * 12), y - 30 - Math.round(u * 90), 1, 1);
   }
-  // el grupo que va a bajar
-  for (let i = 0; i < MAX_GRUPO; i++) {
+  // el grupo que va a bajar (en la intro todavía no hay grupo)
+  if (S.mode !== 'cine') for (let i = 0; i < MAX_GRUPO; i++) {
     const p = X.sel[i], px = 250 + i * 54, py = 226;
     c.fillStyle = '#000'; c.fillRect(px - 1, py - 1, 40, 40);
     c.fillStyle = p ? RAMPS.crypt[5] : RAMPS.crypt[2]; c.fillRect(px - 1, py - 1, 40, 1); c.fillRect(px - 1, py + 38, 40, 1); c.fillRect(px - 1, py - 1, 1, 40); c.fillRect(px + 38, py - 1, 1, 40);

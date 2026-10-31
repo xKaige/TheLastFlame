@@ -562,7 +562,7 @@ function drawCine(ctx) {
     return;
   }
   // banda inferior para el texto, en degradé tramado para que no corte la escena
-  for (let k = 0; k < 8; k++) ditherFill(ctx, 0, 186 + k * 6, W, 6, 0.08 + k * 0.09, R[0]);
+  if (!sc.sinFundido) for (let k = 0; k < 8; k++) ditherFill(ctx, 0, 186 + k * 6, W, 6, 0.08 + k * 0.09, R[0]);   // el fuego del Hogar queda limpio
   ditherFill(ctx, 0, 234, W, 36, 0.8, R[0]);
   ditherFill(ctx, 0, 0, W, H, CINE.fade, R[0]);
 }
