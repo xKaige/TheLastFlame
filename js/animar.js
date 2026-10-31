@@ -34,15 +34,69 @@ function armarPose(g, an, mov) {
     const sx = px - (mov.capa || 0) * capa * capa, sy = py + (mov.pecho || 0) * pecho;
     const pieza = an.partes.find(p => dentro(p.rects, sx, sy));
     if (!pieza) copiar(i, sx, sy);
-    // lo que una pieza del cuerpo deja al descubierto se ve como sombra, no como un agujero
-    else if (pieza.tapar && copiar(i, sx, sy)) lum[i] *= 0.35;
+    // lo que una pieza del cuerpo deja al descubierto sigue siendo cuerpo: se ve el dibujo original
+    else if (pieza.tapar) copiar(i, sx, sy);
   }
-  const borde = new Uint8Array(t * t);
+  cerrarUniones(g, a, lum, k, t, todo);
+  quitarSueltos(a, t);
+  const afuera = zonaDeAfuera(a, t), borde = new Uint8Array(t * t);
   for (let y = 0; y < t; y++) for (let x = 0; x < t; x++) {
+    // un hueco cerrado por dentro no es silueta: se rellena con el dibujo original, sin contorno
+    if (!a[y * t + x] && !afuera[y * t + x]) {
+      const i = y * t + x, X = Math.round(x - (todo.x || 0) * k), Y = Math.round(y - (todo.y || 0) * k), o = clamp(Y, 0, t - 1) * t + clamp(X, 0, t - 1);
+      if (g.a[o]) { a[i] = 1; lum[i] = g.lum[o]; }
+      continue;
+    }
     if (a[y * t + x]) continue;
     if ((x && a[y * t + x - 1]) || (x < t - 1 && a[y * t + x + 1]) || (y && a[(y - 1) * t + x]) || (y < t - 1 && a[(y + 1) * t + x])) borde[y * t + x] = 1;
   }
   return { size: t, lum, a, borde };
+}
+
+// Al mover una pieza queda una rendija entre ella y el cuerpo, que el contorno pintaría de negro.
+// Un hueco angosto, con dibujo a los dos lados, se rellena con el dibujo original.
+function cerrarUniones(g, a, lum, k, t, todo) {
+  const ancho = Math.ceil(3 * k), hay = (x, y) => x >= 0 && y >= 0 && x < t && y < t && a[y * t + x] === 1;
+  const cerca = (x, y, dx, dy) => { for (let n = 1; n <= ancho; n++) if (hay(x + dx * n, y + dy * n)) return true; return false; };
+  for (let vuelta = 0; vuelta < 2; vuelta++) {
+    const nuevos = [];
+    for (let y = 0; y < t; y++) for (let x = 0; x < t; x++) {
+      if (a[y * t + x] || !((cerca(x, y, 1, 0) && cerca(x, y, -1, 0)) || (cerca(x, y, 0, 1) && cerca(x, y, 0, -1)))) continue;
+      const X = Math.round(x - (todo.x || 0) * k), Y = Math.round(y - (todo.y || 0) * k);
+      if (X >= 0 && Y >= 0 && X < t && Y < t && g.a[Y * t + X]) nuevos.push([y * t + x, g.lum[Y * t + X]]);
+    }
+    for (const [i, l] of nuevos) { a[i] = 1; lum[i] = l; }
+  }
+}
+
+function zonaDeAfuera(a, t) {
+  const fuera = new Uint8Array(t * t), pila = [];
+  const sumar = i => { if (!a[i] && !fuera[i]) { fuera[i] = 1; pila.push(i); } };
+  for (let n = 0; n < t; n++) { sumar(n); sumar((t - 1) * t + n); sumar(n * t); sumar(n * t + t - 1); }
+  while (pila.length) {
+    const i = pila.pop(), x = i % t;
+    if (x) sumar(i - 1);
+    if (x < t - 1) sumar(i + 1);
+    if (i >= t) sumar(i - t);
+    if (i < t * (t - 1)) sumar(i + t);
+  }
+  return fuera;
+}
+
+// Los pedacitos que quedan sueltos al mover una pieza se borran
+function quitarSueltos(a, t) {
+  const visto = new Uint8Array(t * t), minimo = Math.round(t * t * 0.002);
+  for (let i = 0; i < t * t; i++) {
+    if (!a[i] || visto[i]) continue;
+    const pila = [i], isla = [];
+    visto[i] = 1;
+    while (pila.length) {
+      const c = pila.pop(), x = c % t;
+      isla.push(c);
+      for (const n of [x ? c - 1 : -1, x < t - 1 ? c + 1 : -1, c - t, c + t]) if (n >= 0 && n < t * t && a[n] && !visto[n]) { visto[n] = 1; pila.push(n); }
+    }
+    if (isla.length < minimo) for (const c of isla) a[c] = 0;
+  }
 }
 
 function prepararPoses(e) {
