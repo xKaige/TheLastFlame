@@ -4,7 +4,7 @@ const W = 480, H = 270;
 // Ventana 3D
 const VX = 0, VY = 0, VW = 480, VH = 270;
 const TEX = 64;
-const MW = 28, MH = 28;
+const MW = 44, MH = 44;
 
 // Azar del juego con semilla (mulberry32): la misma semilla genera los mismos niveles.
 // Cada nivel se resiembra al entrar (seedRng), así el mapa no depende de cómo jugaste antes.

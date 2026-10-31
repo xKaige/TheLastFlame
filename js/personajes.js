@@ -166,6 +166,15 @@ function desbloquear(id) {
   X.grimorio.push(id); guardarX();
   return true;
 }
+// Lo que deja caer un grupo vencido: un jefe siempre suelta algo
+function soltarBotin(jefe) {
+  const ids = Object.keys(D.objetos);
+  if (!jefe && azarX() >= D.mazmorra.botin.enemigo) return '';
+  const id = ids[Math.floor(azarX() * ids.length)];
+  X.mochila.push(id); guardarX();
+  return `${D.objetos[id].nombre} en la mochila`;
+}
+
 const sinDesbloquear = fuente => Object.keys(D.habilidades).filter(id => D.habilidades[id].fuente === fuente && !X.grimorio.includes(id));
 
 function abrirGrimorio() {

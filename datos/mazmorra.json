@@ -269,7 +269,8 @@
     }
   },
   "botin": {
-    "objeto": 0.3,
-    "habilidad": 0.2
+    "objeto": 0.45,
+    "habilidad": 0.25,
+    "enemigo": 0.3
   }
 }

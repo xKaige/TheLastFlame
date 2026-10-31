@@ -19,7 +19,7 @@ const BAL = {
   secretChance: 0.75,                                      // niveles comunes con sala secreta
   maxPotions: 5, maxOil: 5,                                // el cinturón no da para más
   defK: d => 10 + d * 1.5,                                 // la defensa se mide contra la profundidad
-  chests: [2, 3],                                          // por nivel (mín, máx)
+  chests: [5, 7],                                          // por nivel (mín, máx)
   chest: { potion: 0.16, oil: 0.42, rune: 0.53, item: 0.86, atk: 0.93 }, // probabilidades acumuladas; el resto: +1 defensa
   dropConsumable: 0.15,
   enemyHp: d => 1 + (d - 1) * 0.14,                        // multiplicador de vida
@@ -241,11 +241,11 @@ function genFloor(kind) {
   let map, rooms = null;
   if (theme === 'crypt') {
     map = new Uint8Array(MW * MH).fill(1);
-    rooms = placeRooms(map, 10, 3, 6, 1);
+    rooms = placeRooms(map, 24, 3, 6, 1);
     connectRooms(map, rooms, false);
   } else if (theme === 'castle') {
     map = new Uint8Array(MW * MH).fill(1);
-    rooms = placeRooms(map, 7, 5, 9, 2);
+    rooms = placeRooms(map, 16, 5, 9, 2);
     connectRooms(map, rooms, true);
     addColonnades(map, rooms);
   } else map = layoutCaves();
@@ -308,7 +308,7 @@ function genFloor(kind) {
     ents.push({ type: 'chest', x: c[0], y: c[1], open: false });
     map[c[1] * MW + c[0]] = 1; solids.push([c[1] * MW + c[0], 0]);
   }
-  for (let k = 0, want = rnd(4, 7); k < want; k++) {
+  for (let k = 0, want = rnd(8, 12); k < want; k++) {
     const c = solidCell();
     if (!c) continue;
     ents.push({ type: 'prop', p: rnd(0, PROPS[theme].length - 1), x: c[0], y: c[1] });
@@ -319,7 +319,7 @@ function genFloor(kind) {
     const id = pickEvent(), c = id && solidCell();
     if (c) { ents.push({ type: 'event', ev: id, done: false, x: c[0], y: c[1] }); map[c[1] * MW + c[0]] = 1; solids.push([c[1] * MW + c[0], 0]); }
   }
-  for (let k = 0; k < 4 + S.floor + S.level; k++) {
+  for (let k = 0; k < 8 + S.floor * 2 + S.level * 2; k++) {
     const c = openCell(5);
     if (c) ents.push(makeEnemy(pick(POOLS[S.floor]), c[0], c[1]));
   }

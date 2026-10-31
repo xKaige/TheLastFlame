@@ -587,7 +587,7 @@ window.usePotion = () => {
 
 // El inventario del base no aplica: se muestra el grupo
 // La oscuridad le pega a todo el grupo, no al P del juego base
-const ANTORCHA_BASE = BAL.fuelPerStep;
+const ANTORCHA_BASE = BAL.fuelPerStep * 0.6;     // los mapas son más grandes: la antorcha rinde más pasos
 const porGrupo = lista => D.mazmorra.grupo[lista][Math.max(1, Math.min(NUCLEO.vivos(X.grupo).length, 4)) - 1];
 window.afterStep = () => {
   P.hp = P.maxhp;
@@ -639,7 +639,7 @@ window.addEventListener('keydown', ev => {
 
 // El panel del juego base no se dibuja: sus barras quedan sin efecto y el mapa va arriba a la derecha
 window.drawBar = () => {};
-const MAPA = { x: 386, y: 9, cs: 3 };
+const MAPA = { x: 386, y: 9, cs: 2 };
 window.drawMinimap = (c, R, w, p) => {
   const { x: ox, y: oy, cs } = MAPA, { map, explored, ents } = w;
   // lo recorrido brilla y lo cercano se insinúa: 3 pisado, 2 y 1 piso a uno o dos pasos, 9 muro que lo bordea
@@ -657,7 +657,7 @@ window.drawMinimap = (c, R, w, p) => {
     c.fillRect(ox + x * cs, oy + y * cs, cs, cs);
   }
   for (const e of ents) if (explored[e.y * MW + e.x] && ((e.type === 'chest' && !e.open) || (e.type === 'event' && !e.done))) {
-    c.fillStyle = e.type === 'chest' ? R[4] : R[5]; c.fillRect(ox + e.x * cs + 1, oy + e.y * cs + 1, cs - 1, cs - 1);
+    c.fillStyle = e.type === 'chest' ? R[4] : R[5]; c.fillRect(ox + e.x * cs, oy + e.y * cs, cs, cs);
   }
   // el jugador, como una flecha que marca hacia dónde mira
   const [dx, dy] = DIRS[p.dir], cx = ox + p.x * cs + 1.5, cy = oy + p.y * cs + 1.5;
@@ -1103,6 +1103,7 @@ function terminarPelea(gano) {
   W_().ents.splice(W_().ents.indexOf(ent), 1);
   if (ent.def.boss && S.floor < LAST_FLOOR) { W_().map[ent.y * MW + ent.x] = 2; W_().explored[ent.y * MW + ent.x] = 1; }   // se abre la bajada
   const exp = b.enemigos.reduce((n, e) => n + e.exp, 0);
+  const hallado = soltarBotin(ent.def.boss);
   for (const id of sinDesbloquear('jefe')) if (b.enemigos.some(e => e.tipo === D.habilidades[id].jefe)) { desbloquear(id); log(`${D.habilidades[id].nombre} queda en el Grimorio.`, 'em'); }
   X.ceniza += Math.round((ent.def.boss ? D.mazmorra.ceniza.por_jefe : D.mazmorra.ceniza.por_grupo) * porGrupo('ceniza'));
   for (const u of NUCLEO.vivos(X.grupo)) {
@@ -1113,7 +1114,7 @@ function terminarPelea(gano) {
   }
   guardarX();
   b.actual = null;
-  Object.assign(Bt, { fase: 'botin', listo: false, msg: `Victoria · +${exp} de experiencia`, velXp: Math.max(exp / 1.3, 6) });
+  Object.assign(Bt, { fase: 'botin', listo: false, msg: `Victoria · +${exp} de experiencia${hallado ? ` · ${hallado}` : ''}`, velXp: Math.max(exp / 1.3, 6) });
   sfx('level');
   pintarBatalla();
 }
