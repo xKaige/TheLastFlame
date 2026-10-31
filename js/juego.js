@@ -250,11 +250,47 @@ window.openTitleMenu = () => {
 // Cada escena sale de un dibujo de interfaz/intro; los textos están en historia.json.
 // La última es el Hogar mismo: al terminar, la fogata sigue ardiendo y el juego empieza ahí.
 const ARTE_INTRO = {};
-for (const n of ['velombra', 'escalera', 'velombra_apagada', 'boca']) ARTE_INTRO[n] = Object.assign(new Image(), { src: `interfaz/intro/${n}.png` });
+for (const n of ['velombra', 'escalera', 'rey_llama', 'rey_apagada', 'velombra_apagada', 'boca']) ARTE_INTRO[n] = Object.assign(new Image(), { src: `interfaz/intro/${n}.png` });
+// El fuego del dibujo se mueve por filas: abajo queda quieto, sobre el cuenco, y arriba ondula más
+const LLAMA = { x: 188, w: 124, arriba: 6, abajo: 127 };
+function ondular(c, img, t, fuerza) {
+  const { x, w, arriba, abajo } = LLAMA, alto = abajo - arriba;
+  for (let y = arriba; y < abajo; y++) {
+    const k = Math.pow((abajo - y) / alto, 1.3);
+    const d = (Math.sin(y * 0.11 - t * 6.5) * 2.6 + Math.sin(y * 0.27 - t * 10.5) * 1.1) * k * fuerza;
+    const sube = (Math.sin(t * 7.3) * 0.5 + 0.5) * 5 * k * fuerza;
+    c.drawImage(img, x * 4, (y + sube) * 4, w * 4, 4, x + d, y, w, 1);
+  }
+}
+
+function dibujarReyLlama(c, t) {
+  const k = snuffK(1);
+  if (k > 0) {
+    ondular(c, ARTE_INTRO.rey_llama, t, 1);
+    const luz = 0.1 + Math.sin(t * 9) * 0.03 + Math.sin(t * 23) * 0.02;
+    const g = c.createRadialGradient(245, 95, 8, 245, 95, 150);
+    g.addColorStop(0, `rgba(255, 130, 40, ${luz})`); g.addColorStop(1, 'rgba(255, 130, 40, 0)');
+    c.save(); c.globalCompositeOperation = 'lighter'; c.fillStyle = g; c.fillRect(0, 0, 480, 270); c.restore();
+    c.fillStyle = '#ffb45a';
+    for (let i = 0; i < 12; i++) {
+      const f = (t * 0.45 + hash2(i, 3, 9)) % 1;
+      c.globalAlpha = (1 - f) * k;
+      c.fillRect(218 + hash2(i, 5, 2) * 50 + Math.sin(t * 3 + i) * 5, 118 - f * 112, 1, 1);
+    }
+    c.globalAlpha = 1;
+  }
+  if (k < 1) {
+    c.globalAlpha = 1 - k;
+    c.drawImage(ARTE_INTRO.rey_apagada, 0, 0, 480, 270);
+    ondular(c, ARTE_INTRO.rey_apagada, t * 0.4, 0.8);
+    c.globalAlpha = 1;
+  }
+}
+
 const ESCENAS_INTRO = [
   { art: 'velombra', nitida: true, ramp: 'crypt', pan: [0, 0, 0, 0], sfx: 'fire', dibujar: (c, t) => drawFlame(c, 310, 97, 16, 24, t, 1, 'fuegoX') },
   { art: 'escalera', nitida: true, ramp: 'crypt', pan: [0, 0, 0, 0], sfx: 'stairs', dibujar: (c, t) => drawFlame(c, 298, 134, 12, 20, t, 1, 'fuegoX') },
-  { art: 'apagon', ramp: 'castle', pan: [0, 0, 0, 0], snuff: true },
+  { art: 'rey_llama', nitida: true, ramp: 'crypt', pan: [0, 0, 0, 0], sfx: 'fire', dibujar: dibujarReyLlama },
   { art: 'velombra_apagada', nitida: true, ramp: 'crypt', pan: [0, 0, 0, 0] },
   { art: 'boca', nitida: true, ramp: 'crypt', pan: [0, 0, 0, 0], sfx: 'whisper', dibujar: (c, t) => {
     const k = IMG_CARAS.sombra;
