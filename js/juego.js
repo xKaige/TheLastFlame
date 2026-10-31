@@ -1574,7 +1574,7 @@ window.update = dt => {
 };
 window.draw = () => {
   limpiarCapa();
-  if (S.mode === 'xpj') { $('stage').dataset.mode = 'xpj'; ctx.fillStyle = '#000'; ctx.fillRect(0, 0, 480, 270); return; }
+  if (S.mode === 'xpj') { $('stage').dataset.mode = 'xpj'; dibujarFondoPj(ctx); return; }
   if (S.mode === 'menu' && S.menuBg === 'hogar') { Object.assign($('stage').dataset, { mode: 'menu', bg: 'hogar' }); dibujarHogar(ctx); return; }
   marcoDelPiso();
   if ((S.mode === 'xbat' || S.mode === 'xsal') && Bt) {

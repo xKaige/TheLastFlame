@@ -92,28 +92,31 @@
 #nitido { position: absolute; left: 0; top: 0; width: 480px; height: 270px; pointer-events: none; }
 
 /* menú de personajes: la ficha a la izquierda y los paneles a la derecha, sobre piedra oscura */
-#personajes { --p-fondo: #0b0e0c; --p-panel: #101410; --p-borde: #3a4238; --p-luz: #ff9a3c; --p-sangre: #b52a2a;
-  position: absolute; inset: 0; z-index: 60; box-sizing: border-box; padding: 6px 8px; background: var(--p-fondo); color: var(--c5); font-family: var(--f-body); font-size: 8px; line-height: 10px; }
+#personajes { --p-panel: rgba(7, 9, 7, 0.8); --p-fila: rgba(0, 0, 0, 0.5); --p-borde: #3a4238; --p-luz: #ffa04a; --p-sangre: #a8241f;
+  position: absolute; inset: 0; z-index: 60; box-sizing: border-box; padding: 5px 7px; background: none; text-shadow: 0 1px 0 #000; color: var(--c5); font-family: var(--f-body); font-size: 8px; line-height: 10px; }
 #personajes.hidden { display: none; }
 #personajes em { font-style: normal; font-weight: 600; }
-.ptop { display: flex; justify-content: space-between; align-items: center; height: 20px; margin-bottom: 4px; }
+.ptop { display: flex; justify-content: space-between; align-items: center; height: 25px; margin-bottom: 2px; }
 .ptabs { display: flex; gap: 4px; }
-.ptab { padding: 0 11px; font-family: var(--f-title); font-size: 10px; line-height: 16px; color: var(--c4); background: var(--p-panel); border: 1px solid var(--p-borde); box-shadow: inset 0 0 0 1px #000; }
-.ptab.on { color: var(--p-luz); border-color: var(--p-luz); }
-.pgrupo { display: flex; align-items: center; gap: 3px; padding: 1px 4px; background: var(--p-panel); border: 1px solid var(--p-borde); font-size: 6.5px; color: var(--c4); text-transform: uppercase; letter-spacing: 0.4px; }
+.ptab { padding: 0 9px; font-family: var(--f-title); font-size: 11px; line-height: 10px; color: var(--c4); background: var(--p-panel); border: 6px solid; border-image: url(../interfaz/hud/marco_menu.png) 6 fill; image-rendering: pixelated; }
+.ptab.on { color: var(--p-luz); text-shadow: 0 0 5px #c25a14, 0 1px 0 #000; }
+.pgrupo { display: flex; align-items: center; gap: 3px; padding: 0 2px; background: var(--p-panel); border: 6px solid; border-image: url(../interfaz/hud/marco_menu.png) 6 fill; image-rendering: pixelated; font-size: 6.5px; color: var(--c4); text-transform: uppercase; letter-spacing: 0.4px; }
 .pgrupo span { margin-right: 2px; }
 .pgrupo img { width: 13px; height: 13px; border: 1px solid var(--p-borde); opacity: 0.7; }
 .pgrupo img.on { border-color: var(--p-luz); opacity: 1; }
 .pgrupo img.caido { filter: grayscale(1); opacity: 0.35; }
-.pcuerpo { display: flex; gap: 5px; height: 226px; }
-.pder { flex: 1; display: flex; gap: 5px; min-width: 0; }
-.ppanel { box-sizing: border-box; padding: 4px 6px; background: var(--p-panel); border: 1px solid var(--p-borde); box-shadow: inset 0 0 0 1px #000; }
-.ppanel h4 { display: flex; justify-content: space-between; align-items: baseline; margin: 0 0 4px; padding-bottom: 2px; font-family: var(--f-title); font-size: 11px; line-height: 13px; color: var(--c5); border-bottom: 1px solid var(--p-borde); }
-.ppanel h4 small { font-family: var(--f-body); font-size: 7px; color: var(--p-luz); font-weight: 600; }
-.pficha { width: 112px; flex: none; text-align: center; }
+.pcuerpo { display: flex; gap: 3px; height: 224px; }
+#stage[data-mode=xpj] #menu, #stage[data-mode=xpj] #hud, #stage[data-mode=xpj] #log { display: none; }
+.pder { flex: 1; display: flex; gap: 3px; min-width: 0; }
+.ppanel { box-sizing: border-box; padding: 1px 3px; background: var(--p-panel); border: 6px solid; border-image: url(../interfaz/hud/marco_menu.png) 6 fill; }
+.ppanel h4 { display: flex; align-items: center; gap: 4px; margin: 0 0 3px; font-family: var(--f-title); font-size: 12px; line-height: 14px; color: var(--c5); justify-content: center; white-space: nowrap; }
+.ppanel h4::before, .ppanel h4::after { content: ''; flex: 1; height: 0; border-top: 1px solid #6b5a44; border-bottom: 1px solid #000; }
+.ppanel h4 small { order: 3; font-family: var(--f-body); font-size: 7px; color: var(--p-luz); font-weight: 600; }
+.ppanel h4::after { order: 2; }
+.pficha { width: 116px; flex: none; text-align: center; }
 .pnom { margin-top: 2px; font-family: var(--f-title); font-size: 14px; line-height: 15px; }
 .ptit { font-size: 6.5px; line-height: 9px; color: var(--p-luz); text-transform: uppercase; letter-spacing: 0.3px; }
-.pret { display: block; width: 88px; height: 88px; margin: 6px auto 8px; border: 1px solid var(--p-borde); outline: 1px solid #000; }
+.pret { display: block; box-sizing: content-box; width: 80px; height: 80px; margin: 5px auto 6px; border: 6px solid; border-image: url(../interfaz/hud/marco_menu.png) 6; }
 .pdato { display: flex; justify-content: space-between; margin-top: 4px; font-size: 7px; line-height: 9px; color: var(--c4); text-transform: uppercase; }
 .pdato em { color: var(--c5); }
 .pdato.vida { margin-top: 10px; color: var(--c5); }
@@ -122,34 +125,33 @@
 .pbarra.vida { height: 7px; }
 .pbarra.vida b { background: var(--p-sangre); }
 .patrs { flex: 1; min-width: 0; }
-.pcol { flex: 1.15; display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+.pcol { flex: 1.15; display: flex; flex-direction: column; gap: 3px; min-width: 0; }
 .pcol .ppanel:last-child { flex: 1; }
-.paviso { margin-bottom: 4px; padding: 2px 5px; font-size: 7.5px; color: var(--p-luz); border: 1px solid #6b4422; background: #1c130a; }
-.patr { display: flex; align-items: center; gap: 5px; height: 21px; margin-bottom: 3px; padding: 0 5px; font-size: 9px; border: 1px solid var(--p-borde); background: #0a0d0a; }
+.paviso { margin-bottom: 3px; text-align: center; font-size: 7.5px; color: var(--p-luz); }
+.patr { display: flex; align-items: center; gap: 5px; height: 20px; margin-bottom: 2px; padding: 0 5px; font-family: var(--f-title); font-size: 10px; border-bottom: 1px solid var(--p-borde); }
 .patr span { flex: 1; }
 .patr u { width: 11px; height: 11px; text-align: center; line-height: 10px; text-decoration: none; color: var(--c5); background: #1b211b; border: 1px solid var(--p-borde); }
-.patr.sel, .pequipo.sel { color: var(--p-luz); border-color: var(--p-luz); background: #1c130a; }
+.patr.sel, .pequipo.sel, .pitem.sel { color: var(--p-luz); border-color: var(--p-luz); background: linear-gradient(90deg, rgba(168, 70, 16, 0.42), rgba(168, 70, 16, 0.04)); text-shadow: 0 0 5px #c25a14, 0 1px 0 #000; }
 .patr.sel u { color: var(--p-luz); border-color: var(--p-luz); }
 .pstats { display: grid; grid-template-columns: 1fr 1fr; gap: 3px; }
-.pstat { display: flex; justify-content: space-between; align-items: center; height: 15px; padding: 0 5px; font-size: 7px; text-transform: uppercase; border: 1px solid var(--p-borde); background: #0a0d0a; }
+.pstat { display: flex; justify-content: space-between; align-items: center; height: 14px; padding: 0 4px; font-size: 7.5px; border-bottom: 1px solid var(--p-borde); }
 .pstat em { font-size: 8px; }
 .pstat.ancho { grid-column: span 2; }
-.pequipo { display: flex; align-items: center; gap: 4px; height: 18px; margin-bottom: 3px; padding: 0 5px; border: 1px solid var(--p-borde); background: #0a0d0a; }
+.pequipo { display: flex; align-items: center; gap: 4px; height: 22px; margin-bottom: 2px; padding: 0 5px; border: 1px solid var(--p-borde); background: var(--p-fila); }
 .pequipo small { font-size: 6.5px; color: var(--c4); }
 .pequipo span { font-family: var(--f-title); font-size: 9px; }
 .pequipo em { margin-left: auto; font-size: 6.5px; color: var(--p-luz); white-space: nowrap; }
 .pequipo.vacio { border-style: dashed; }
 .pequipo.vacio span { color: var(--c3); }
-.plista { height: 196px; overflow: hidden; }
+.plista { height: 190px; overflow: hidden; }
 .pitem { display: flex; justify-content: space-between; align-items: center; height: 15px; margin-bottom: 1px; padding: 0 5px; font-size: 8.5px; border: 1px solid transparent; }
-.pitem.sel { color: var(--p-luz); border-color: var(--p-luz); background: #1c130a; }
 .pitem em { font-size: 7px; }
 .pitem.no { color: var(--c3); }
 .pnom2 { margin-bottom: 4px; font-family: var(--f-title); font-size: 12px; line-height: 14px; }
 .pdesc { margin-bottom: 4px; font-size: 8.5px; line-height: 11px; color: var(--c4); }
 .pdesc.no { color: #d0463c; }
 .pdesc.nota { margin-top: 8px; color: var(--p-luz); font-size: 7.5px; }
-.psubm { position: absolute; left: 190px; right: 40px; top: 70px; padding: 6px; background: #000; border: 1px solid var(--p-luz); }
+.psubm { position: absolute; left: 190px; right: 40px; top: 70px; padding: 2px 3px; background: #070907; border: 6px solid; border-image: url(../interfaz/hud/marco_menu.png) 6 fill; }
 .psubm h4 { margin: 0 0 4px; font-family: var(--f-title); font-size: 11px; line-height: 13px; }
 .pinfo { position: absolute; left: 8px; right: 8px; bottom: 13px; text-align: center; color: var(--p-luz); }
 .payuda { position: absolute; left: 8px; right: 8px; bottom: 3px; text-align: center; font-size: 7px; color: var(--c4); }

@@ -15,6 +15,23 @@ function abrirPersonajes(lista, edita) {
   pintarPj();
 }
 
+// De fondo, la cripta de las peleas con sus dos antorchas: el menú se abre dentro del lugar, no sobre negro
+function dibujarFondoPj(c) {
+  if (!LUZ.c) prepararLuz();
+  if (!PJ.gris) PJ.gris = fondoBatalla();
+  const { px, lat, w, h } = LUZ, f = clamp(flick, 0.7, 1.05), alcance = 125 * (0.86 + f * 0.14);
+  const pal = LUZ.pal.crypt || (LUZ.pal.crypt = packRamp(RAMPS.crypt)), n = pal.length - 1;
+  for (let y = 0, i = 0; y < h; y++) for (let x = 0; x < w; x++, i++) {
+    const b = Math.min(1, PJ.gris[i] * (0.22 + Math.max(0, 1 - lat[i] / alcance))), v = b * n;
+    let k = v | 0;
+    if (v - k > BAYER[((y & 3) << 2) | (x & 3)]) k++;
+    px[i] = pal[k];
+  }
+  LUZ.g.putImageData(LUZ.img, 0, 0);
+  c.drawImage(LUZ.c, 0, 0);
+  for (const [x, y] of ANTORCHAS.crypt) drawFlame(c, x, y, 18, 26, T, 0.75, 'fuegoX');
+}
+
 function cerrarPersonajes() {
   $('personajes').classList.add('hidden');
   S.mode = PJ.prev;
