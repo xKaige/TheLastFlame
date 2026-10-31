@@ -1,5 +1,5 @@
 {
-  "inicio": { "quien": "sombra", "lineas": ["Cuatro lucecitas bajando juntas. Qué ternura.", "Una sola antorcha para todos. Van a pelearse por ella antes de llegar abajo."] },
+  "inicio": { "quien": "sombra", "caras": ["base", "risa"], "lineas": ["Cuatro lucecitas bajando juntas. Qué ternura.", "Una sola antorcha para todos. Van a pelearse por ella antes de llegar abajo."] },
   "rescate": { "quien": "narrador", "lineas": ["Alguien respira detrás del osario: un portador que bajó solo y todavía conserva su chispa."],
     "opciones": [
       { "texto": "Sumarlo al grupo", "efecto": "reclutar" },
@@ -7,7 +7,7 @@
       { "texto": "Seguir de largo", "efecto": null }
     ] },
   "jefe": { "quien": "rey", "lineas": ["¿Vienen a devolverme la Llama?", "Entonces arrodíllense. Nadie sale de mi osario."] },
-  "muerte": { "quien": "sombra", "lineas": ["Una chispa menos. Se quedó en mi cripta. Quizás vuelvan a verla."] },
-  "victoria": { "quien": "sombra", "lineas": ["Ganaron un piso. Todavía falta el fondo, y la antorcha no se llena sola."] },
-  "derrota": { "quien": "sombra", "lineas": ["Ya está. Ahora todo es tibio."] }
+  "muerte": { "quien": "sombra", "caras": ["risa"], "lineas": ["Una chispa menos. Se quedó en mi cripta. Quizás vuelvan a verla."] },
+  "victoria": { "quien": "sombra", "caras": ["enojo"], "lineas": ["Ganaron un piso. Todavía falta el fondo, y la antorcha no se llena sola."] },
+  "derrota": { "quien": "sombra", "caras": ["risa"], "lineas": ["Ya está. Ahora todo es tibio."] }
 }

@@ -427,9 +427,28 @@ window.renderLog = () => {
 // ---------- Diálogos ----------
 const QUIEN = { sombra: ['shade', 'shade', 'La Sombra'], rey: ['boneKing', 'blood', 'El Rey del Osario'], narrador: [null, null, ''] };
 let CH = null;
+// La cara de quien habla flota sobre el diálogo; cada línea puede elegir su gesto ("caras" en dialogos.json)
+const CARAS = { sombra: { base: 'sombra', risa: 'sombra_risa', enojo: 'sombra_enojo' } };
+const IMG_CARAS = {};
+for (const g of Object.values(CARAS)) for (const n of Object.values(g)) IMG_CARAS[n] = { img: Object.assign(new Image(), { src: `interfaz/personajes/${n}.png` }), c: {} };
+const CARA = { lado: 124, x: 172, y: 62 };
+function caraDe(nombre) {
+  const k = IMG_CARAS[nombre];
+  if (!k.c[S.env] && k.img.complete && k.img.naturalWidth) k.c[S.env] = spriteCanvas(spriteDesdeImagen(k.img, k.img.naturalWidth), CARA.lado, S.env, 1);
+  return k.c[S.env];
+}
+function dibujarCara(c) {
+  const g = CH && CARAS[CH.n.quien];
+  if (!g) return;
+  const img = caraDe(g[(CH.n.caras && CH.n.caras[CH.i]) || 'base'] || g.base);
+  if (!img) return;
+  c.globalAlpha = clamp((T - CH.desde) / 0.5, 0, 1);
+  c.drawImage(img, CARA.x - CARA.lado / 2, CARA.y + Math.round(Math.sin(T * 1.3) * 2));
+  c.globalAlpha = 1;
+}
 function charla(id, luego) {
   const n = D.dialogos[id];
-  CH = { n, i: 0, luego, sel: 0, vuelve: S.mode === 'xbat' ? 'xbat' : 'explore' };
+  CH = { n, i: 0, luego, sel: 0, desde: T, vuelve: S.mode === 'xbat' ? 'xbat' : 'explore' };
   S.mode = 'xcharla';
   $('xCharla').classList.remove('hidden');
   pintarCharla();
@@ -1106,6 +1125,7 @@ window.draw = () => {
   // el base marca la antorcha baja con un recuadro en su panel, que acá no existe
   if (!ctx.strokeBase) { ctx.strokeBase = ctx.strokeRect; ctx.strokeRect = function (x, y, w, h) { if (x !== 343.5) this.strokeBase(x, y, w, h); }; }
   baseX.draw();
+  if (S.mode === 'xcharla') dibujarCara(ctx);
   if (['explore', 'fade', 'xcharla', 'xtrans'].includes(S.mode)) dibujarAntorcha(ctx);
   if (S.mode === 'xtrans' && Tr) dibujarCierre(ctx);
 };
