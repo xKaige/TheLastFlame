@@ -3,7 +3,7 @@
 
 const SETTINGS_KEY = 'laultimallama.opciones';
 const SETTINGS = (() => {
-  const base = { master: 0.8, music: 0.7, sfx: 0.9, shake: true, lang: 'es', keys: {}, prompts: 'auto' };
+  const base = { master: 0.8, music: 0.7, sfx: 0.9, shake: true, lang: 'es', keys: {}, pad: {}, prompts: 'auto' };
   try { return { ...base, ...JSON.parse(STORE.get(SETTINGS_KEY) || '{}') }; } catch (e) { return base; }
 })();
 const saveSettings = () => STORE.set(SETTINGS_KEY, JSON.stringify(SETTINGS));
@@ -23,8 +23,7 @@ function openLanguagePick(then) {
 const REBINDABLE = [
   ['fwd', 'Avanzar', 'KeyW'], ['back', 'Retroceder', 'KeyS'], ['strafeL', 'Paso a la izquierda', 'KeyA'], ['strafeR', 'Paso a la derecha', 'KeyD'],
   ['turnL', 'Girar a la izquierda', 'KeyQ'], ['turnR', 'Girar a la derecha', 'KeyE'], ['ok', 'Interactuar', 'Enter'],
-  ['potion', 'Poción', 'KeyP'], ['oil', 'Aceite', 'KeyO'], ['inv', 'Inventario', 'KeyI'],
-  ['skills', 'Habilidades', 'KeyH'], ['attrs', 'Atributos', 'KeyU'], ['runes', 'Runas', 'KeyR'],
+  ['cancel', 'Volver / pausa', 'Escape'], ['potion', 'Poción', 'KeyP'], ['oil', 'Aceite', 'KeyO'], ['inv', 'El grupo', 'KeyI'],
 ];
 const keyName = code => ({ ArrowUp: '↑', ArrowDown: '↓', ArrowLeft: '←', ArrowRight: '→', Space: 'Espacio', Enter: 'Enter', Escape: 'Esc', Tab: 'Tab' }[code]
   || code.replace(/^Key/, '').replace(/^Digit/, '').replace(/^Numpad/, 'Num '));
@@ -40,6 +39,42 @@ function buildKeys(defaults) {
     map[code] = act;
   }
   return map;
+}
+
+// ---------- Botones del joystick ----------
+// Igual que las teclas, con el número de botón del mando estándar
+const PAD_REBIND = [
+  ['fwd', 'Avanzar', 12], ['back', 'Retroceder', 13], ['strafeL', 'Paso a la izquierda', 4], ['strafeR', 'Paso a la derecha', 5],
+  ['turnL', 'Girar a la izquierda', 14], ['turnR', 'Girar a la derecha', 15], ['ok', 'Interactuar', 0],
+  ['cancel', 'Volver / pausa', 1], ['potion', 'Poción', 2], ['oil', 'Aceite', 3], ['inv', 'El grupo', 8],
+];
+const boundPad = act => SETTINGS.pad[act] ?? PAD_REBIND.find(r => r[0] === act)[2];
+
+function buildPad(defaults) {
+  const map = { ...defaults };
+  for (const [act, , def] of PAD_REBIND) {
+    const b = SETTINGS.pad[act];
+    if (b === undefined || b === def) continue;
+    if (map[def] === act) delete map[def];
+    map[b] = act;
+  }
+  return map;
+}
+
+let REBIND_PAD = null;   // acción esperando su botón nuevo
+function finishPadRebind(b) {
+  const act = REBIND_PAD; REBIND_PAD = null;
+  const m = topMenu();
+  if (b !== null) {
+    // si otra acción usaba ese botón, se queda con el viejo de esta
+    for (const [other] of PAD_REBIND) if (other !== act && boundPad(other) === b) SETTINGS.pad[other] = boundPad(act);
+    SETTINGS.pad[act] = b;
+    saveSettings(); PADS = buildPad(PADMAP);
+    if (m) m.msg = tr('Listo.');
+  } else if (m) m.msg = tr('Sin cambios.');
+  if (m && m.refresh) m.refresh();
+  renderMenu();
+  refreshPrompts();
 }
 
 let REBIND = null;   // acción esperando su tecla nueva
@@ -70,8 +105,6 @@ function openOptionsMenu(focus) {
     m.title = tr('Opciones');
     m.items = [
       vol('master', 'Volumen general'), vol('music', 'Música'), vol('sfx', 'Efectos'),
-      { label: `${tr('Temblor de pantalla')} <small>· ${SETTINGS.shake ? tr('sí') : tr('no')}</small>`, sub: tr('Sacudidas al golpear y al recibir golpes.'),
-        fn: () => { SETTINGS.shake = !SETTINGS.shake; saveSettings(); m.refresh(); renderMenu(); } },
       (() => {
         // ← → eligen el modo y Enter lo aplica (cambiar de ventana tarda un momento: no se hace al pasar)
         const cur = () => m.displayPick || displayMode();
@@ -83,16 +116,10 @@ function openOptionsMenu(focus) {
       })(),
       { label: `${tr('Idioma')} <small>· ${SETTINGS.lang === 'en' ? 'English' : 'Español'}</small>`, sub: 'Español / English',
         fn: () => { SETTINGS.lang = SETTINGS.lang === 'en' ? 'es' : 'en'; saveSettings(); applyStaticTr(); m.refresh(); refreshPrompts(); } },
-      (() => {
-        // ← → o Enter recorren los estilos; el panel y los menús se redibujan con los iconos elegidos
-        const step = d => { const i = PROMPT_ORDER.indexOf(SETTINGS.prompts || 'auto'); SETTINGS.prompts = PROMPT_ORDER[(i + d + PROMPT_ORDER.length) % PROMPT_ORDER.length]; saveSettings(); sfx('select'); m.refresh(); refreshPrompts(); };
-        return { label: `${tr('Iconos de botones')} <small>· ${tr(PROMPT_LABEL[SETTINGS.prompts || 'auto'])}</small>`,
-          sub: `${tr('Teclado, Xbox o PlayStation. Automático: según lo que estés usando.')} ${glyph('ok', 'kb')} ${glyph('ok', 'xbox')} ${glyph('ok', 'ps')}`,
-          adjust: d => step(d), fn: () => step(1) };
-      })(),
-      { label: tr('Controles'), sub: tr('Cambiar las teclas.'), fn: openControlsMenu },
+      { label: `${tr('Temblor de pantalla')} <small>· ${SETTINGS.shake ? tr('sí') : tr('no')}</small>`, sub: tr('Sacudidas al golpear y al recibir golpes.'),
+        fn: () => { SETTINGS.shake = !SETTINGS.shake; saveSettings(); m.refresh(); renderMenu(); } },
+      { label: tr('Controles'), sub: tr('Teclado, joystick e iconos de botones.'), fn: openControlsMenu },
     ];
-    if (STORE.where) m.items.push({ label: tr('Carpeta de guardado'), sub: STORE.where, fn: () => {} });
   };
   m.refresh();
   if (focus) m.sel = Math.max(0, m.items.findIndex(it => it.id === focus));
@@ -108,13 +135,44 @@ const DISPLAY_HELP = {
 function openControlsMenu() {
   const m = { title: tr('Controles'), cls: 'altar', items: [] };
   m.refresh = () => {
-    const ps = promptStyle() === 'ps' ? 'ps' : 'xbox';
-    m.text = `${tr('Enter y luego la tecla nueva. Las flechas siempre funcionan.')}<br>${tr('Mando')}: ${glyph('move', ps)} ${tr('moverse')} · ${glyph('strafeL', ps)}${glyph('strafeR', ps)} ${tr('paso lateral')} · ${glyph('ok', ps)} ${tr('interactuar')} · ${glyph('potion', ps)} ${tr('poción')} · ${glyph('oil', ps)} ${tr('aceite')} · ${glyph('inv', ps)} ${tr('inventario')} · ${glyph('menu', ps)} ${tr('pausa')}`;
+    const step = d => { const i = PROMPT_ORDER.indexOf(SETTINGS.prompts || 'auto'); SETTINGS.prompts = PROMPT_ORDER[(i + d + PROMPT_ORDER.length) % PROMPT_ORDER.length]; saveSettings(); sfx('select'); m.refresh(); refreshPrompts(); };
+    m.items = [
+      { label: tr('Teclado'), sub: tr('Cambiar las teclas.'), fn: openKeysMenu },
+      { label: tr('Joystick'), sub: tr('Cambiar los botones.'), fn: openPadMenu },
+      { label: `${tr('Iconos de botones')} <small>· ◂ ${tr(PROMPT_LABEL[SETTINGS.prompts || 'auto'])} ▸</small>`,
+        sub: `${tr('Teclado, Xbox o PlayStation. Automático: según lo que estés usando.')} ${glyph('ok', 'kb')} ${glyph('ok', 'xbox')} ${glyph('ok', 'ps')}`,
+        adjust: d => step(d), fn: () => step(1) },
+    ];
+  };
+  m.refresh();
+  openMenu(m);
+}
+
+function openKeysMenu() {
+  const m = { title: tr('Teclado'), cls: 'altar', items: [] };
+  m.refresh = () => {
+    m.text = tr('Enter y luego la tecla nueva. Las flechas siempre funcionan.');
     m.items = REBINDABLE.map(([act, label]) => ({
       label: `${tr(label)} <small>· ${REBIND === act ? tr('pulsa una tecla…') : keyName(boundKey(act))}</small>`,
       fn: () => { REBIND = act; m.msg = tr('Pulsa la tecla nueva (Esc cancela).'); m.refresh(); renderMenu(); },
     }));
     m.items.push({ label: tr('Restablecer teclas'), fn: () => { SETTINGS.keys = {}; saveSettings(); KEYS = buildKeys(KEYMAP); m.msg = tr('Teclas de fábrica.'); m.refresh(); renderMenu(); } });
+  };
+  m.refresh();
+  openMenu(m);
+}
+
+function openPadMenu() {
+  const m = { title: tr('Joystick'), cls: 'altar', items: [] };
+  m.refresh = () => {
+    const hay = navigator.getGamepads && [...navigator.getGamepads()].some(Boolean);
+    m.text = hay ? tr('Aceptar y luego el botón nuevo. El stick izquierdo siempre mueve.') : tr('No hay ningún joystick conectado.');
+    m.items = PAD_REBIND.map(([act, label]) => ({
+      label: `${tr(label)} <small>· ${REBIND_PAD === act ? tr('pulsa un botón…') : padGlyph(boundPad(act))}</small>`,
+      off: !hay,
+      fn: () => { REBIND_PAD = act; m.msg = tr('Pulsa el botón nuevo (Esc cancela).'); m.refresh(); renderMenu(); },
+    }));
+    m.items.push({ label: tr('Restablecer botones'), fn: () => { SETTINGS.pad = {}; saveSettings(); PADS = buildPad(PADMAP); m.msg = tr('Botones de fábrica.'); m.refresh(); renderMenu(); refreshPrompts(); } });
   };
   m.refresh();
   openMenu(m);

@@ -588,6 +588,21 @@ Object.assign(EN, {
   'Ocupa todo el monitor, también la barra de tareas.': 'Fills the whole monitor, taskbar included.',
   'Una ventana sin bordes del tamaño del monitor: cambiar de programa es instantáneo.': 'A borderless window the size of the monitor: switching programs is instant.',
   'F11 alterna ventana y pantalla completa.': 'F11 toggles windowed and fullscreen.',
+  'Teclado': 'Keyboard',
+  'Joystick': 'Gamepad',
+  'Cambiar los botones.': 'Change the buttons.',
+  'Teclado, joystick e iconos de botones.': 'Keyboard, gamepad and button icons.',
+  'Volver / pausa': 'Back / pause',
+  'El grupo': 'The party',
+  'Aceptar y luego el botón nuevo. El stick izquierdo siempre mueve.': 'Accept, then the new button. The left stick always moves.',
+  'No hay ningún joystick conectado.': 'No gamepad connected.',
+  'pulsa un botón…': 'press a button…',
+  'Pulsa el botón nuevo (Esc cancela).': 'Press the new button (Esc cancels).',
+  'Restablecer botones': 'Reset buttons',
+  'Botones de fábrica.': 'Default buttons.',
+  'Salir al título': 'Quit to title',
+  '¿Salir? La expedición en curso se pierde.': 'Quit? The current expedition is lost.',
+  '¿Empezar de nuevo? Se borra todo el progreso.': 'Start over? All progress is erased.',
 });
 
 Object.assign(EN, {

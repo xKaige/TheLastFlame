@@ -13,30 +13,51 @@ const PAD_BTN = {
   menu: 'start', skills: 'start', attrs: 'start', runes: 'start',
 };
 // teclas que no se reasignan
-const KB_FIXED = { cancel: 'Escape', menu: 'Escape', drop: 'KeyX', move: '↑↓', change: '←→' };
+const KB_FIXED = { drop: 'KeyX', move: '↑↓', change: '←→' };
 
 const SVG = d => `<svg viewBox="0 0 10 10">${d}</svg>`;
 const PS_FACE = {
   a: SVG('<path d="M2.7 2.7l4.6 4.6M7.3 2.7L2.7 7.3"/>'),        // cruz
   b: SVG('<circle cx="5" cy="5" r="2.6"/>'),                        // círculo
   x: SVG('<rect x="2.8" y="2.8" width="4.4" height="4.4"/>'),       // cuadrado
-  y: SVG('<path d="M5 2.3L7.7 7.1H2.3z"/>'),                        // triángulo
+  y: SVG('<path d="M5 2.6L7.7 7.4H2.3z"/>'),                        // triángulo
+};
+// Las letras del mando van dibujadas: una tipografía nunca queda centrada del todo en un botón tan chico
+const XB_FACE = {
+  a: SVG('<path d="M2.7 7.6L5 2.4l2.3 5.2M3.6 5.8h2.8"/>'),
+  b: SVG('<path d="M3.3 2.5v5h2.1a1.3 1.3 0 0 0 0-2.6H3.3h1.9a1.2 1.2 0 0 0 0-2.4z"/>'),
+  x: SVG('<path d="M3 2.6l4 4.8M7 2.6l-4 4.8"/>'),
+  y: SVG('<path d="M3 2.5L5 5l2-2.5M5 5v2.5"/>'),
 };
 const DPAD = SVG('<path class="f" d="M3.7 .8h2.6v2.9h2.9v2.6H6.3v2.9H3.7V6.3H.8V3.7h2.9z"/>');
 const XB_MENU = SVG('<path d="M2.6 3.2h4.8M2.6 5h4.8M2.6 6.8h4.8"/>');
 const XB_VIEW = SVG('<rect x="2" y="2.2" width="4" height="3.4"/><rect x="4" y="4.4" width="4" height="3.4"/>');
 
+// Número de botón del mando estándar → su nombre en PAD_BTN
+const PAD_NOMBRE = ['a', 'b', 'x', 'y', 'lb', 'rb', 'lt', 'rt', 'view', 'start', 'l3', 'r3', 'arriba', 'abajo', 'izquierda', 'derecha'];
+const PAD_TEXTO = { lb: ['LB', 'L1'], rb: ['RB', 'R1'], lt: ['LT', 'L2'], rt: ['RT', 'R2'], l3: ['L3', 'L3'], r3: ['R3', 'R3'] };
+const PAD_FLECHA = { arriba: '↑', abajo: '↓', izquierda: '←', derecha: '→' };
+
+function iconoBoton(b, st) {
+  const ps = st === 'ps';
+  if (b === 'dpad') return `<span class="pg pad">${DPAD}</span>`;
+  if (PAD_FLECHA[b]) return `<span class="pg bump">${PAD_FLECHA[b]}</span>`;
+  if (PAD_TEXTO[b]) return `<span class="pg bump">${PAD_TEXTO[b][ps ? 1 : 0]}</span>`;
+  if (b === 'start') return ps ? '<span class="pg bump">OPTIONS</span>' : `<span class="pg face">${XB_MENU}</span>`;
+  if (b === 'view') return ps ? '<span class="pg bump">SHARE</span>' : `<span class="pg face">${XB_VIEW}</span>`;
+  return ps ? `<span class="pg face ps">${PS_FACE[b]}</span>` : `<span class="pg face xb">${XB_FACE[b]}</span>`;
+}
+const padGlyph = n => iconoBoton(PAD_NOMBRE[n] || 'a', promptStyle() === 'ps' ? 'ps' : 'xbox');
+
 function glyph(action, st = promptStyle()) {
   if (st === 'kb') {
+    if (action === 'menu') action = 'cancel';
     const k = KB_FIXED[action] || (REBINDABLE.some(r => r[0] === action) ? boundKey(action) : action);
     return k.length <= 2 && /[↑↓←→]/.test(k) ? `<span class="k arrows">${k}</span>` : `<span class="k">${keyName(k)}</span>`;
   }
-  const b = PAD_BTN[action] || 'a';
-  if (b === 'dpad') return `<span class="pg pad">${DPAD}</span>`;
-  if (b === 'lb' || b === 'rb') return `<span class="pg bump">${st === 'ps' ? (b === 'lb' ? 'L1' : 'R1') : b.toUpperCase()}</span>`;
-  if (b === 'start') return st === 'ps' ? '<span class="pg bump">OPTIONS</span>' : `<span class="pg face">${XB_MENU}</span>`;
-  if (b === 'view') return st === 'ps' ? '<span class="pg bump">SHARE</span>' : `<span class="pg face">${XB_VIEW}</span>`;
-  return st === 'ps' ? `<span class="pg face ps">${PS_FACE[b]}</span>` : `<span class="pg face xb">${b.toUpperCase()}</span>`;
+  // lo que se cambió en Opciones manda sobre el botón de fábrica
+  const propio = PAD_REBIND.some(r => r[0] === action) && SETTINGS.pad[action] !== undefined;
+  return iconoBoton(propio ? PAD_NOMBRE[SETTINGS.pad[action]] || 'a' : PAD_BTN[action] || 'a', st);
 }
 
 // [O] [I] [U] [R] [H] [P] [Enter] [Esc] dentro de un texto → el icono que corresponde

@@ -1254,6 +1254,7 @@ let KEYS = buildKeys(KEYMAP);
 
 window.addEventListener('keydown', ev => {
   if (REBIND) { ev.preventDefault(); finishRebind(ev.code); return; }
+  if (REBIND_PAD) { ev.preventDefault(); if (ev.code === 'Escape') finishPadRebind(null); return; }
   if (ev.code === 'F11') { ev.preventDefault(); toggleFullscreen(); return; }
   // Mientras se escribe el nombre, sólo algunas teclas salen del campo
   if (document.activeElement === $('cName')) {
@@ -1278,7 +1279,7 @@ window.addEventListener('keydown', ev => {
 // ---------- Modo de pantalla ----------
 // En Electron: ventana, pantalla completa nativa o ventana sin bordes (main.js).
 // En el navegador: ventana o la pantalla completa de HTML.
-const DISPLAY_MODES = window.nativeDisplay ? ['ventana', 'completa', 'sinBordes'] : ['ventana', 'completa'];
+const DISPLAY_MODES = ['ventana', 'completa'];
 const DISPLAY_LABEL = { ventana: 'Ventana', completa: 'Pantalla completa', sinBordes: 'Ventana sin bordes' };
 const displayMode = () => (window.nativeDisplay ? nativeDisplay.mode() : document.fullscreenElement ? 'completa' : 'ventana');
 
@@ -1362,14 +1363,24 @@ function exploreAction(act) {
 // Mando (Steam Deck / Xbox)
 const padPrev = {};
 const PADMAP = { 12: 'fwd', 13: 'back', 14: 'turnL', 15: 'turnR', 4: 'strafeL', 5: 'strafeR', 0: 'ok', 9: 'cancel', 1: 'cancel', 2: 'potion', 3: 'oil', 8: 'inv' };
+let PADS = buildPad(PADMAP);
 function pollGamepad() {
   const pads = navigator.getGamepads ? navigator.getGamepads() : [];
   for (const gp of pads) {
     if (!gp) continue;
-    for (const b in PADMAP) {
+    // cambiando un botón: el primero que se apriete es el nuevo, y no hace nada más
+    if (REBIND_PAD) {
+      gp.buttons.forEach((bt, b) => {
+        const key = gp.index + ':' + b;
+        if (REBIND_PAD && bt.pressed && !padPrev[key]) { noteInput('pad', gp.id); finishPadRebind(b); }
+        padPrev[key] = bt.pressed;
+      });
+      continue;
+    }
+    for (const b in PADS) {
       const down = gp.buttons[b] && gp.buttons[b].pressed;
       const key = gp.index + ':' + b;
-      if (down && !padPrev[key]) { audioInit(); noteInput('pad', gp.id); onAction(PADMAP[b], true); }
+      if (down && !padPrev[key]) { audioInit(); noteInput('pad', gp.id); onAction(PADS[b], true); }
       padPrev[key] = down;
     }
     const ax = gp.axes[0] || 0, ay = gp.axes[1] || 0;

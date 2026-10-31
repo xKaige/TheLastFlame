@@ -249,12 +249,27 @@ window.openTitleMenu = () => {
   for (const id of ['combat', 'inv', 'dialog', 'battle', 'xCharla']) $(id).classList.add('hidden');
   showScreen(null); setPalette('castle'); setMusic('intro');
   S.mode = 'title';
-  openMenu({ back: false, cls: 'compact', items: [
-    { label: 'Ir al Hogar', sub: `${X.ceniza} de Ceniza · ${X.plantel.length} en el plantel · ${X.corridas} expedicion${X.corridas === 1 ? '' : 'es'}`, fn: () => (X.memoria.introVista ? abrirHogar() : verIntro()) },
-    { label: 'La historia', sub: 'Lo que pasó con la Llama.', fn: verIntro },
-    { label: 'Borrar progreso', sub: 'Ceniza, plantel, caídos y leyendas.', fn: () => confirmMenu('¿Borrar todo el progreso?', () => { Object.assign(X, { ceniza: 0, caidos: [], corridas: 0, plantel: [], candidatos: [], leyendas: [], sel: [], memoria: { hondo: 1, reveladas: [], ultimoCaido: null, habitante: null, finales: {} } }); guardarX(); openTitleMenu(); }) },
-  ] }, 'title');
+  const hay = hayPartida(), items = [];
+  if (hay) items.push({ label: 'Continuar', sub: `${X.ceniza} de Ceniza · ${X.plantel.length} en el plantel · ${X.corridas} expedicion${X.corridas === 1 ? '' : 'es'}`, fn: abrirHogar });
+  items.push({ label: 'Nueva partida', fn: () => (hay ? confirmMenu('¿Empezar de nuevo? Se borra todo el progreso.', nuevaPartida) : nuevaPartida()) });
+  items.push({ label: 'Opciones', fn: openOptionsMenu });
+  if (/Electron/i.test(navigator.userAgent)) items.push({ label: 'Salir', fn: () => window.close() });
+  openMenu({ back: false, cls: 'compact', items }, 'title');
 };
+
+const hayPartida = () => X.corridas > 0 || X.ceniza > 0 || !!X.memoria.introVista;
+function nuevaPartida() {
+  Object.assign(X, { ceniza: 0, caidos: [], corridas: 0, plantel: [], candidatos: [], leyendas: [], sel: [], memoria: { hondo: 1, reveladas: [], ultimoCaido: null, habitante: null, finales: {} } });
+  guardarX();
+  verIntro();
+}
+
+// La pausa de la expedición: lo demás del menú del juego base no corre acá
+window.openPauseMenu = () => openMenu({ title: 'Pausa', items: [
+  { label: 'Continuar', fn: closeMenu },
+  { label: 'Opciones', fn: openOptionsMenu },
+  { label: 'Salir al título', fn: () => confirmMenu('¿Salir? La expedición en curso se pierde.', openTitleMenu) },
+] }, 'game');
 
 // ---------- La introducción ----------
 // Cada escena sale de un dibujo de interfaz/intro; los textos están en historia.json.
@@ -440,6 +455,7 @@ function abrirHogar() {
       { label: 'Reclutar', sub: `${X.plantel.length} de ${REGLAS_HOGAR.plantel_max} en el plantel.`, fn: () => abrirReclutas(m) },
       { label: 'Los caídos', sub: 'Quienes quedaron en la cripta.', off: !X.caidos.length, fn: () => abrirLista('Los caídos', X.caidos, c => `Cayó en el nivel ${c.cayo}. Puede volver a aparecer entre los reclutas.`) },
       { label: 'Las leyendas', sub: 'Quienes volvieron con la Llama.', off: !X.leyendas.length, fn: () => abrirLista('Las leyendas', X.leyendas, c => `Sobrevivió a la expedición ${c.corrida}.`) },
+      { label: 'La historia', sub: 'Lo que pasó con la Llama.', fn: verIntro },
       { label: 'Volver al título', fn: openTitleMenu },
     ];
   };
@@ -1531,6 +1547,7 @@ function dibujarBatalla(c) {
 
 // ---------- Conexión con el bucle del juego base ----------
 window.onAction = (act, pad) => {
+  if (['skills', 'attrs', 'runes'].includes(act)) return;     // son del juego base
   if (S.mode === 'xbat') return batallaAction(act);
   if (S.mode === 'xcharla') return charlaAction(act);
   if (S.mode === 'xsal') return;
