@@ -131,8 +131,7 @@ function colgarDelTecho(w, nivel) {
     w.colgantes.push({ x: x + 0.5, y: y + 0.5, n: Math.floor(azar(x, y, 8) * TECHO.lista.length) });
   }
 }
-// Accesorios de piso: sprites sólidos que se esquivan. Sólo van en salas, nunca en pasillos ni frente a su boca,
-// y donde no dejan nada aislado.
+// Accesorios de piso: sprites sólidos, siempre en esquinas de sala y donde no dejan nada aislado.
 const PISO = ACCESORIOS.piso;
 for (const a of PISO.lista) a.img = Object.assign(new Image(), { src: `interfaz/mazmorra/cripta/accesorios/${a.imagen}.png` });
 function zonaAlcanzable(w, tapado) {
@@ -143,13 +142,16 @@ function zonaAlcanzable(w, tapado) {
   }
   return visto.size;
 }
-function lugarDeSala(w, x, y) {
+// Sólo la esquina de una sala: dos muros en ángulo y libre todo lo demás alrededor. Nunca queda en el paso.
+function esquinaDeSala(w, x, y) {
   const muro = (a, b) => a < 0 || b < 0 || a >= MW || b >= MH || w.map[b * MW + a] === 1;
   const pasillo = (a, b) => (muro(a - 1, b) && muro(a + 1, b)) || (muro(a, b - 1) && muro(a, b + 1));
-  if (pasillo(x, y) || pasillo(x + 1, y) || pasillo(x - 1, y) || pasillo(x, y + 1) || pasillo(x, y - 1)) return false;
-  let libres = 0;
-  for (let b = y - 1; b <= y + 1; b++) for (let a = x - 1; a <= x + 1; a++) if (!muro(a, b)) libres++;
-  return libres >= 6;
+  for (const sx of [-1, 1]) for (const sy of [-1, 1]) {
+    if (!muro(x + sx, y) || !muro(x, y + sy)) continue;
+    const a = [x - sx, y], b = [x, y - sy], c = [x - sx, y - sy];
+    if (!muro(...a) && !muro(...b) && !muro(...c) && !pasillo(...a) && !pasillo(...b)) return true;
+  }
+  return false;
 }
 function ponerEnElPiso(w, nivel) {
   w.adornos = []; w.solidos = new Set();
@@ -163,7 +165,7 @@ function ponerEnElPiso(w, nivel) {
   let total = zonaAlcanzable(w, -1);
   for (let y = 1; y < MH - 1; y++) for (let x = 1; x < MW - 1; x++) {
     const i = y * MW + x;
-    if (w.map[i] !== 0 || !lugarDeSala(w, x, y) || azar(x, y, 3) > PISO.densidad || Math.abs(x - w.start[0]) + Math.abs(y - w.start[1]) < 3) continue;
+    if (w.map[i] !== 0 || !esquinaDeSala(w, x, y) || azar(x, y, 3) > PISO.densidad || Math.abs(x - w.start[0]) + Math.abs(y - w.start[1]) < 3) continue;
     if (w.ents.some(e => e.x === x && e.y === y) || w.adornos.some(p => Math.abs(p.x - x - 0.5) + Math.abs(p.y - y - 0.5) < PISO.separacion)) continue;
     if (zonaAlcanzable(w, i) !== total - 1) continue;
     const a = lista[Math.floor(azar(x, y, 4) * lista.length)];
@@ -179,6 +181,32 @@ window.renderScene = (w, v, sprites, h) => {
   const extra = [];
   for (const c of w.colgantes || []) { const spr = spriteTecho(c.n); if (spr) extra.push({ x: c.x, y: c.y, spr, scale: 1, ramp: 0, glow: 0.3 * flick }); }
   baseRenderScene(w, v, sprites.concat(extra, w.adornos || []), h);
+};
+
+// Temas grabados: conviven con la música por código y usan su misma entrada, setMusic
+const TEMAS = {};
+for (const [n, t] of Object.entries(D.mazmorra.musica)) TEMAS[n] = { ...t, datos: fetch(t.archivo).then(r => r.arrayBuffer()), audio: null };
+async function iniciarTema(st) {
+  const t = TEMAS[st.name];
+  if (!t.audio) t.audio = await AC.decodeAudioData(await t.datos);
+  if (MUSIC.cur !== st) return;              // cambió de música mientras se decodificaba
+  const src = AC.createBufferSource();
+  src.buffer = t.audio; src.loop = true; [src.loopStart, src.loopEnd] = t.bucle;
+  src.connect(st.out); src.start();
+  st.src = src;
+  st.out.gain.setValueAtTime(0, AC.currentTime);
+  st.out.gain.linearRampToValueAtTime(t.volumen, AC.currentTime + 0.25);
+}
+const baseSetMusic = setMusic, baseFadeOut = fadeOutTrack;
+window.fadeOutTrack = st => { baseFadeOut(st); if (st.src) setTimeout(() => st.src.stop(), 2500); };
+window.setMusic = name => {
+  if (!TEMAS[name]) return baseSetMusic(name);
+  if (!AC) { MUSIC.want = name; return; }
+  if (MUSIC.cur && MUSIC.cur.name === name) return;
+  if (MUSIC.cur) fadeOutTrack(MUSIC.cur);
+  const out = AC.createGain(); out.gain.value = 0; out.connect(musicBus);
+  MUSIC.cur = { name, out, timer: 0 };
+  iniciarTema(MUSIC.cur);
 };
 
 // ---------- Título ----------
@@ -406,7 +434,7 @@ window.enterLevel = (floor, level) => {
     const q = w.ents.find(e => e.type === 'prop');
     if (q) Object.assign(q, { type: 'event', ev: 'peregrino', done: false, rescate: true });
   }
-  w.ents = w.ents.filter(e => e.type !== 'prop' || lugarDeSala(w, e.x, e.y));     // los adornos del juego base tampoco van en el camino
+  w.ents = w.ents.filter(e => e.type !== 'prop' || esquinaDeSala(w, e.x, e.y));     // los adornos del juego base tampoco van en el camino
 };
 
 window.openEvent = e => {
@@ -670,7 +698,7 @@ window.startCombat = (e, emboscada) => {
   const jefe = e.def.boss, tipo = jefe ? 'jefe' : emboscada ? 'emboscada' : 'comun';
   const ids = jefe ? D.mazmorra.jefes[S.floor] : (p => p[Math.floor(azarX() * p.length)])(D.mazmorra.grupos_por_piso[S.floor]);
   const go = () => iniciarTransicion(e, ids, tipo);
-  if (jefe) { setMusic(S.floor === LAST_FLOOR ? 'final' : 'boss'); charla(`jefe_${S.floor}`, go); } else go();
+  if (jefe) { setMusic(S.floor === LAST_FLOOR ? 'final' : 'boss'); charla(`jefe_${S.floor}`, go); } else { setMusic('pelea'); go(); }
 };
 
 // ---------- Transición a la pelea ----------
@@ -966,6 +994,7 @@ function cerrarPelea() {
   $('battle').classList.add('hidden');
   Bt = null;
   S.mode = 'explore';
+  setMusic(floorMusic());
 }
 
 function actualizarBotin(dt) {
@@ -988,7 +1017,6 @@ function salirDelBotin() {
   for (const u of X.grupo) delete u.reparto;
   cerrarPelea();
   updateHUD();
-  if (jefe) setMusic(floorMusic());
   const muerte = caido && { quien: 'sombra', caras: ['risa'], lineas: [D.historia.modelos[caido.modelo].muerte.replace('{nombre}', caido.nombre)] };
   X.memoria.ultimoCaido = null;
   if (jefe && piso === LAST_FLOOR) return encadenar([muerte, 'jefe_3_muerto', revelar(4)], elegirPortador);

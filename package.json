@@ -27,7 +27,8 @@
       "js/**",
       "assets/**",
       "datos/**",
-      "interfaz/**"
+      "interfaz/**",
+      "!assets/musica/*.mp3"
     ],
     "win": {
       "target": "dir",

@@ -69,8 +69,8 @@
       }
     ],
     "piso": {
-      "densidad": 0.14,
-      "separacion": 4,
+      "densidad": 0.3,
+      "separacion": 3,
       "lista": [
         {
           "imagen": "columna_rota",
@@ -207,5 +207,15 @@
   },
   "santuario": {
     "cura": 0.7
+  },
+  "musica": {
+    "pelea": {
+      "archivo": "assets/musica/pelea_comun.ogg",
+      "bucle": [
+        36.385,
+        181.933
+      ],
+      "volumen": 0.42
+    }
   }
 }
