@@ -240,10 +240,39 @@ window.openTitleMenu = () => {
   showScreen(null); setPalette('castle'); setMusic('intro');
   S.mode = 'title';
   openMenu({ back: false, cls: 'compact', items: [
-    { label: 'Ir al Hogar', sub: `${X.ceniza} de Ceniza · ${X.plantel.length} en el plantel · ${X.corridas} expedicion${X.corridas === 1 ? '' : 'es'}`, fn: abrirHogar },
+    { label: 'Ir al Hogar', sub: `${X.ceniza} de Ceniza · ${X.plantel.length} en el plantel · ${X.corridas} expedicion${X.corridas === 1 ? '' : 'es'}`, fn: () => (X.memoria.introVista ? abrirHogar() : verIntro()) },
+    { label: 'La historia', sub: 'Lo que pasó con la Llama.', fn: verIntro },
     { label: 'Borrar progreso', sub: 'Ceniza, plantel, caídos y leyendas.', fn: () => confirmMenu('¿Borrar todo el progreso?', () => { Object.assign(X, { ceniza: 0, caidos: [], corridas: 0, plantel: [], candidatos: [], leyendas: [], sel: [], memoria: { hondo: 1, reveladas: [], ultimoCaido: null, habitante: null, finales: {} } }); guardarX(); openTitleMenu(); }) },
   ] }, 'title');
 };
+
+// ---------- La introducción ----------
+// Cada escena sale de un dibujo de interfaz/intro; los textos están en historia.json.
+// La última es el Hogar mismo: al terminar, la fogata sigue ardiendo y el juego empieza ahí.
+const ARTE_INTRO = {};
+for (const n of ['velombra', 'escalera', 'velombra_apagada', 'boca']) ARTE_INTRO[n] = Object.assign(new Image(), { src: `interfaz/intro/${n}.png` });
+const ESCENAS_INTRO = [
+  { art: 'velombra', ramp: 'crypt', pan: [0, 0, 0, 0], sfx: 'fire', dibujar: (c, t) => drawFlame(c, 310, 97, 16, 24, t, 1, 'fuegoX') },
+  { art: 'escalera', ramp: 'crypt', pan: [0, 0, 0, 0], sfx: 'stairs', dibujar: (c, t) => drawFlame(c, 298, 134, 12, 20, t, 1, 'fuegoX') },
+  { art: 'apagon', ramp: 'castle', pan: [0, 0, 0, 0], snuff: true },
+  { art: 'velombra_apagada', ramp: 'crypt', pan: [0, 0, 0, 0] },
+  { art: 'boca', ramp: 'crypt', pan: [0, 0, 0, 0], sfx: 'whisper', dibujar: (c, t) => {
+    const cara = caraDe('sombra');
+    if (!cara) return;
+    c.globalAlpha = clamp((t - 1.5) / 3, 0, 1) * (0.85 + Math.sin(t * 1.3) * 0.15);
+    c.drawImage(cara, 240 - CARA.lado / 2, 28); c.globalAlpha = 1;
+  } },
+  { art: 'hogar', ramp: 'crypt', pan: [0, 0, 0, 0], sfx: 'oil', sinFundido: true, dibujar: c => dibujarHogar(c) },
+];
+
+function verIntro() {
+  closeAllMenus();
+  prepararHogar();
+  if (!CINE.art) CINE.art = buildCineArt();
+  Object.assign(CINE.art, ARTE_INTRO, { hogar: document.createElement('canvas') });
+  const escenas = ESCENAS_INTRO.map((e, i) => ({ ...e, lines: D.historia.intro[i] }));
+  playCine(escenas, () => { X.memoria.introVista = true; guardarX(); abrirHogar(); }, null, 'historia');
+}
 
 // ---------- El Hogar ----------
 // El último fuego de Vel'Ombra: acá se contrata, se arma el grupo y se baja a la cripta.

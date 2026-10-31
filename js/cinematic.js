@@ -453,6 +453,7 @@ function cineUpdate(dt) {
     const talking = CINE.audio && !CINE.audio.ended && !CINE.audio.error;
     if (!talking && CINE.lt > lineDur(CINE.scenes[CINE.si].lines[CINE.li])) nextLine();
   } else {
+    if (CINE.scenes[CINE.si].sinFundido && !CINE.skip) return endIntro();
     CINE.fade += dt / (CINE.skip ? 0.5 : 0.9);
     if (CINE.fade >= 1) {
       CINE.fade = 1;
@@ -549,6 +550,7 @@ function drawCine(ctx) {
       if (sc.heroSnuff !== undefined && grow < 0.6) drawSmoke(ctx, tx + 0.5, ty, t, R[2]);
     }
   }
+  if (sc.dibujar) sc.dibujar(ctx, t);
   if (typeof drawEndingFx === 'function') drawEndingFx(ctx, sc, R, ox, oy, t, e);
   // banda inferior para el texto, en degradé tramado para que no corte la escena
   for (let k = 0; k < 8; k++) ditherFill(ctx, 0, 186 + k * 6, W, 6, 0.08 + k * 0.09, R[0]);

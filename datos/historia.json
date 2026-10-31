@@ -1,4 +1,38 @@
 {
+  "intro": [
+    [
+      "Vel’Ombra fue el reino más luminoso del continente.",
+      "Su riqueza no venía del oro: venía de la Llama Primera, que ardía bajo la montaña.",
+      "Mientras ardiera, la noche no podía entrar del todo."
+    ],
+    [
+      "El último rey, Aldemar el Insomne, tenía miedo a morir.",
+      "Le juraron que quien poseyera la Llama no conocería la oscuridad, ni siquiera la de la tumba.",
+      "Aldemar bajó a robarla, con sus caballeros y el Cazador Gris."
+    ],
+    [
+      "Cuando el rey tocó la Llama, esta se apagó.",
+      "No hubo explosión ni grito."
+    ],
+    [
+      "Toda la sombra que el fuego había mantenido a raya entró de golpe.",
+      "Desde entonces, no amanece.",
+      "Lo que quedó del rey sigue ahí abajo, en el lugar del fuego, y tiene hambre de luz."
+    ],
+    [
+      "Una voz recibe a quien entra en la cripta.",
+      {
+        "q": "Otra lucecita bajando a mi cripta..."
+      }
+    ],
+    [
+      "Dicen que la Llama no murió: quedó una chispa en cada antorcha.",
+      "Si alguien lleva una hasta el fondo, el fuego va a recordar lo que fue.",
+      {
+        "big": "Queda una sola antorcha."
+      }
+    ]
+  ],
   "modelos": {
     "viuda": {
       "motivo": "Su pareja bajó con la última antorcha y nunca volvió.",
@@ -73,32 +107,87 @@
   },
   "finales": {
     "luz": {
-      "label": "Subir con la Llama", "sub": "Llevarla de vuelta a Vel'Ombra.",
+      "label": "Subir con la Llama",
+      "sub": "Llevarla de vuelta a Vel'Ombra.",
       "escenas": [
-        ["{nombre} no la deja ahí abajo. La cubre con la mano y empieza a subir.", "Piso por piso, la cripta los ve pasar: los osarios, los salones, las cavernas sin nombre.", "Las sombras se apartan del camino. Ninguna se atreve a tocarla."],
-        ["Arriba, Vel'Ombra sigue a oscuras, como hace siglos.", "{nombre} levanta la antorcha. Y el cielo, detrás de la montaña, empieza a aclarar.", "Por primera vez en siglos, alguien ve amanecer.", { "big": "La Llama Perdura" }]
+        [
+          "{nombre} no la deja ahí abajo. La cubre con la mano y empieza a subir.",
+          "Piso por piso, la cripta los ve pasar: los osarios, los salones, las cavernas sin nombre.",
+          "Las sombras se apartan del camino. Ninguna se atreve a tocarla."
+        ],
+        [
+          "Arriba, Vel'Ombra sigue a oscuras, como hace siglos.",
+          "{nombre} levanta la antorcha. Y el cielo, detrás de la montaña, empieza a aclarar.",
+          "Por primera vez en siglos, alguien ve amanecer.",
+          {
+            "big": "La Llama Perdura"
+          }
+        ]
       ]
     },
     "trono": {
-      "label": "Ocupar el trono vacío", "sub": "Alguien tiene que quedarse.",
+      "label": "Ocupar el trono vacío",
+      "sub": "Alguien tiene que quedarse.",
       "escenas": [
-        ["Al fondo de la cámara hay un trono. Está vacío.", "La oscuridad no soporta un trono vacío. Ya busca quién lo ocupe.", { "q": "Sentate. Ya caminaste demasiado. La oscuridad es tibia." }],
-        ["{nombre} mira la antorcha por última vez.", "Y la apaga con sus propios dedos.", "Los demás no van a entenderlo nunca. Alguien tenía que hacerlo."],
-        ["{nombre} se sienta donde él se sentaba. La oscuridad lo reconoce.", "Ahora espera en el fondo del pozo, como esperó la primera.", "Y cuando una luz baje por la escalera, va a saber exactamente qué decirle:", { "q": "Otra lucecita bajando a mi cripta..." }, { "big": "El Nuevo Habitante" }]
+        [
+          "Al fondo de la cámara hay un trono. Está vacío.",
+          "La oscuridad no soporta un trono vacío. Ya busca quién lo ocupe.",
+          {
+            "q": "Sentate. Ya caminaste demasiado. La oscuridad es tibia."
+          }
+        ],
+        [
+          "{nombre} mira la antorcha por última vez.",
+          "Y la apaga con sus propios dedos.",
+          "Los demás no van a entenderlo nunca. Alguien tenía que hacerlo."
+        ],
+        [
+          "{nombre} se sienta donde él se sentaba. La oscuridad lo reconoce.",
+          "Ahora espera en el fondo del pozo, como esperó la primera.",
+          "Y cuando una luz baje por la escalera, va a saber exactamente qué decirle:",
+          {
+            "q": "Otra lucecita bajando a mi cripta..."
+          },
+          {
+            "big": "El Nuevo Habitante"
+          }
+        ]
       ]
     },
     "relicario": {
-      "label": "Ofrecer a los caídos", "sub": "Devolverle a la Llama las chispas perdidas.",
+      "label": "Ofrecer a los caídos",
+      "sub": "Devolverle a la Llama las chispas perdidas.",
       "escenas": [
-        ["{nombre} nombra a quienes no llegaron, uno por uno, y deja caer sus chispas en el cuenco.", "Cada una cargaba una deuda. Juntas, recuerdan el fuego del que salieron.", "La Llama Primera vuelve a encenderse."],
-        ["Lo que se apaga no es la luz: es la maldición que la encerraba ahí abajo.", "Las chimeneas de Vel'Ombra vuelven a echar humo tibio. Las sombras se acortan.", { "big": "La Ofrenda" }]
+        [
+          "{nombre} nombra a quienes no llegaron, uno por uno, y deja caer sus chispas en el cuenco.",
+          "Cada una cargaba una deuda. Juntas, recuerdan el fuego del que salieron.",
+          "La Llama Primera vuelve a encenderse."
+        ],
+        [
+          "Lo que se apaga no es la luz: es la maldición que la encerraba ahí abajo.",
+          "Las chimeneas de Vel'Ombra vuelven a echar humo tibio. Las sombras se acortan.",
+          {
+            "big": "La Ofrenda"
+          }
+        ]
       ]
     },
     "leyenda": {
-      "label": "Volver sin perder a nadie", "sub": "Todos los que bajaron, suben.",
+      "label": "Volver sin perder a nadie",
+      "sub": "Todos los que bajaron, suben.",
       "escenas": [
-        ["Bajaron con una sola antorcha. Y volvieron todos.", "Nadie los esperaba arriba. Nadie creía que fuera posible."],
-        ["Años después, en las aldeas de la ladera, los viejos juntan a los chicos alrededor del fuego.", "Cuentan de un grupo que bajó a la Cripta de Vel'Ombra sin dejar a nadie atrás.", "Sus nombres se dicen en voz baja, como una plegaria.", { "big": "{nombres}" }]
+        [
+          "Bajaron con una sola antorcha. Y volvieron todos.",
+          "Nadie los esperaba arriba. Nadie creía que fuera posible."
+        ],
+        [
+          "Años después, en las aldeas de la ladera, los viejos juntan a los chicos alrededor del fuego.",
+          "Cuentan de un grupo que bajó a la Cripta de Vel'Ombra sin dejar a nadie atrás.",
+          "Sus nombres se dicen en voz baja, como una plegaria.",
+          {
+            "big": "{nombres}"
+          }
+        ]
       ]
     }
   }
