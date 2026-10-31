@@ -61,6 +61,9 @@ function pintarPj() {
   PJ.sel = clamp(PJ.sel, 0, Math.max(0, filasPj().length - 1));
   const elegida = f => !!f && !PJ.sub && filas[PJ.sel] === f;
   const retrato = q => retratoX(q.modelo, LADO_RETRATO, 'crypt').toDataURL();
+  const ps = promptStyle() === 'ps', uno = PJ.lista.length < 2;
+  const tecla = (letra, boton) => (promptStyle() === 'kb' ? `<span class="k ptecla">${letra}</span>`
+    : boton === 'lt' || boton === 'rt' ? `<span class="pg bump ptecla">${ps ? boton.replace('lt', 'L2').replace('rt', 'R2') : boton.toUpperCase()}</span>` : glyph(boton));
   const panel = (titulo, extra, cuerpo, cls = '') => `<section class="ppanel ${cls}"><h4>${titulo}${extra ? `<small>${extra}</small>` : ''}</h4>${cuerpo}</section>`;
 
   const pestanas = PESTANAS.map((t, i) => `<div class="ptab${i === PJ.tab ? ' on' : ''}">${t}</div>`).join('');
@@ -105,12 +108,9 @@ function pintarPj() {
     const o = id && D.objetos[id];
     return `<div class="pitem${i === PJ.sel ? ' sel' : ''}"><span>${o ? o.nombre : 'Dejar vacío'}</span><em>${o ? textoBonos(o) : ''}</em></div>`;
   }).join('')}</div>` : '';
-  const pad = promptStyle() !== 'kb', pestana = pad ? `${glyph('strafeL')}${glyph('strafeR')}` : '<span class="k">Q</span><span class="k">E</span>';
-  const otro = pad ? `<span class="pg bump">${promptStyle() === 'ps' ? 'L2' : 'LT'}</span><span class="pg bump">${promptStyle() === 'ps' ? 'R2' : 'RT'}</span>` : '<span class="k">Z</span><span class="k">C</span>';
-  const personaje = PJ.lista.length > 1 ? ` · ${otro} personaje` : '';
-  $('personajes').innerHTML = `<div class="ptop"><div class="ptabs">${pestanas}</div><div class="pgrupo"><span>Grupo</span>${grupo}</div></div>
+  $('personajes').innerHTML = `<div class="ptop"><div class="ptabs">${tecla('Q', 'strafeL')}${pestanas}${tecla('E', 'strafeR')}</div><div class="pgrupo">${uno ? '' : tecla('Z', 'lt')}<span>Grupo</span>${grupo}${uno ? '' : tecla('X', 'rt')}</div></div>
     <div class="pcuerpo">${ficha}<div class="pder">${centro}</div></div>${sub}
-    <div class="pinfo">${PJ.msg || ''}</div><div class="payuda">${pestana} pestaña${personaje} · ${glyph('ok')} aceptar · ${glyph('cancel')} volver</div>`;
+    <div class="pinfo">${PJ.msg || ''}</div><div class="payuda">${glyph('ok')} aceptar · ${glyph('cancel')} volver</div>`;
   PJ.msg = '';
   const sel = $('personajes').querySelector('.pitem.sel');
   if (sel) sel.scrollIntoView({ block: 'nearest' });
@@ -179,8 +179,8 @@ function pjAction(act, pad) {
   pintarPj();
 }
 
-// Q E cambian de pestaña y Z C de personaje; las flechas y A D son sólo para moverse dentro de la pantalla
-const TECLAS_PJ = { KeyQ: () => cambiarPestana(-1), KeyE: () => cambiarPestana(1), KeyZ: () => cambiarPersonaje(-1), KeyC: () => cambiarPersonaje(1) };
+// Q E cambian de pestaña y Z X de personaje; las flechas y A D son sólo para moverse dentro de la pantalla
+const TECLAS_PJ = { KeyQ: () => cambiarPestana(-1), KeyE: () => cambiarPestana(1), KeyZ: () => cambiarPersonaje(-1), KeyX: () => cambiarPersonaje(1) };
 addEventListener('keydown', ev => {
   if (S.mode !== 'xpj' || PJ.sub || ev.repeat || !TECLAS_PJ[ev.code]) return;
   ev.stopImmediatePropagation(); ev.preventDefault();

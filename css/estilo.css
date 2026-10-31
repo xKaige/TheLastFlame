@@ -97,10 +97,11 @@
 #personajes.hidden { display: none; }
 #personajes em { font-style: normal; font-weight: 600; }
 .ptop { display: flex; justify-content: space-between; align-items: center; height: 25px; margin-bottom: 2px; }
-.ptabs { display: flex; gap: 4px; }
+.ptabs { display: flex; align-items: center; gap: 4px; }
+#personajes .ptecla { flex: none; margin: 0; }
 .ptab { padding: 0 9px; font-family: var(--f-title); font-size: 11px; line-height: 10px; color: var(--c4); background: var(--p-panel); border: 6px solid; border-image: url(../interfaz/hud/marco_menu.png) 6 fill; image-rendering: pixelated; }
 .ptab.on { color: var(--p-luz); text-shadow: 0 0 5px #c25a14, 0 1px 0 #000; }
-.pgrupo { display: flex; align-items: center; gap: 3px; padding: 0 2px; background: var(--p-panel); border: 6px solid; border-image: url(../interfaz/hud/marco_menu.png) 6 fill; image-rendering: pixelated; font-size: 6.5px; color: var(--c4); text-transform: uppercase; letter-spacing: 0.4px; }
+.pgrupo { margin-right: 16px; display: flex; align-items: center; gap: 3px; padding: 0 2px; background: var(--p-panel); border: 6px solid; border-image: url(../interfaz/hud/marco_menu.png) 6 fill; image-rendering: pixelated; font-size: 6.5px; color: var(--c4); text-transform: uppercase; letter-spacing: 0.4px; }
 .pgrupo span { margin-right: 2px; }
 .pgrupo img { width: 13px; height: 13px; border: 1px solid var(--p-borde); opacity: 0.7; }
 .pgrupo img.on { border-color: var(--p-luz); opacity: 1; }
