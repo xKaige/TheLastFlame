@@ -60,7 +60,7 @@
 #xCharla .co.sel { background: var(--c5); color: var(--c0); }
 
 /* retrato en la lista de la reunión */
-#menu .mopt .xr { width: 11px; height: 11px; margin-right: 3px; vertical-align: -2px; image-rendering: pixelated; }
+#menu .mopt .xr { width: 11px; height: 11px; margin-right: 3px; vertical-align: -2px; }
 #menu .mopt.sel .xr { width: 20px; height: 20px; float: left; margin: 0 5px 0 -2px; }
 
 /* cartel de la transición a la pelea */
@@ -87,3 +87,6 @@
 #menu.bg-hogar .mtext { text-align: center; }
 #menu.bg-hogar .ml small { font-size: 7.5px; }
 #stage:has(#menu.bg-hogar:not(.hidden)) #title { display: none; }
+
+/* textos y retratos en alta resolución, entre el canvas y la interfaz */
+#nitido { position: absolute; left: 0; top: 0; width: 480px; height: 270px; pointer-events: none; }

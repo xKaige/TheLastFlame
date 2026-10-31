@@ -17,6 +17,19 @@ try { Object.assign(X, JSON.parse(STORE.get(CLAVE) || '{}')); } catch (e) { /* s
 for (const k of ['caidos', 'plantel', 'candidatos']) X[k] = X[k].filter(c => D.modelos[c.modelo] && D.clases[c.clase]);   // personajes de modelos que ya no existen
 const guardarX = () => STORE.set(CLAVE, JSON.stringify({ ceniza: X.ceniza, caidos: X.caidos, corridas: X.corridas, plantel: X.plantel, candidatos: X.candidatos, leyendas: X.leyendas, memoria: X.memoria }));
 const azarX = () => Math.random();
+// Capa fina sobre el canvas de 480x270: textos y retratos no se pixelan al agrandar la ventana.
+// Se dibuja con las mismas coordenadas que el canvas; sus 4 veces de resolución las pone la escala.
+const LADO_RETRATO = 128;
+const NITIDO = { g: null, sucio: false };
+function capaNitida() {
+  if (!NITIDO.g) { NITIDO.g = $('nitido').getContext('2d'); NITIDO.g.scale(4, 4); }
+  NITIDO.sucio = true;
+  return NITIDO.g;
+}
+function limpiarCapa() {
+  if (NITIDO.sucio) NITIDO.g.clearRect(0, 0, 480, 270);
+  NITIDO.sucio = false;
+}
 const baseX = { draw, update, onAction, updateHUD, enterLevel, afterStep };
 
 // Retratos de cada modelo: el PNG se pasa por la paleta del piso, como todo lo demás
@@ -318,7 +331,7 @@ function dibujarHogar(c) {
     const p = X.sel[i], px = 250 + i * 54, py = 226;
     c.fillStyle = '#000'; c.fillRect(px - 1, py - 1, 40, 40);
     c.fillStyle = p ? RAMPS.crypt[5] : RAMPS.crypt[2]; c.fillRect(px - 1, py - 1, 40, 1); c.fillRect(px - 1, py + 38, 40, 1); c.fillRect(px - 1, py - 1, 1, 40); c.fillRect(px + 38, py - 1, 1, 40);
-    if (p) c.drawImage(retratoX(p.modelo, 38, 'crypt'), px, py);
+    if (p) capaNitida().drawImage(retratoX(p.modelo, LADO_RETRATO, 'crypt'), px, py, 38, 38);
   }
 }
 
@@ -331,7 +344,7 @@ function prepararHogar() {
 }
 // Mientras el plantel no alcance para bajar de a dos, los reclutas son gratis: la partida nunca queda trabada
 const costoRecluta = p => (p.condicion ? p.condicion.ceniza || 0 : X.plantel.length < REGLAS_HOGAR.plantel_gratis ? 0 : REGLAS_HOGAR.costo_recluta);
-const fichaDe = p => `<img class="xr" src="${retratoX(p.modelo, 40, 'crypt').toDataURL()}" alt="">`;
+const fichaDe = p => `<img class="xr" src="${retratoX(p.modelo, LADO_RETRATO, 'crypt').toDataURL()}" alt="">`;
 const datosDe = p => `${p.nombre} <small>· ${D.clases[p.clase].nombre} nv ${p.nivel}, ${D.modelos[p.modelo].titulo}${p.caido ? ' · caído' : ''}${p.marcado ? ' · marcado' : ''}</small>`;
 const detalleDe = p => `${D.historia.modelos[p.modelo].motivo} ${D.modelos[p.modelo].rasgo}. Vida ${p.vidaMax} · Ataque ${p.ataque} · Velocidad ${p.velocidad}. ${D.clases[p.clase].rol}.`;
 
@@ -622,10 +635,10 @@ function caraDe(nombre) {
 }
 function dibujarCara(c) {
   if (CH && CH.n.p) {
-    const r = retratoX(CH.n.p.modelo, 64, S.env), x = CARA.x - 32, y = 122;
-    c.globalAlpha = clamp((T - CH.desde) / 0.3, 0, 1);
-    c.fillStyle = RAMPS[S.env][4]; c.fillRect(x - 1, y - 1, 66, 66);
-    c.drawImage(r, x, y); c.globalAlpha = 1;
+    const r = retratoX(CH.n.p.modelo, LADO_RETRATO, S.env), x = CARA.x - 32, y = 122, n = capaNitida();
+    n.globalAlpha = clamp((T - CH.desde) / 0.3, 0, 1);
+    n.fillStyle = RAMPS[S.env][4]; n.fillRect(x - 1, y - 1, 66, 66);
+    n.drawImage(r, x, y, 64, 64); n.globalAlpha = 1;
     return;
   }
   const g = CH && CARAS[CH.n.quien];
@@ -739,16 +752,18 @@ function actualizarTransicion(dt) {
 }
 
 // El círculo de luz se achica con el mismo tramado de la mazmorra
-function dibujarCierre(c) {
-  const k = clamp(Tr.t / Tr.cierre, 0, 1), r = 330 * (1 - k * k) - 40;
+function dibujarCierre(c, k = clamp(Tr.t / Tr.cierre, 0, 1), rojo = Tr.rojo) {
+  const r = 330 * (1 - k * k) - 40;
   const { px, cen, w, h } = LUZ, negro = 0xff020104 >>> 0;
   for (let y = 0, i = 0; y < h; y++) for (let x = 0; x < w; x++, i++) {
     const v = (cen[i] - r) / 46;
     px[i] = (v >= 1 || (v > 0 && v > BAYER[((y & 3) << 2) | (x & 3)])) ? negro : 0;
   }
   LUZ.g.putImageData(LUZ.img, 0, 0);
-  c.drawImage(LUZ.c, 0, 0);
-  if (Tr.rojo) { c.fillStyle = `rgba(150, 20, 20, ${Tr.rojo * 0.6})`; c.fillRect(0, 0, 480, 270); }
+  c.imageSmoothingEnabled = false;
+  c.drawImage(LUZ.c, 0, 0, 480, 270);
+  c.imageSmoothingEnabled = true;
+  if (rojo) { c.fillStyle = `rgba(150, 20, 20, ${rojo * 0.6})`; c.fillRect(0, 0, 480, 270); }
 }
 
 // Fondo pintado de cada zona; si no cargó, el procedural
@@ -790,7 +805,7 @@ function grisDeEnemigo(e) {
 function iniciarPelea(ent, ids, entrada = 0.95) {
   const b = NUCLEO.iniciarBatalla(D, X.grupo, ids);
   const fx = ids.length === 1 ? [240] : ids.length === 2 ? [190, 290] : FX3;
-  for (const e of b.enemigos) { e.x = fx[e.i]; const propia = IMG_ENEMIGOS[e.imagen], lista = propia && propia.complete && propia.naturalWidth; const tam = lista ? propia.naturalWidth : e.jefe ? FTAM + 14 : FTAM; e.tam = tam; e.img = lista ? propia : spriteCanvas(SPRITES[e.sprite].p, tam, S.env, 1); e.golpeado = 0; e.luz = luzDeEnemigo(e); e.gris = grisDeEnemigo(e); e.icono = spriteCanvas(e.gris, LINEA.tam * 2, S.env, 1); }
+  for (const e of b.enemigos) { e.x = fx[e.i]; const propia = IMG_ENEMIGOS[e.imagen], lista = propia && propia.complete && propia.naturalWidth; const tam = lista ? propia.naturalWidth : e.jefe ? FTAM + 14 : FTAM; e.tam = tam; e.img = lista ? propia : spriteCanvas(SPRITES[e.sprite].p, tam, S.env, 1); e.golpeado = 0; e.luz = luzDeEnemigo(e); e.gris = grisDeEnemigo(e); e.icono = spriteCanvas(e.gris, e.tam, S.env, 1); }
   for (const u of b.aliados) u.golpeado = 0;
   Bt = { b, ent, fase: 'espera', sel: 0, tsel: 0, ops: [], msg: 'Te cierran el paso.', t: 0, gris: fondoBatalla(), fx: [], part: [], temblor: 0, destello: 0, golpe: 'tajo', ini: 0, entrada };
   S.mode = 'xbat';
@@ -1022,11 +1037,40 @@ function actualizarBotin(dt) {
   if (!queda && !Bt.listo) { Bt.listo = true; Bt.msg += ' · Enter para seguir'; pintarBatalla(); }
 }
 
+// Al salir la oscuridad se cierra sobre la pelea y se abre sobre el mapa, como al entrar pero al revés
+const SALIDA = { cierre: 0.42, negro: 0.12, apertura: 0.55 };
+let Sal = null;
 function salirDelBotin() {
+  Sal = { t: 0, abierto: false };
+  S.mode = 'xsal';
+  sfx('whoosh');
+  if (!LUZ.c) prepararLuz();
+}
+
+function actualizarSalida(dt) {
+  Sal.t += dt;
+  if (Bt) $('battle').style.opacity = 1 - clamp(Sal.t / (SALIDA.cierre * 0.7), 0, 1);
+  if (!Sal.abierto && Sal.t >= SALIDA.cierre + SALIDA.negro) { Sal.abierto = true; volverAlMapa(); S.mode = 'xsal'; }
+  if (Sal.t >= SALIDA.cierre + SALIDA.negro + SALIDA.apertura) { Sal = null; S.mode = 'explore'; seguirTrasPelea(); }
+}
+
+function dibujarSalida(c) {
+  const k = Sal.t < SALIDA.cierre + SALIDA.negro ? Sal.t / SALIDA.cierre : 1 - (Sal.t - SALIDA.cierre - SALIDA.negro) / SALIDA.apertura;
+  dibujarCierre(c, clamp(k, 0, 1), 0);
+}
+
+let trasPelea = null;
+function volverAlMapa() {
   const { ent } = Bt, jefe = ent.def.boss, piso = S.floor, caido = X.memoria.ultimoCaido;
   for (const u of X.grupo) delete u.reparto;
   cerrarPelea();
+  $('battle').style.opacity = '';
   updateHUD();
+  trasPelea = { jefe, piso, caido };
+}
+
+function seguirTrasPelea() {
+  const { jefe, piso, caido } = trasPelea;
   const muerte = caido && { quien: 'sombra', caras: ['risa'], lineas: [D.historia.modelos[caido.modelo].muerte.replace('{nombre}', caido.nombre)] };
   X.memoria.ultimoCaido = null;
   if (jefe && piso === LAST_FLOOR) return encadenar([muerte, 'jefe_3_muerto', revelar(4)], elegirPortador);
@@ -1316,7 +1360,7 @@ function dibujarLinea(c) {
   // lugar de Turno
   c.fillStyle = MARCO.fondo; c.fillRect(L.turno - 3, L.y - 3, L.tam + 6, L.tam + 6);
   c.strokeStyle = MARCO.luz; c.lineWidth = 1; c.strokeRect(L.turno - 2.5, L.y - 2.5, L.tam + 5, L.tam + 5);
-  c.font = '700 7px "Grenze Gotisch", serif'; c.textAlign = 'right'; c.fillStyle = MARCO.luz;
+  c.font = '700 8px "Grenze Gotisch", serif'; c.textAlign = 'right'; c.fillStyle = MARCO.luz;
   c.fillText('Turno', L.turno - 6, cy + 3);
   c.textAlign = 'left';
   // los que vuelven pasan por debajo de la fila
@@ -1325,7 +1369,7 @@ function dibujarLinea(c) {
     const x = Math.round(u.lx), y = L.y + Math.round(u.ly || 0);
     c.fillStyle = u === act ? MARCO.luz : u.enemigo ? MARCO.vida[0] : MARCO.piedra; c.fillRect(x - 1, y - 1, L.tam + 2, L.tam + 2);
     c.fillStyle = MARCO.fondo; c.fillRect(x, y, L.tam, L.tam);
-    c.drawImage(u.enemigo ? u.icono : retratoX(u.modelo, L.tam * 2), x, y, L.tam, L.tam);
+    c.drawImage(u.enemigo ? u.icono : retratoX(u.modelo, LADO_RETRATO), x, y, L.tam, L.tam);
   }
 }
 
@@ -1348,6 +1392,20 @@ function dibujarReparto(c, u, x, y) {
 // Cuánto emergió cada enemigo (0..1): entran de a uno
 const aparicion = e => clamp((Bt.ini - (0.1 + e.i * 0.14) * Bt.entrada) / (0.3 * Bt.entrada), 0, 1);
 
+// El aliado elegido como objetivo: el marco de su retrato late con esquinas de fuego
+function marcoApuntado(n, x, y) {
+  const p = 0.5 + 0.5 * Math.sin(Bt.t * 7), f = 1.5 + p * 1.5, l = 9, L = 46 + f * 2, x0 = x - f, y0 = y - f;
+  n.save();
+  n.strokeStyle = '#ffd27a'; n.shadowColor = '#ff9a3c'; n.shadowBlur = 8 + p * 14;
+  n.globalAlpha = 0.45 + p * 0.3; n.lineWidth = 0.75; n.strokeRect(x0, y0, L, L);
+  n.globalAlpha = 1; n.lineWidth = 1.5; n.beginPath();
+  for (const [cx, cy, sx, sy] of [[x0, y0, 1, 1], [x0 + L, y0, -1, 1], [x0, y0 + L, 1, -1], [x0 + L, y0 + L, -1, -1]]) {
+    n.moveTo(cx + sx * l, cy); n.lineTo(cx, cy); n.lineTo(cx, cy + sy * l);
+  }
+  n.stroke();
+  n.restore();
+}
+
 function dibujarBatalla(c) {
   const R = RAMPS[S.env], b = Bt.b, tm = SETTINGS.shake ? Bt.temblor : 0;
   const ex = Math.round((azarX() - 0.5) * tm), ey = Math.round((azarX() - 0.5) * tm);
@@ -1361,15 +1419,17 @@ function dibujarBatalla(c) {
     if ((Bt.fase === 'objetivo' && Bt.lista[Bt.tsel] === e) || b.actual === e) {
       // la flecha va sobre la cabeza real del sprite y el nombre arriba de ella
       const y = FBASE - e.tam + topeVisible(e) - 9;
-      c.font = '700 10px "Grenze Gotisch", serif'; c.textAlign = 'center';
-      c.fillStyle = '#000'; c.fillText(e.nombre, e.x + 1, y - 3);
-      c.fillStyle = R[5]; c.fillText(e.nombre, e.x, y - 4);
+      const n = capaNitida();
+      n.font = '700 11px "Grenze Gotisch", serif'; n.textAlign = 'center';
+      n.fillStyle = '#000'; n.fillText(e.nombre, e.x + 0.5, y - 3.5);
+      n.fillStyle = R[5]; n.fillText(e.nombre, e.x, y - 4);
+      c.fillStyle = R[5];
       if (Math.sin(Bt.t * 8) > -0.4) for (let k = 0; k < 5; k++) c.fillRect(e.x - 4 + k, y + k, 9 - k * 2, 1);
     }
   }
   dibujarFx(c);
   if (Bt.fase === 'menu' || Bt.fase === 'objetivo') dibujarMenu(c);
-  if (Bt.ini >= Bt.entrada * 0.8 && Bt.fase !== 'botin') dibujarLinea(c);
+  if (Bt.ini >= Bt.entrada * 0.8 && Bt.fase !== 'botin') dibujarLinea(capaNitida());
   // las tarjetas suben desde abajo
   const sube = 1 - clamp((Bt.ini - Bt.entrada * 0.45) / (Bt.entrada * 0.4), 0, 1), bajan = Math.round(sube * sube * 70);
   $('bCards').style.transform = bajan ? `translateY(${bajan}px)` : '';
@@ -1380,11 +1440,13 @@ function dibujarBatalla(c) {
     // retrato en su marco
     c.fillStyle = marcado ? MARCO.luz : MARCO.piedra; c.fillRect(x, y, 46, 46);
     c.fillStyle = MARCO.fondo; c.fillRect(x + 1, y + 1, 44, 44);
-    c.drawImage(retratoX(u.modelo, 44), x + 1, y + 1, 44, 44);
-    if (u.vida <= 0) ditherFill(c, x + 1, y + 1, 44, 44, 0.7, R[0]);
-    else if (u.golpeado > 0.12) ditherFill(c, x + 1, y + 1, 44, 44, 0.45, '#b52a2a');
+    const n = capaNitida();
+    n.drawImage(retratoX(u.modelo, LADO_RETRATO), x + 1, y + 1, 44, 44);
+    if (Bt.fase === 'objetivo' && Bt.lista[Bt.tsel] === u) marcoApuntado(n, x, y);
+    if (u.vida <= 0) ditherFill(n, x + 1, y + 1, 44, 44, 0.7, R[0]);
+    else if (u.golpeado > 0.12) ditherFill(n, x + 1, y + 1, 44, 44, 0.45, '#b52a2a');
     placa(c, x + 48 + (u.sacude ? Math.round(Math.sin(Bt.t * 70)) : 0), y + 12, CW - 48, 9, Math.max(0, u.vida) / u.vidaMax, MARCO.vida, marcado, Math.max(0, u.fantasma ?? u.vida) / u.vidaMax);
-    if (Bt.fase === 'botin' && u.reparto) dibujarReparto(c, u, x + 49, y + 24);
+    if (Bt.fase === 'botin' && u.reparto) dibujarReparto(n, u, x + 49, y + 24);
     else if (Bt.fase !== 'botin') for (let k = 0; k < NUCLEO.IMP_TOPE; k++) rombo(c, x + 50 + k * 10, y + 23, k < u.impetu);
   }
 }
@@ -1393,22 +1455,30 @@ function dibujarBatalla(c) {
 window.onAction = (act, pad) => {
   if (S.mode === 'xbat') return batallaAction(act);
   if (S.mode === 'xcharla') return charlaAction(act);
+  if (S.mode === 'xsal') return;
   if (S.mode === 'xtrans') { if (act === 'ok' && Tr) Tr.t = Math.max(Tr.t, Tr.cierre + Tr.negro); return; }
   return baseX.onAction(act, pad);
 };
 window.update = dt => {
   baseX.update(dt);
   if (S.mode === 'xtrans' && Tr) actualizarTransicion(dt);
+  if (S.mode === 'xsal' && Sal) actualizarSalida(dt);
   if (S.mode === 'xbat' && Bt) { Bt.t += dt; Bt.ini += dt; for (const u of Bt.b.unidades) u.golpeado = Math.max(0, (u.golpeado || 0) - dt); actualizarFx(dt); }
 };
 window.draw = () => {
+  limpiarCapa();
   if (S.mode === 'menu' && S.menuBg === 'hogar') { Object.assign($('stage').dataset, { mode: 'menu', bg: 'hogar' }); dibujarHogar(ctx); return; }
   marcoDelPiso();
-  if (S.mode === 'xbat' && Bt) { $('stage').dataset.mode = 'battle'; $('stage').dataset.bg = ''; dibujarBatalla(ctx); return; }
+  if ((S.mode === 'xbat' || S.mode === 'xsal') && Bt) {
+    $('stage').dataset.mode = 'battle'; $('stage').dataset.bg = ''; dibujarBatalla(ctx);
+    if (Sal) dibujarSalida(capaNitida());
+    return;
+  }
   // el base marca la antorcha baja con un recuadro en su panel, que acá no existe
   if (!ctx.strokeBase) { ctx.strokeBase = ctx.strokeRect; ctx.strokeRect = function (x, y, w, h) { if (x !== 343.5) this.strokeBase(x, y, w, h); }; }
   baseX.draw();
   if (S.mode === 'xcharla') dibujarCara(ctx);
-  if (['explore', 'fade', 'xcharla', 'xtrans'].includes(S.mode)) dibujarAntorcha(ctx);
+  if (['explore', 'fade', 'xcharla', 'xtrans', 'xsal'].includes(S.mode)) dibujarAntorcha(ctx);
   if (S.mode === 'xtrans' && Tr) dibujarCierre(ctx);
+  if (S.mode === 'xsal' && Sal) { $('stage').dataset.mode = 'explore'; dibujarSalida(capaNitida()); }
 };
