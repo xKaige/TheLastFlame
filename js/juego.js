@@ -1741,7 +1741,7 @@ const ICONOS = {
   quemadura: ['...#...', '..##...', '..###..', '.#####.', '.##.##.', '.#####.', '..###..'],
   sangrado: ['...#...', '...#...', '..###..', '.#####.', '.#####.', '.#####.', '..###..'],
   aturdido: ['..#....', '.###.#.', '..#.###', '.....#.', '.#.....', '###....', '.#.....'],
-  presa: ['..###..', '.#.#.#.', '#..#..#', '#######', '#..#..#', '.#.#.#.', '..###..'],
+  presa: ['....#....', '..#####..', '.#..#..#.', '.#.....#.', '###.#.###', '.#.....#.', '.#..#..#.', '..#####..', '....#....'],
   debil: ['..###..', '..###..', '..###..', '#######', '.#####.', '..###..', '...#...'],
   bonus: ['...#...', '..###..', '.#####.', '#######', '..###..', '..###..', '..###..'],
 };
@@ -1749,9 +1749,9 @@ const ICONOS = {
 const ICONO_URL = {};
 function iconoEstado(tipo) {
   if (!ICONO_URL[tipo]) {
-    const c = document.createElement('canvas'); c.width = c.height = 7;
+    const c = document.createElement('canvas'); c.width = c.height = ICONOS[tipo].length;
     const g = c.getContext('2d'); g.fillStyle = COLOR_ESTADO[tipo][2];
-    ICONOS[tipo].forEach((f, j) => { for (let i = 0; i < 7; i++) if (f[i] === '#') g.fillRect(i, j, 1, 1); });
+    ICONOS[tipo].forEach((f, j) => { for (let i = 0; i < f.length; i++) if (f[i] === '#') g.fillRect(i, j, 1, 1); });
     ICONO_URL[tipo] = c.toDataURL();
   }
   return `<img class="ipix" src="${ICONO_URL[tipo]}" alt="">`;
