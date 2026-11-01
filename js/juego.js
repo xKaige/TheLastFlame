@@ -1186,13 +1186,18 @@ function grisDeEnemigo(e) {
   return g;
 }
 
+function prepararEnemigo(e) {
+  const propia = IMG_ENEMIGOS[e.imagen], lista = propia && propia.complete && propia.naturalWidth, tam = lista ? D.enemigos[e.tipo].tam_batalla || propia.naturalWidth : e.jefe ? FTAM + 14 : FTAM;
+  e.tam = tam; e.img = lista ? propia : spriteCanvas(SPRITES[e.sprite].p, tam, S.env, 1); e.golpeado = 0; e.luz = luzDeEnemigo(e); e.gris = grisDeEnemigo(e); e.icono = spriteCanvas(e.gris, e.tam, S.env, 1); prepararPoses(e);
+}
+
 function iniciarPelea(ent, ids, entrada = 0.95, emboscada = false) {
   const b = NUCLEO.iniciarBatalla(D, X.grupo, ids, emboscada);
   if (S.flags.impetu) { for (const u of b.aliados) u.impetu = Math.min(NUCLEO.IMP_TOPE, u.impetu + S.flags.impetu); delete S.flags.impetu; }
   const fx = ids.length === 1 ? [240] : ids.length === 2 ? [190, 290] : ids.some(id => D.enemigos[id].tam_batalla) ? [92, 240, 388] : FX3;   // un jefe grande necesita lugar
-  for (const e of b.enemigos) { e.x = fx[e.i]; const propia = IMG_ENEMIGOS[e.imagen], lista = propia && propia.complete && propia.naturalWidth; const tam = lista ? D.enemigos[e.tipo].tam_batalla || propia.naturalWidth : e.jefe ? FTAM + 14 : FTAM; e.tam = tam; e.img = lista ? propia : spriteCanvas(SPRITES[e.sprite].p, tam, S.env, 1); e.golpeado = 0; e.luz = luzDeEnemigo(e); e.gris = grisDeEnemigo(e); e.icono = spriteCanvas(e.gris, e.tam, S.env, 1); prepararPoses(e); }
+  for (const e of b.enemigos) { e.x = fx[e.i]; prepararEnemigo(e); }
   for (const u of b.aliados) u.golpeado = 0;
-  Bt = { b, ent, fase: 'espera', sel: 0, tsel: 0, ops: [], msg: 'Te cierran el paso.', t: 0, gris: fondoBatalla(), fx: [], fxHab: [], part: [], temblor: 0, destello: 0, golpe: 'tajo', ini: 0, entrada };
+  Bt = { b, lugares: fx, ent, fase: 'espera', sel: 0, tsel: 0, ops: [], msg: 'Te cierran el paso.', t: 0, gris: fondoBatalla(), fx: [], fxHab: [], part: [], temblor: 0, destello: 0, golpe: 'tajo', ini: 0, entrada };
   S.mode = 'xbat';
   $('battle').classList.remove('hidden');
   $('bMenu').classList.add('hidden');
@@ -1206,13 +1211,14 @@ function siguiente() {
   if (!Bt) return;
   const r = NUCLEO.haTerminado(Bt.b);
   if (r) return terminarPelea(r === 'victoria');
-  const { unidad: u, eventos } = NUCLEO.proximoTurno(Bt.b);
+  const { unidad: u, eventos, pierde } = NUCLEO.proximoTurno(Bt.b);
   mostrar(eventos);
+  if (pierde) { pintarBatalla(); return later(1000, siguiente); }
   if (u.vida <= 0) return later(500, siguiente);
   if (u.enemigo) {
     Bt.fase = 'espera'; Bt.msg = ''; pintarBatalla();
     iniciarAtaqueAnimado(u);
-    later(600, () => { if (Bt) { mostrar(NUCLEO.turnoEnemigo(Bt.b, u, azarX)); later(450, () => { if (Bt) Bt.fase = 'cambio'; }); later(800, siguiente); } });
+    later(600, () => { if (Bt) { mostrar(NUCLEO.turnoEnemigo(D, Bt.b, u, azarX)); later(450, () => { if (Bt) Bt.fase = 'cambio'; }); later(800, siguiente); } });
   } else {
     Bt.ops = [{ id: 'atk', nombre: tr('Atacar'), descripcion: tr(D.clases[u.clase].doble_golpe ? 'Dos golpes: el segundo, más flojo. +1 Ímpetu.' : 'Golpe común. +1 Ímpetu.'), objetivo: 'enemigo' },
       { id: 'def', nombre: tr('Defender'), descripcion: tr('Mitad de daño hasta tu próximo turno. +1 Ímpetu.') },
@@ -1250,7 +1256,8 @@ function mostrarEvento(e) {
     Bt.msg = q.enemigo ? tr('{0} cae.', q.nombre) : tr('{0} cae. Su chispa se apaga.', q.nombre);
     if (q.enemigo) { q.muriendo = 0.6; chispas(q.x, FBASE - q.tam * 0.45, 24, [RAMPS[S.env][2], RAMPS[S.env][3], RAMPS[S.env][4]], -18); }
   }
-  if (e.tipo === 'fase') { Bt.msg = tr('{0} se enfurece y se cubre de escudos.', q.nombre); Bt.temblor = 6; Bt.destello = 0.5; sfx('encounter'); chispas(q.x, FBASE - q.tam * 0.5, 30, VIDA_ESCUDO, -24); }
+  if (e.tipo === 'invoca') { for (const n of e.nuevos) { n.x = Bt.lugares[n.i]; prepararEnemigo(n); chispas(n.x, FBASE - 24, 18, MARCO.vida, -24); } sfx('encounter'); Bt.temblor = 4; }
+  if (e.tipo === 'fase') { Bt.msg = tr(q.fase.mensaje || '{0} se enfurece y se cubre de escudos.', q.nombre); Bt.temblor = 6; Bt.destello = 0.5; sfx('encounter'); chispas(q.x, FBASE - q.tam * 0.5, 30, VIDA_ESCUDO, -24); }
   if (e.tipo === 'escudo') {
     q.golpeado = 0.2; sfx(e.quedan ? 'miss' : 'chest');
     chispas(q.x, FBASE - q.tam * 0.45, e.quedan ? 10 : 34, VIDA_ESCUDO, -30);
@@ -1262,6 +1269,8 @@ function mostrarEvento(e) {
   if (e.tipo === 'texto' && e.clave === 'jefe_resiste') Bt.msg = tr('{0} ni se inmuta.', q.nombre);
   if (e.tipo === 'texto' && e.clave === 'resiste') Bt.msg = tr('{0} ya tiene ese efecto: no se renueva.', q.nombre);
   if (e.tipo === 'texto' && e.clave === 'especial') { Bt.msg = `${q.nombre} ${e.texto}.`; Bt.temblor = 5; Bt.destello = 0.5; }
+  if (e.tipo === 'texto' && e.clave === 'enganchado') Bt.msg = tr('{0} queda enganchado y pierde su próximo turno.', q.nombre);
+  if (e.tipo === 'texto' && e.clave === 'presa') Bt.msg = tr('{0} es la presa: lo persiguen y le pegan más fuerte.', q.nombre);
   if (e.tipo === 'texto' && e.clave === 'roba') Bt.msg = tr('El Soplo le roba Ímpetu a {0}.', q.nombre);
 }
 
@@ -1622,7 +1631,7 @@ function rombo(c, x, y, lleno) {
 // Fila de estados: lo que afecta a cada personaje ahora
 function estadosDe(q) {
   const on = [q.guardia && ['escudo', icon('shield'), 'En guardia'], q.provoca > 0 && ['ira', icon('cross'), 'Provocando'],
-    q.defensaExtra > 0 && ['mas', '▲', `Defensa +${q.defensaExtra}`], q.marcado && ['marca', icon('ash'), 'Marcado']].filter(Boolean);
+    q.defensaExtra > 0 && ['mas', '▲', `Defensa +${q.defensaExtra}`], q.marcado && ['marca', icon('ash'), 'Marcado'], q.presa > 0 && ['ira', '◎', 'Presa'], q.enganchado && ['ira', '▼', 'Enganchado']].filter(Boolean);
   return Array.from({ length: 4 }, (_, i) => (on[i] ? `<i class="${on[i][0]}" title="${on[i][2]}">${on[i][1]}</i>` : '<i></i>')).join('');
 }
 

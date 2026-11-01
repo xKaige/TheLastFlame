@@ -10,9 +10,9 @@ function pelear(grupo, ids) {
   const b = N.iniciarBatalla(D, grupo, ids);
   let turnos = 0, r;
   while (!(r = N.haTerminado(b)) && turnos++ < 400) {
-    const { unidad: u } = N.proximoTurno(b);
-    if (N.haTerminado(b) || u.vida <= 0) continue;
-    if (u.enemigo) { N.turnoEnemigo(b, u, azar); continue; }
+    const { unidad: u, pierde } = N.proximoTurno(b);
+    if (N.haTerminado(b) || u.vida <= 0 || pierde) continue;
+    if (u.enemigo) { N.turnoEnemigo(D, b, u, azar); continue; }
     const rivales = N.vivos(b.enemigos), mas = rivales.slice().sort((x, y) => x.vida - y.vida)[0];
     const herido = N.vivos(b.aliados).slice().sort((x, y) => x.vida / x.vidaMax - y.vida / y.vidaMax)[0];
     const op = N.opciones(D, u).filter(o => !o.apagada);

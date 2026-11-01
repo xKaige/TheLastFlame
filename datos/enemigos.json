@@ -1639,6 +1639,47 @@
           }
         }
       ]
+    },
+    "ojos": [
+      [
+        69,
+        22
+      ],
+      [
+        77,
+        22
+      ]
+    ],
+    "fase": {
+      "umbral": 0.5,
+      "escudos": 0,
+      "velocidad": 1.2,
+      "dano": 1.1,
+      "mensaje": "{0} se enfurece y olfatea la sangre.",
+      "ciclo": [
+        "jauria",
+        "gancho",
+        "presa",
+        "especial",
+        "golpe"
+      ],
+      "jauria": {
+        "nombre": "silba y la jauría acude",
+        "enemigo": "perro",
+        "cantidad": 2
+      },
+      "gancho": {
+        "nombre": "lanza su cadena",
+        "dano": [
+          8,
+          12
+        ]
+      },
+      "presa": {
+        "nombre": "elige a su presa",
+        "turnos": 2,
+        "dano": 1.5
+      }
     }
   },
   "habitante": {
@@ -1659,6 +1700,112 @@
       "dano": [
         12,
         17
+      ]
+    }
+  },
+  "perro": {
+    "nombre": "Perro Gris",
+    "sprite": "lurker",
+    "imagen": "acechador",
+    "vida": 28,
+    "ataque": [
+      6,
+      9
+    ],
+    "defensa": 1,
+    "velocidad": 11,
+    "exp": 2,
+    "animacion": {
+      "base": 136,
+      "cintura": 108,
+      "pies": 108,
+      "partes": [
+        {
+          "nombre": "cabeza",
+          "rects": [
+            [
+              18,
+              78,
+              42,
+              112
+            ]
+          ],
+          "pivote": [
+            42,
+            92
+          ],
+          "tapar": true
+        }
+      ],
+      "reposo": {
+        "pecho": 1,
+        "partes": {
+          "cabeza": {
+            "giro": 0.05
+          }
+        }
+      },
+      "ataque": [
+        {
+          "cabeza": {
+            "giro": 0.052,
+            "y": -0.7
+          },
+          "pecho": 0.7,
+          "todo": {
+            "x": 1.75
+          }
+        },
+        {
+          "cabeza": {
+            "giro": 0.105,
+            "y": -1.4
+          },
+          "pecho": 1.4,
+          "todo": {
+            "x": 3.5
+          }
+        },
+        {
+          "cabeza": {
+            "giro": 0.15,
+            "y": -2
+          },
+          "pecho": 2,
+          "todo": {
+            "x": 5
+          }
+        },
+        {
+          "cabeza": {
+            "giro": -0.084,
+            "x": -2.8
+          },
+          "pecho": -1.05,
+          "todo": {
+            "x": -7.0
+          }
+        },
+        {
+          "cabeza": {
+            "giro": -0.12,
+            "x": -4
+          },
+          "pecho": -1.5,
+          "todo": {
+            "x": -10
+          }
+        },
+        {
+          "cabeza": {
+            "giro": -0.048,
+            "x": -1.6
+          },
+          "pecho": -0.6,
+          "todo": {
+            "x": -4.0
+          }
+        }
       ]
     }
   }
