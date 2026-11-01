@@ -238,10 +238,10 @@
     "crypt": {
       "archivo": "assets/musica/exploracion_cripta.ogg",
       "bucle": [
-        16,
-        128
+        39.156,
+        115.375
       ],
-      "volumen": 0.15
+      "volumen": 0.13
     },
     "pelea": {
       "archivo": "assets/musica/pelea_comun.ogg",
