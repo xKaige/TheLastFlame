@@ -1552,8 +1552,8 @@ function pintarBatalla() {
   pintarAyuda(ver);
   if (ver) {
     const opcion = (o, i) => `<div class="bopt${i === Bt.sel ? ' sel' : ''}${o.apagada ? ' off' : ''}">${o.nombre}${o.costo ? ` <span>${'◆'.repeat(o.costo)}</span>` : ''}</div>`;
-    const fila = (d, h) => `<div class="bopts">${Bt.ops.map(opcion).slice(d, h).join('')}</div>`;
-    m.innerHTML = `<div class="bpista">${glyph('inv')} ${tr(ayudaBatalla ? 'Ocultar detalle' : 'Detalle')}</div>${fila(0, ACCIONES_BASE)}${fila(ACCIONES_BASE)}`;
+    const fila = (d, h, cls = '') => `<div class="bopts ${cls}">${Bt.ops.map(opcion).slice(d, h).join('')}</div>`;
+    m.innerHTML = `<div class="bpista">${glyph('inv')} ${tr(ayudaBatalla ? 'Ocultar detalle' : 'Detalle')}</div>${fila(0, ACCIONES_BASE)}${fila(ACCIONES_BASE, undefined, 'hab')}`;
     // el canvas dibuja velas y llamas en la posición real de cada palabra
     Bt.menuX = [...m.querySelectorAll('.bopt')].map(e => ({ x: m.offsetLeft + e.offsetLeft, y: m.offsetTop + e.offsetTop, w: e.offsetWidth }));
   }

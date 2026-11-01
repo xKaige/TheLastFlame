@@ -66,9 +66,9 @@
 #xBanner.hidden { display: none; }
 
 /* menú de acciones: sólo palabras, juntas; la llama del elegido se dibuja en el canvas */
-#bMenu { top: 186px; height: 26px; left: 16px; right: 16px; width: auto; background: none; box-shadow: none; padding: 0; }
-#bMenu .bopts { gap: 1px; align-items: flex-start; }
-#bMenu .bopt { display: flex; gap: 2px; align-items: center; padding: 0 3px 0 7px; font-size: 10px; line-height: 12px; color: var(--c4); background: none; text-shadow: 0 1px 0 #000, 0 0 3px #000; }
+#bMenu { top: 184px; height: 30px; left: 16px; right: 16px; width: auto; background: none; box-shadow: none; padding: 0; }
+#bMenu .bopts { gap: 6px; align-items: flex-start; }
+#bMenu .bopt { display: flex; flex-direction: column; align-items: center; padding: 0 3px 0 7px; font-size: 10px; line-height: 12px; color: var(--c4); background: none; text-shadow: 0 1px 0 #000, 0 0 3px #000; }
 #bMenu .bopt.sel { background: none; color: var(--c5); font-family: var(--f-title); font-weight: 700; }
 #bMenu .bpista { position: absolute; right: 0; top: -12px; font-size: 7.5px; color: var(--c4); text-shadow: 0 1px 0 #000, 0 0 3px #000; }
 #bAyuda { position: absolute; left: 110px; right: 110px; bottom: 90px; padding: 3px 6px 4px; text-align: center; background: rgba(0, 0, 0, 0.88); box-shadow: 0 0 0 0.5px var(--c3); }
@@ -76,7 +76,9 @@
 #bAyuda b { display: block; font-size: 10px; line-height: 12px; color: var(--c5); }
 #bAyuda p { margin: 0; font-size: 8.5px; line-height: 11px; color: var(--c4); }
 #bAyuda em { display: block; font-style: normal; font-size: 7.5px; line-height: 10px; color: var(--c5); }
-#bMenu .bopt span, #bMenu .bopt.sel span { color: var(--c4); line-height: 12px; font-size: 5.5px; }
+#bMenu .bopt span, #bMenu .bopt.sel span { color: var(--c4); line-height: 6px; font-size: 5.5px; }
+#bMenu .hab .bopt, #bMenu .hab .bopt span { color: #ee9a3a; }
+#bMenu .hab .bopt.sel, #bMenu .hab .bopt.sel span { color: #ffd27a; }
 #bMenu .bopt.off { opacity: 0.6; }
 
 /* números de daño por estado */
