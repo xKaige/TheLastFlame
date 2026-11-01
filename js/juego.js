@@ -1055,7 +1055,6 @@ function efecto(o) {
 
 // ---------- Batalla ----------
 // tarjetas flotantes: separadas entre sí y del borde inferior
-const MENU_Y = 191;
 const CX = [10, 128, 246, 364], CY = 216, CW = 106, FX3 = [145, 240, 335], FBASE = 168, FTAM = 74;
 let Bt = null;
 // Se pelea contra el enemigo del mapa: va en el centro y los demás del grupo son los que lo acompañan.
@@ -1186,9 +1185,9 @@ function siguiente() {
     later(600, () => { if (Bt) { mostrar(NUCLEO.turnoEnemigo(Bt.b, u, azarX)); later(450, () => { if (Bt) Bt.fase = 'cambio'; }); later(800, siguiente); } });
   } else {
     Bt.ops = [{ id: 'atk', nombre: tr('Atacar'), descripcion: tr(D.clases[u.clase].doble_golpe ? 'Dos golpes: el segundo, más flojo. +1 Ímpetu.' : 'Golpe común. +1 Ímpetu.'), objetivo: 'enemigo' },
-      ...NUCLEO.opciones(D, u),
       { id: 'def', nombre: tr('Defender'), descripcion: tr('Mitad de daño hasta tu próximo turno. +1 Ímpetu.') },
-      { id: 'pot', nombre: tr('Poción'), descripcion: tr('Cura un 40% al aliado más herido. Quedan {0}.', P.potions), apagada: !P.potions }];
+      { id: 'pot', nombre: tr('Poción'), descripcion: tr('Cura un 40% al aliado más herido. Quedan {0}.', P.potions), apagada: !P.potions },
+      ...NUCLEO.opciones(D, u)];
     Bt.sel = 0; Bt.fase = 'menu'; Bt.msg = ''; pintarBatalla();
   }
 }
@@ -1323,6 +1322,8 @@ function pintarAyuda(ver) {
   a.innerHTML = `<b>${o.nombre}</b><p>${o.descripcion}</p>${costo ? `<em>${costo}${falta}</em>` : ''}`;
 }
 
+// Arriba Atacar, Defender y Poción; abajo las habilidades
+const ACCIONES_BASE = 3;
 function batallaAction(act) {
   if (!Bt) return;
   if (Bt.fase === 'botin') {
@@ -1335,9 +1336,12 @@ function batallaAction(act) {
   if (act === 'inv' && (Bt.fase === 'menu' || Bt.fase === 'objetivo')) { ayudaBatalla = !ayudaBatalla; sfx('select'); pintarBatalla(); return; }
   if (Bt.fase === 'menu') {
     const n = Bt.ops.length;
-    if (act === 'fwd' || act === 'turnL' || act === 'strafeL') { Bt.sel = (Bt.sel + n - 1) % n; sfx('select'); }
-    else if (act === 'back' || act === 'turnR' || act === 'strafeR') { Bt.sel = (Bt.sel + 1) % n; sfx('select'); }
-    else if (act === 'ok') {
+    if (act === 'turnL' || act === 'strafeL') { Bt.sel = (Bt.sel + n - 1) % n; sfx('select'); }
+    else if (act === 'turnR' || act === 'strafeR') { Bt.sel = (Bt.sel + 1) % n; sfx('select'); }
+    else if (act === 'fwd' || act === 'back') {
+      // arriba y abajo cambian de fila, en la misma columna si existe
+      if (n > ACCIONES_BASE) { Bt.sel = Bt.sel < ACCIONES_BASE ? Math.min(ACCIONES_BASE + Bt.sel, n - 1) : Math.min(Bt.sel - ACCIONES_BASE, ACCIONES_BASE - 1); sfx('select'); }
+    } else if (act === 'ok') {
       const o = Bt.ops[Bt.sel];
       if (o.apagada) { sfx('bump'); return; }
       if (o.objetivo === 'enemigo' || o.objetivo === 'aliado') { Bt.fase = 'objetivo'; Bt.lista = NUCLEO.vivos(o.objetivo === 'enemigo' ? b.enemigos : b.aliados); Bt.tsel = 0; sfx('select'); }
@@ -1547,9 +1551,11 @@ function pintarBatalla() {
   m.classList.toggle('hidden', !ver);
   pintarAyuda(ver);
   if (ver) {
-    m.innerHTML = `<div class="bpista">${glyph('inv')} ${tr(ayudaBatalla ? 'Ocultar detalle' : 'Detalle')}</div><div class="bopts">${Bt.ops.map((o, i) => `<div class="bopt${i === Bt.sel ? ' sel' : ''}${o.apagada ? ' off' : ''}">${o.nombre}${o.costo ? ` <span>${'◆'.repeat(o.costo)}</span>` : ''}</div>`).join('')}</div>`;
+    const opcion = (o, i) => `<div class="bopt${i === Bt.sel ? ' sel' : ''}${o.apagada ? ' off' : ''}">${o.nombre}${o.costo ? ` <span>${'◆'.repeat(o.costo)}</span>` : ''}</div>`;
+    const fila = (d, h) => `<div class="bopts">${Bt.ops.map(opcion).slice(d, h).join('')}</div>`;
+    m.innerHTML = `<div class="bpista">${glyph('inv')} ${tr(ayudaBatalla ? 'Ocultar detalle' : 'Detalle')}</div>${fila(0, ACCIONES_BASE)}${fila(ACCIONES_BASE)}`;
     // el canvas dibuja velas y llamas en la posición real de cada palabra
-    Bt.menuX = [...m.querySelectorAll('.bopt')].map(e => ({ x: m.offsetLeft + e.parentNode.offsetLeft + e.offsetLeft, w: e.offsetWidth }));
+    Bt.menuX = [...m.querySelectorAll('.bopt')].map(e => ({ x: m.offsetLeft + e.offsetLeft, y: m.offsetTop + e.offsetTop, w: e.offsetWidth }));
   }
 }
 
@@ -1679,7 +1685,7 @@ function dibujarParticulas(c) {
 // Sólo palabras sobre la oscuridad; una llama marca la acción elegida.
 function dibujarMenu(c) {
   const p = (Bt.menuX || [])[Bt.sel];
-  if (p) drawFlame(c, p.x - 2, MENU_Y + 11, 11, 15, Bt.t, 0.9, 'fuegoX');
+  if (p) drawFlame(c, p.x - 2, p.y + 11, 10, 12, Bt.t, 0.9, 'fuegoX');
 }
 
 // ---------- Vida y estados de los enemigos ----------
