@@ -24,7 +24,7 @@
   },
   "exp_por_nivel": 10,
   "zonas": {
-    "pisos": 3,
+    "pisos": 1,
     "nivel_maximo": 10
   },
   "mejora_nivel": {

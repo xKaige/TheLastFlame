@@ -2,7 +2,7 @@
 
 El camino del juego es la expedición de grupo. El plan del juego anterior está en `juego_viejo/ROADMAP.md`.
 
-**Versión actual: 0.3.34.** Lo próximo: 0.4.0.
+**Versión actual: 0.3.35.** Lo próximo: 0.4.0.
 
 ## Cómo se numeran las versiones
 
@@ -28,15 +28,26 @@ Cada parche sube la versión en `package.json` y en `index.html`, y se anota ac�
 - Eventos propios.
 - Animar a su jefe cuando tenga el dibujo definitivo.
 
-### 0.6.0: Idiomas
+### 0.6.0: Runas
+
+- Traer al grupo las runas del juego anterior (`juego_viejo/js/runes.js`: 8 runas, 2 ranuras y una tercera tras vencer a un jefe).
+- Son la base de la rejugabilidad: entran antes que los pisos nuevos para que cada uno pueda sumar las suyas.
+
+### 0.7.0 a 0.12.0: Pisos 4 a 9
+
+- Un piso por versión, con arte y música propios, hechos como los anteriores.
+- El contenido y los nombres de cada piso se definen cuando llegue su turno.
+
+### 0.13.0: Idiomas
 
 - Completar el inglés (`node tools/textos_faltantes.js en`).
 - Sumar los demás idiomas que se elijan.
 
-### 0.7.0: Pulido final
+### 0.14.0: Pulido final
 
 - Quitar del motor lo que quedó sin uso (combate, creación de personaje, partidas del juego anterior).
 - Balance de toda la expedición, de punta a punta.
+- Rejugabilidad.
 
 ### 1.0.0: Publicación
 
@@ -45,7 +56,8 @@ Cada parche sube la versión en `package.json` y en `index.html`, y se anota ac�
 ## Reglas decididas
 
 - **Orden de trabajo:** primero se termina el piso 1, después se remodela el piso 2 y recién entonces el resto.
-- **Zonas:** cada 3 pisos son una zona, con nivel máximo 10, 20, 30... (`zonas` en `datos/mazmorra.json`). En un piso de una zona ya superada el personaje no gana experiencia.
+- **Extensión:** el juego tiene 9 pisos. Una expedición completa dura de 3 a 4 horas, unos 20 a 25 minutos por piso, y se puede guardar entre piso y piso.
+- **Nivel máximo:** cada piso sube el tope 10 niveles: 10, 20, 30... hasta 90 en el piso 9 (`zonas` en `datos/mazmorra.json`). En un piso ya superado el personaje no gana experiencia.
 - **Continuar:** la expedición se guarda sola explorando, nunca en medio de una pelea. Morir no se deshace cerrando el juego.
 - **Botín:** los objetos raros (✦) salen el 20% de las veces, y el 70% si los suelta un jefe (`botin` en `datos/mazmorra.json`).
 - **Personajes:** no hay protagonistas fijos. Son al azar, se conocen entre sí, y la historia importante está en notas por la mazmorra.
@@ -56,6 +68,11 @@ Cada parche sube la versión en `package.json` y en `index.html`, y se anota ac�
 - **Título:** el logo "The Last Flame" no cambia con el idioma.
 
 ## Historial
+
+### 0.3.35
+
+- El nivel máximo sube 10 por piso, rumbo a 90 en el piso 9.
+- El roadmap pasa a 9 pisos y suma las runas.
 
 ### 0.3.34
 
