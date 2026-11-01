@@ -2,7 +2,7 @@
 
 El camino del juego es la expedición de grupo. El plan del juego anterior está en `juego_viejo/ROADMAP.md`.
 
-**Versión actual: 0.3.5.** Lo próximo: 0.3.6.
+**Versión actual: 0.3.6.** Lo próximo: 0.3.7.
 
 ## Cómo se numeran las versiones
 
@@ -14,10 +14,8 @@ Cada parche sube la versión en `package.json` y en `index.html`, y se anota ac�
 
 ## Próximas versiones
 
-### 0.3.6: Archivos pendientes del piso 1
+### 0.3.7: Archivos pendientes del piso 1
 
-- Velas sobre la calavera: reemplazar el dibujo viejo.
-- Sprite de la nota: reemplazar el provisorio.
 - Música de exploración, cuando esté el archivo.
 - Retratos: conseguir los PNG originales sin marco.
 
@@ -62,6 +60,10 @@ Cada parche sube la versión en `package.json` y en `index.html`, y se anota ac�
 - **Título:** el logo "The Last Flame" no cambia con el idioma.
 
 ## Historial
+
+### 0.3.6
+
+- Dibujos nuevos para las velas sobre la calavera y para las notas.
 
 ### 0.3.5
 

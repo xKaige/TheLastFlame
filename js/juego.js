@@ -674,9 +674,12 @@ for (const [id, ev] of Object.entries(D.eventos)) {
   ev.imgMapa = Object.assign(new Image(), { src: `interfaz/${ev.mapa}.png` });
   EVENTS[id] = { spr: `ev_${id}`, sprDone: `ev_${id}`, scale: ev.escala, glow: 0.7, doneText: '', title: '', text: '', choices: [] };
 }
-for (const n of D.notas) EVENTS[`nota_${n.id}`] = { spr: 'ev_nota', sprDone: 'ev_nota', scale: 0.42, glow: 0.5, doneText: '', title: '', text: '', choices: [] };
+for (const n of D.notas) EVENTS[`nota_${n.id}`] = { spr: 'ev_nota', sprDone: 'ev_nota', scale: 0.6, glow: 0.5, doneText: '', title: '', text: '', choices: [] };
 const IMG_NOTA = Object.assign(new Image(), { src: 'interfaz/mazmorra/cripta/accesorios/nota.png' });
+const IMG_VELAS = Object.assign(new Image(), { src: 'interfaz/mazmorra/cripta/accesorios/velas_calavera.png' });
 function prepararEventos() {
+  // las velas del juego base usan el dibujo nuevo, que no se anima por cuadros: la luz ya titila
+  if (SPRITES.candles.frames && IMG_VELAS.complete && IMG_VELAS.naturalWidth) { SPRITES.candles.w = spriteDesdeImagen(IMG_VELAS, IMG_VELAS.naturalWidth); delete SPRITES.candles.frames; }
   if (!SPRITES.ev_nota && IMG_NOTA.complete && IMG_NOTA.naturalWidth) SPRITES.ev_nota = { w: spriteDesdeImagen(IMG_NOTA, IMG_NOTA.naturalWidth) };
   for (const [id, ev] of Object.entries(D.eventos)) {
     if (!SPRITES[`ev_${id}`] && ev.imgMapa.complete && ev.imgMapa.naturalWidth) SPRITES[`ev_${id}`] = { w: spriteDesdeImagen(ev.imgMapa, ev.imgMapa.naturalWidth) };
