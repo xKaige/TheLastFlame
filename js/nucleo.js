@@ -127,9 +127,9 @@ const NUCLEO = (() => {
 
   // ---------- Batalla ----------
   const crearEnemigo = (D, id, i, fuerza, nombre) => {
-    const d = D.enemigos[id];
-    return { enemigo: true, tipo: id, i, nombre, sprite: d.sprite, imagen: d.imagen || null, vida: Math.round(d.vida * fuerza), vidaMax: Math.round(d.vida * fuerza),
-      golpe: d.ataque, defensa: d.defensa, velocidad: d.velocidad, critico: 0.05, esquiva: 0, exp: d.exp, jefe: !!d.jefe, especial: d.especial || null, robaImpetu: !!d.roba_impetu, turnos: 0, estados: [], fase: d.fase || null, escudos: 0, enfurecido: false, pasoFase: 0, habilidades: d.habilidades || [], resisteFisico: d.resiste_fisico || 0, alMorir: d.al_morir || null };
+    const d = D.enemigos[id], dif = D.mazmorra.dificultad, vida = Math.round(d.vida * fuerza * dif.vida);
+    return { enemigo: true, tipo: id, i, nombre, sprite: d.sprite, imagen: d.imagen || null, vida, vidaMax: vida,
+      golpe: d.ataque.map(n => Math.round(n * dif.dano)), defensa: d.defensa, velocidad: d.velocidad, critico: 0.05, esquiva: 0, exp: d.exp, jefe: !!d.jefe, especial: d.especial || null, robaImpetu: !!d.roba_impetu, turnos: 0, estados: [], fase: d.fase || null, escudos: 0, enfurecido: false, pasoFase: 0, habilidades: d.habilidades || [], resisteFisico: d.resiste_fisico || 0, alMorir: d.al_morir || null };
   };
 
   function iniciarBatalla(D, grupo, ids, emboscada = false) {

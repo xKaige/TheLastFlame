@@ -22,6 +22,10 @@
   "charlas": {
     "prob": 0.5
   },
+  "dificultad": {
+    "vida": 1.1,
+    "dano": 1.1
+  },
   "exp_por_nivel": 10,
   "zonas": {
     "pisos": 1,
