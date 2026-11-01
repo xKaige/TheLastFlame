@@ -816,7 +816,7 @@ function cerrarEvento() {
   S.mode = 'explore';
   if (res.efectos.some(f => f.tipo === 'emboscada')) {
     // lo que estaba ahí pasa a ser el enemigo: al ganar se lo saca del mapa como a cualquier otro
-    Object.assign(e, { type: 'enemy', kind: 'rata', def: ENEMIES.rata, hp: 1, maxhp: 1, aware: true, stun: 0 });
+    Object.assign(e, { type: 'enemy', kind: 'rata', def: ENEMIES.rata, hp: 1, maxhp: 1, aware: true, stun: 0, sorpresa: true });
     return startCombat(e, true);
   }
   ents.splice(ents.indexOf(e), 1);
@@ -1058,12 +1058,23 @@ function efecto(o) {
 const MENU_Y = 191;
 const CX = [10, 128, 246, 364], CY = 216, CW = 106, FX3 = [145, 240, 335], FBASE = 168, FTAM = 74;
 let Bt = null;
+// Se pelea contra el enemigo del mapa: va en el centro y los demás del grupo son los que lo acompañan.
+// Si ningún grupo del piso lo incluye, ocupa el centro de uno cualquiera.
+function grupoDeEnemigo(e) {
+  const azar = l => l[Math.floor(azarX() * l.length)], grupos = D.mazmorra.grupos_por_piso[S.floor];
+  if (e.sorpresa) return azar(grupos);       // lo que salta de un evento no se había visto en el mapa
+  const id = Object.keys(D.enemigos).find(k => D.enemigos[k].sprite === e.def.spr), propios = grupos.filter(g => g.includes(id));
+  const ids = azar(propios.length ? propios : grupos).slice(), i = ids.indexOf(id), centro = (ids.length - 1) >> 1;
+  if (i >= 0) [ids[i], ids[centro]] = [ids[centro], ids[i]]; else ids[centro] = id;
+  return ids;
+}
+
 window.startCombat = (e, emboscada) => {
   if (Bt || S.mode !== 'explore') return;
   if (S.flags.trato && !e.def.boss) { delete S.flags.trato; emboscada = true; log('La Sombra cobra lo suyo.', 'bad'); }
   guardarExpedicion();
   const jefe = e.def.boss, tipo = jefe ? 'jefe' : emboscada ? 'emboscada' : 'comun';
-  const ids = jefe ? D.mazmorra.jefes[S.floor] : (p => p[Math.floor(azarX() * p.length)])(D.mazmorra.grupos_por_piso[S.floor]);
+  const ids = jefe ? D.mazmorra.jefes[S.floor] : grupoDeEnemigo(e);
   const go = () => iniciarTransicion(e, ids, tipo);
   if (jefe) { setMusic(temaDeJefe()); charla(`jefe_${S.floor}`, go); } else { setMusic('pelea'); go(); }
 };

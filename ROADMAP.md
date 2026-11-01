@@ -2,7 +2,7 @@
 
 El camino del juego es la expedición de grupo. El plan del juego anterior está en `juego_viejo/ROADMAP.md`.
 
-**Versión actual: 0.3.8.** Lo próximo: 0.3.9.
+**Versión actual: 0.3.9.** Lo próximo: 0.3.10.
 
 ## Cómo se numeran las versiones
 
@@ -14,7 +14,7 @@ Cada parche sube la versión en `package.json` y en `index.html`, y se anota ac�
 
 ## Próximas versiones
 
-### 0.3.9: Archivos pendientes del piso 1
+### 0.3.10: Archivos pendientes del piso 1
 
 - Música de exploración, cuando esté el archivo.
 - Retratos: conseguir los PNG originales sin marco.
@@ -55,11 +55,16 @@ Cada parche sube la versión en `package.json` y en `index.html`, y se anota ac�
 - **Continuar:** la expedición se guarda sola explorando, nunca en medio de una pelea. Morir no se deshace cerrando el juego.
 - **Botín:** los objetos raros (✦) salen el 20% de las veces, y el 70% si los suelta un jefe (`botin` en `datos/mazmorra.json`).
 - **Personajes:** no hay protagonistas fijos. Son al azar, se conocen entre sí, y la historia importante está en notas por la mazmorra.
+- **Encuentros:** el enemigo del mapa siempre está en la pelea, en el centro. Los acompañantes salen de los grupos del piso.
 - **Primera expedición:** arranca con las 4 clases y no se pueden repetir.
 - **Modelos y clases:** cada retrato tiene su clase fija.
 - **Título:** el logo "The Last Flame" no cambia con el idioma.
 
 ## Historial
+
+### 0.3.9
+
+- Se pelea contra el enemigo encontrado en el mapa: va al centro, acompañado por otros del piso.
 
 ### 0.3.8
 
