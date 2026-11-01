@@ -1,6 +1,6 @@
 {
   "name": "la-ultima-llama",
-  "version": "0.3.26",
+  "version": "0.3.27",
   "description": "Dungeon crawler de grupo por turnos con estética de dithering y pocos colores",
   "main": "main.js",
   "private": true,

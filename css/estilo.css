@@ -19,6 +19,7 @@
 #bCards .bestados .mas { color: var(--c5); }
 #bCards .bestados .ira { color: #e0605a; }
 #bCards .bestados .marca { color: var(--c4); }
+#bCards .bestados .ipix { width: 9px; height: 9px; image-rendering: pixelated; }
 #bCards .bestados .veneno { color: #5fbf4a; }
 #bCards .bestados .quemadura { color: #e8761c; }
 #bCards .bestados .sangrado { color: #e0605a; }

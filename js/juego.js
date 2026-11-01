@@ -1637,8 +1637,8 @@ function rombo(c, x, y, lleno) {
 // Fila de estados: lo que afecta a cada personaje ahora
 function estadosDe(q) {
   const on = [q.guardia && ['escudo', icon('shield'), 'En guardia'], q.provoca > 0 && ['ira', icon('cross'), 'Provocando'],
-    q.defensaExtra > 0 && ['mas', '▲', `Defensa +${q.defensaExtra}`], q.marcado && ['marca', icon('ash'), 'Marcado'], q.presa > 0 && ['ira', '◎', 'Presa'], q.enganchado && ['ira', '▼', 'Pierde el turno'], q.debil > 0 && ['debil', '▽', 'Debilitado'],
-    ...(q.estados || []).map(v => [v.tipo, '●', v.tipo])].filter(Boolean).slice(-4);
+    q.defensaExtra > 0 && ['mas', '▲', `Defensa +${q.defensaExtra}`], q.marcado && ['marca', icon('ash'), 'Marcado'], q.presa > 0 && ['ira', '◎', 'Presa'], q.enganchado && ['aturdido', iconoEstado('aturdido'), 'Pierde el turno'], q.debil > 0 && ['debil', '▽', 'Debilitado'],
+    ...(q.estados || []).map(v => [v.tipo, ICONOS[v.tipo] ? iconoEstado(v.tipo) : '●', v.tipo])].filter(Boolean).slice(-4);
   return Array.from({ length: 4 }, (_, i) => (on[i] ? `<i class="${on[i][0]}" title="${on[i][2]}">${on[i][1]}</i>` : '<i></i>')).join('');
 }
 
@@ -1735,12 +1735,24 @@ function dibujarMenu(c) {
 }
 
 // ---------- Vida y estados de los enemigos ----------
-const COLOR_ESTADO = { veneno: ['#2f6a2a', '#5fbf4a', '#b6e36a'], quemadura: ['#8a3a10', '#e8761c', '#fbbf5a'], sangrado: ['#6a1518', '#b52a2a', '#e0605a'] };
+const COLOR_ESTADO = { veneno: ['#2f6a2a', '#5fbf4a', '#b6e36a'], quemadura: ['#8a3a10', '#e8761c', '#fbbf5a'], sangrado: ['#6a1518', '#b52a2a', '#e0605a'], aturdido: ['#6a5a10', '#c8a81c', '#ffe14a'] };
 const ICONOS = {
-  veneno: ['.#####.', '#######', '#.###.#', '#######', '.#####.', '.#.#.#.', '.......'],
+  veneno: ['.#####.', '#######', '#..#..#', '#######', '.##.##.', '.#####.', '.#.#.#.'],
   quemadura: ['...#...', '..##...', '..###..', '.#####.', '.##.##.', '.#####.', '..###..'],
   sangrado: ['...#...', '...#...', '..###..', '.#####.', '.#####.', '.#####.', '..###..'],
+  aturdido: ['..#....', '.###.#.', '..#.###', '.....#.', '.#.....', '###....', '.#.....'],
 };
+// El mismo dibujo para las tarjetas del grupo
+const ICONO_URL = {};
+function iconoEstado(tipo) {
+  if (!ICONO_URL[tipo]) {
+    const c = document.createElement('canvas'); c.width = c.height = 7;
+    const g = c.getContext('2d'); g.fillStyle = COLOR_ESTADO[tipo][2];
+    ICONOS[tipo].forEach((f, j) => { for (let i = 0; i < 7; i++) if (f[i] === '#') g.fillRect(i, j, 1, 1); });
+    ICONO_URL[tipo] = c.toDataURL();
+  }
+  return `<img class="ipix" src="${ICONO_URL[tipo]}" alt="">`;
+}
 function dibujarIcono(c, tipo, x, y) {
   c.fillStyle = MARCO.fondo; c.fillRect(x - 1, y - 1, 9, 9);
   c.fillStyle = COLOR_ESTADO[tipo][2];
