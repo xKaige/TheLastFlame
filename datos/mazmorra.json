@@ -3,7 +3,7 @@
   "candidatos": 5,
   "hogar": {
     "costo_recluta": 4,
-    "plantel_inicial": 3,
+    "plantel_inicial": 4,
     "plantel_max": 8,
     "plantel_gratis": 2
   },

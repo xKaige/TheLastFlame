@@ -73,6 +73,12 @@
 #bMenu .bopts { gap: 1px; align-items: flex-start; }
 #bMenu .bopt { display: flex; flex-direction: column; align-items: center; padding: 0 3px 0 7px; font-size: 10px; line-height: 12px; color: var(--c4); background: none; text-shadow: 0 1px 0 #000, 0 0 3px #000; }
 #bMenu .bopt.sel { background: none; color: var(--c5); font-family: var(--f-title); font-weight: 700; }
+#bMenu .bpista { position: absolute; right: 0; top: -12px; font-size: 7.5px; color: var(--c4); text-shadow: 0 1px 0 #000, 0 0 3px #000; }
+#bAyuda { position: absolute; left: 110px; right: 110px; bottom: 90px; padding: 3px 6px 4px; text-align: center; background: rgba(0, 0, 0, 0.88); box-shadow: 0 0 0 0.5px var(--c3); }
+#bAyuda.hidden { display: none; }
+#bAyuda b { display: block; font-size: 10px; line-height: 12px; color: var(--c5); }
+#bAyuda p { margin: 0; font-size: 8.5px; line-height: 11px; color: var(--c4); }
+#bAyuda em { display: block; font-style: normal; font-size: 7.5px; line-height: 10px; color: var(--c5); }
 #bMenu .bopt span, #bMenu .bopt.sel span { color: var(--c4); line-height: 6px; font-size: 5.5px; }
 
 /* números de daño por estado */

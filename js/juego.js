@@ -1148,6 +1148,16 @@ function numero(x, y, text, kind) {
   setTimeout(() => el.remove(), 1000);
 }
 
+// La explicación de la acción elegida: se abre y se cierra con el botón del inventario y queda así entre turnos
+let ayudaBatalla = false;
+function pintarAyuda(ver) {
+  const a = $('bAyuda'), o = ver && ayudaBatalla && Bt.ops[Bt.sel];
+  a.classList.toggle('hidden', !o);
+  if (!o) return;
+  const costo = o.costo ? tr('Cuesta {0} de Ímpetu.', o.costo) : '', falta = o.apagada && o.costo ? ` ${tr('Te falta Ímpetu: atacá o defendé para juntarlo.')}` : '';
+  a.innerHTML = `<b>${o.nombre}</b><p>${o.descripcion}</p>${costo ? `<em>${costo}${falta}</em>` : ''}`;
+}
+
 function batallaAction(act) {
   if (!Bt) return;
   if (Bt.fase === 'botin') {
@@ -1157,6 +1167,7 @@ function batallaAction(act) {
   }
   if (Bt.ini < Bt.entrada) { if (act === 'ok') Bt.ini = Bt.entrada; return; }
   const b = Bt.b, u = b.actual;
+  if (act === 'inv' && (Bt.fase === 'menu' || Bt.fase === 'objetivo')) { ayudaBatalla = !ayudaBatalla; sfx('select'); pintarBatalla(); return; }
   if (Bt.fase === 'menu') {
     const n = Bt.ops.length;
     if (act === 'fwd' || act === 'turnL' || act === 'strafeL') { Bt.sel = (Bt.sel + n - 1) % n; sfx('select'); }
@@ -1369,8 +1380,9 @@ function pintarBatalla() {
     <div class="bestados">${Bt.fase === 'botin' ? '' : estadosDe(q)}</div></div>`).join('');
   const m = $('bMenu'), ver = Bt.fase === 'menu' || Bt.fase === 'objetivo';
   m.classList.toggle('hidden', !ver);
+  pintarAyuda(ver);
   if (ver) {
-    m.innerHTML = `<div class="bopts">${Bt.ops.map((o, i) => `<div class="bopt${i === Bt.sel ? ' sel' : ''}${o.apagada ? ' off' : ''}">${o.nombre}${o.costo ? ` <span>${'◆'.repeat(o.costo)}</span>` : ''}</div>`).join('')}</div>`;
+    m.innerHTML = `<div class="bpista">${glyph('inv')} ${tr(ayudaBatalla ? 'Ocultar detalle' : 'Detalle')}</div><div class="bopts">${Bt.ops.map((o, i) => `<div class="bopt${i === Bt.sel ? ' sel' : ''}${o.apagada ? ' off' : ''}">${o.nombre}${o.costo ? ` <span>${'◆'.repeat(o.costo)}</span>` : ''}</div>`).join('')}</div>`;
     // el canvas dibuja velas y llamas en la posición real de cada palabra
     Bt.menuX = [...m.querySelectorAll('.bopt')].map(e => ({ x: m.offsetLeft + e.parentNode.offsetLeft + e.offsetLeft, w: e.offsetWidth }));
   }
@@ -1604,6 +1616,16 @@ function dibujarLinea(c) {
     c.fillStyle = u === act ? MARCO.luz : u.enemigo ? MARCO.vida[0] : MARCO.piedra; c.fillRect(x - 1, y - 1, L.tam + 2, L.tam + 2);
     c.fillStyle = MARCO.fondo; c.fillRect(x, y, L.tam, L.tam);
     c.drawImage(u.enemigo ? u.icono : retratoX(u.modelo, LADO_RETRATO), x, y, L.tam, L.tam);
+  }
+  // a quién se está apuntando: el mismo objetivo marcado en la fila
+  const ap = Bt.fase === 'objetivo' && Bt.lista[Bt.tsel];
+  if (ap && ap.lx !== undefined) {
+    const x = Math.round(ap.lx), y = L.y + Math.round(ap.ly || 0), mx = x + L.tam / 2, py = y + L.tam + 3;
+    c.save();
+    c.strokeStyle = c.fillStyle = '#ffe9b0'; c.shadowColor = '#ff9a3c'; c.shadowBlur = 6 + Math.sin(Bt.t * 8) * 3; c.lineWidth = 1.5;
+    c.strokeRect(x - 1.75, y - 1.75, L.tam + 3.5, L.tam + 3.5);
+    c.beginPath(); c.moveTo(mx, py); c.lineTo(mx - 3.5, py + 4); c.lineTo(mx + 3.5, py + 4); c.fill();
+    c.restore();
   }
 }
 

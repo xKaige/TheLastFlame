@@ -984,5 +984,9 @@
   "El grupo sigue adelante.": "The party presses on.",
   "Máximo de la zona": "Zone maximum",
   "Nv {0} máx": "Lv {0} max",
-  "En la primera expedición no se repite la clase.": "Classes cannot repeat on the first expedition."
+  "En la primera expedición no se repite la clase.": "Classes cannot repeat on the first expedition.",
+  "Detalle": "Details",
+  "Ocultar detalle": "Hide details",
+  "Cuesta {0} de Ímpetu.": "Costs {0} Momentum.",
+  "Te falta Ímpetu: atacá o defendé para juntarlo.": "Not enough Momentum: attack or defend to build it."
 }
