@@ -140,7 +140,7 @@ const NUCLEO = (() => {
       return crearEnemigo(D, id, i, fuerza, D.enemigos[id].nombre + (n > 1 ? ` ${'ABCD'[letras[id] - 1]}` : ''));
     });
     const aliados = vivos(grupo);
-    aliados.forEach((u, i) => Object.assign(u, { i, impetu: u.impetuInicial, guardia: false, provoca: 0, defensaExtra: 0, esquivaSegura: false, presa: 0, enganchado: false, hechizado: false, estados: [], debil: 0 }));
+    aliados.forEach((u, i) => Object.assign(u, { i, impetu: Math.min(IMP_TOPE, u.impetuInicial + (D.clases[u.clase].impetu_inicial || 0)), guardia: false, provoca: 0, defensaExtra: 0, esquivaSegura: false, presa: 0, enganchado: false, hechizado: false, estados: [], debil: 0 }));
     const unidades = [...aliados, ...enemigos];
     for (const e of enemigos) e.aliados = aliados;      // lo que estalla al morir necesita saber a quién alcanza
     for (const u of unidades) u.reloj = 100 / u.velocidad;
@@ -258,9 +258,9 @@ const NUCLEO = (() => {
     return eventos;
   }
 
-  function defender(u) {
+  function defender(D, u) {
     u.guardia = true;
-    u.impetu = Math.min(IMP_TOPE, u.impetu + 1);
+    u.impetu = Math.min(IMP_TOPE, u.impetu + (D.clases[u.clase].concentra || 1));
     return [{ tipo: 'texto', clave: 'defiende', quien: u }];
   }
 

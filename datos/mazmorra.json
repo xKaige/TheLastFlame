@@ -23,8 +23,8 @@
     "prob": 0.5
   },
   "dificultad": {
-    "vida": 1.1,
-    "dano": 1.1
+    "vida": 1.2,
+    "dano": 1.2
   },
   "exp_por_nivel": 10,
   "zonas": {

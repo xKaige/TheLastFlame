@@ -54,6 +54,8 @@
   },
   "mago": {
     "nombre": "Mago",
+    "impetu_inicial": 2,
+    "concentra": 2,
     "rol": "Fuego contra todos",
     "arte": "hechicero",
     "vida": 30,
@@ -79,6 +81,8 @@
   },
   "sanador": {
     "nombre": "Sanador",
+    "impetu_inicial": 2,
+    "concentra": 2,
     "rol": "Cura y sostiene",
     "arte": "hechicero",
     "vida": 32,

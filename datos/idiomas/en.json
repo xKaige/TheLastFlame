@@ -74,6 +74,8 @@
   "Nv": "Lv",
   "Atacar": "Attack",
   "Defender": "Defend",
+  "Concentrar": "Focus",
+  "Mitad de daño hasta tu próximo turno. +{0} Ímpetu.": "Half damage until your next turn. +{0} Momentum.",
   "Quemar": "Burn",
   "Huir": "Flee",
   "Tu turno": "Your turn",

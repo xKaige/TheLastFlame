@@ -1234,7 +1234,7 @@ function siguiente() {
     later(600, () => { if (Bt) { mostrar(NUCLEO.turnoEnemigo(D, Bt.b, u, azarX)); later(450, () => { if (Bt) Bt.fase = 'cambio'; }); later(800, siguiente); } });
   } else {
     Bt.ops = [{ id: 'atk', nombre: tr('Atacar'), descripcion: tr(D.clases[u.clase].doble_golpe ? 'Dos golpes: el segundo, más flojo. +1 Ímpetu.' : 'Golpe común. +1 Ímpetu.'), objetivo: 'enemigo' },
-      { id: 'def', nombre: tr('Defender'), descripcion: tr('Mitad de daño hasta tu próximo turno. +1 Ímpetu.') },
+      D.clases[u.clase].concentra ? { id: 'def', nombre: tr('Concentrar'), descripcion: tr('Mitad de daño hasta tu próximo turno. +{0} Ímpetu.', D.clases[u.clase].concentra) } : { id: 'def', nombre: tr('Defender'), descripcion: tr('Mitad de daño hasta tu próximo turno. +1 Ímpetu.') },
       { id: 'pot', nombre: tr('Poción'), descripcion: tr('Cura un 40% al aliado más herido. Quedan {0}.', P.potions), apagada: !P.potions },
       ...NUCLEO.opciones(D, u)];
     Bt.sel = 0; Bt.fase = 'menu'; Bt.msg = ''; pintarBatalla();
@@ -1414,7 +1414,7 @@ function ejecutar(o, t) {
   if (h) lanzarEfecto(o.id, u, t);
   let ev;
   if (o.id === 'atk') ev = NUCLEO.atacar(D, u, t, azarX);
-  else if (o.id === 'def') ev = NUCLEO.defender(u);
+  else if (o.id === 'def') ev = NUCLEO.defender(D, u);
   else if (o.id === 'pot') {
     const h = NUCLEO.vivos(b.aliados).sort((x, y) => x.vida / x.vidaMax - y.vida / y.vidaMax)[0], v = Math.round(h.vidaMax * 0.4);
     P.potions--; h.vida = Math.min(h.vidaMax, h.vida + v); ev = [{ tipo: 'cura', quien: h, valor: v }];

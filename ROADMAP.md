@@ -2,7 +2,7 @@
 
 El camino del juego es la expedición de grupo. El plan del juego anterior está en `juego_viejo/ROADMAP.md`.
 
-**Versión actual: 0.3.37.** Lo próximo: 0.4.0.
+**Versión actual: 0.3.38.** Lo próximo: 0.4.0.
 
 ## Cómo se numeran las versiones
 
@@ -94,10 +94,16 @@ La idea que une todo es una regla de las Guardianas: "quien le pida algo va a re
 - **Encuentros:** el enemigo del mapa siempre está en la pelea, en el centro. Los acompañantes salen de los grupos del piso.
 - **Enemigos:** ninguno pelea igual; cada uno tiene al menos una habilidad propia, y cada jefe, una fase de furia distinta.
 - **Primera expedición:** arranca con las 4 clases y no se pueden repetir.
+- **Ímpetu:** Sanador y Mago arrancan cada pelea con 2, y en lugar de Defender tienen Concentrar: la misma protección, con +2 de Ímpetu (`impetu_inicial` y `concentra` en `datos/clases.json`).
 - **Modelos y clases:** cada retrato tiene su clase fija.
 - **Título:** el logo "The Last Flame" no cambia con el idioma.
 
 ## Historial
+
+### 0.3.38
+
+- Sanador y Mago empiezan las peleas con 2 de Ímpetu y ganan Concentrar, que carga +2.
+- Para compensar, los enemigos pasan a tener 20% más de vida y pegar 20% más.
 
 ### 0.3.37
 
