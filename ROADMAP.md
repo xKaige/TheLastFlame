@@ -2,7 +2,7 @@
 
 El camino del juego es la expedición de grupo. El plan del juego anterior está en `juego_viejo/ROADMAP.md`.
 
-**Versión actual: 0.3.21.** Lo próximo: 0.4.0.
+**Versión actual: 0.3.22.** Lo próximo: 0.4.0.
 
 ## Cómo se numeran las versiones
 
@@ -17,7 +17,6 @@ Cada parche sube la versión en `package.json` y en `index.html`, y se anota ac�
 ### 0.4.0: Piso 2 (Los Salones)
 
 - Falta un adorno de pared: el candelabro.
-- Dibujo del Perro Gris (hoy usa el del Acechador).
 - Eventos y misiones propios.
 - Música de exploración.
 
@@ -56,6 +55,10 @@ Cada parche sube la versión en `package.json` y en `index.html`, y se anota ac�
 - **Título:** el logo "The Last Flame" no cambia con el idioma.
 
 ## Historial
+
+### 0.3.22
+
+- Dibujo y animación propios del Perro Gris.
 
 ### 0.3.21
 

@@ -1705,8 +1705,8 @@
   },
   "perro": {
     "nombre": "Perro Gris",
-    "sprite": "lurker",
-    "imagen": "acechador",
+    "sprite": "perro",
+    "imagen": "perro",
     "vida": 28,
     "ataque": [
       6,
@@ -1716,29 +1716,29 @@
     "velocidad": 11,
     "exp": 2,
     "animacion": {
-      "base": 136,
-      "cintura": 108,
-      "pies": 108,
+      "base": 112,
+      "cintura": 86,
+      "pies": 86,
       "partes": [
         {
           "nombre": "cabeza",
           "rects": [
             [
-              18,
-              78,
-              42,
-              112
+              0,
+              26,
+              30,
+              68
             ]
           ],
           "pivote": [
-            42,
-            92
+            30,
+            52
           ],
           "tapar": true
         }
       ],
       "reposo": {
-        "pecho": 1,
+        "pecho": 0.9,
         "partes": {
           "cabeza": {
             "giro": 0.05
@@ -1783,7 +1783,7 @@
           },
           "pecho": -1.05,
           "todo": {
-            "x": -7.0
+            "x": -7
           }
         },
         {
@@ -1803,7 +1803,7 @@
           },
           "pecho": -0.6,
           "todo": {
-            "x": -4.0
+            "x": -4
           }
         }
       ]

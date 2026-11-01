@@ -104,7 +104,7 @@ function aplicarEnemigosEnMapa() {
   for (const [id, d] of Object.entries(D.enemigos)) {
     const img = IMG_ENEMIGOS[d.imagen];
     if (!img || img.enMapa || !img.complete || !img.naturalWidth) continue;
-    SPRITES[d.sprite].w = spriteDesdeImagen(img, 96);
+    if (SPRITES[d.sprite]) SPRITES[d.sprite].w = spriteDesdeImagen(img, 96);      // lo invocado en pelea no está en el mapa
     if (d.escala_mapa) ENEMIES[id].scale = d.escala_mapa;
     img.enMapa = true;
   }
