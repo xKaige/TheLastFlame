@@ -1813,6 +1813,9 @@ function actualizarLinea(dt) {
   }
 }
 
+// Colores fijos, no los del piso: en la paleta violeta el marco de piedra se confundía con el rojo enemigo.
+// Azul y rojo también se distinguen en los modos de daltonismo.
+const COLOR_LINEA = { enemigo: '#e0261c', aliado: '#6fa8c8' };
 function dibujarLinea(c) {
   const b = Bt.b, L = LINEA, { act, fila } = ordenLinea(), fin = L.primero + Math.max(0, fila.length - 1) * L.paso + L.tam + 8;
   const cy = L.y + L.tam / 2;
@@ -1827,7 +1830,7 @@ function dibujarLinea(c) {
   const orden = b.unidades.filter(u => u.vida > 0 && u.lx !== undefined).sort((x, y) => (y.ly || 0) - (x.ly || 0));
   for (const u of orden) {
     const x = Math.round(u.lx), y = L.y + Math.round(u.ly || 0);
-    c.fillStyle = u === act ? MARCO.luz : u.enemigo ? MARCO.vida[0] : MARCO.piedra; c.fillRect(x - 1, y - 1, L.tam + 2, L.tam + 2);
+    c.fillStyle = u === act ? MARCO.luz : u.enemigo ? COLOR_LINEA.enemigo : COLOR_LINEA.aliado; c.fillRect(x - 1, y - 1, L.tam + 2, L.tam + 2);
     c.fillStyle = MARCO.fondo; c.fillRect(x, y, L.tam, L.tam);
     c.drawImage(u.enemigo ? u.icono : retratoX(u.modelo, LADO_RETRATO), x, y, L.tam, L.tam);
   }
