@@ -235,6 +235,14 @@
     "cura": 0.7
   },
   "musica": {
+    "crypt": {
+      "archivo": "assets/musica/exploracion_cripta.ogg",
+      "bucle": [
+        16,
+        128
+      ],
+      "volumen": 0.15
+    },
     "pelea": {
       "archivo": "assets/musica/pelea_comun.ogg",
       "bucle": [

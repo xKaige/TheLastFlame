@@ -2,7 +2,7 @@
 
 El camino del juego es la expedición de grupo. El plan del juego anterior está en `juego_viejo/ROADMAP.md`.
 
-**Versión actual: 0.3.12.** Lo próximo: 0.3.13.
+**Versión actual: 0.3.13.** Lo próximo: 0.4.0.
 
 ## Cómo se numeran las versiones
 
@@ -13,10 +13,6 @@ El camino del juego es la expedición de grupo. El plan del juego anterior está
 Cada parche sube la versión en `package.json` y en `index.html`, y se anota acá: pasa de "Próximas versiones" a "Historial". Lo que surja en el camino se agrega al parche que corresponda.
 
 ## Próximas versiones
-
-### 0.3.13: Archivos pendientes del piso 1
-
-- Música de exploración, cuando esté el archivo.
 
 ### 0.4.0: Piso 2 (Los Salones)
 
@@ -60,6 +56,10 @@ Cada parche sube la versión en `package.json` y en `index.html`, y se anota ac�
 - **Título:** el logo "The Last Flame" no cambia con el idioma.
 
 ## Historial
+
+### 0.3.13
+
+- Música de exploración para el piso 1, más baja y con el ritmo suavizado (`tools/suavizar_ritmo.py`).
 
 ### 0.3.12
 
