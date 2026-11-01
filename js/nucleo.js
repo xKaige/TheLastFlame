@@ -380,7 +380,8 @@ const NUCLEO = (() => {
     u.turnos++;
     if (u.enfurecido && u.fase.ciclo) { if (habilidadDeFase(D, b, u, grupo, azar, eventos)) return eventos; }
     else if (u.especial && u.turnos % u.especial.cada === 0) { especialDeJefe(u, grupo, azar, eventos); return eventos; }
-    const propia = u.habilidades.find(h => azar() < h.prob);
+    // la muestra enseguida: muchos enemigos no duran más de un par de turnos
+    const propia = u.turnos === 1 ? elegir(azar, u.habilidades) : u.habilidades.find(h => azar() < h.prob);
     if (propia) { habilidadEnemiga(u, propia, grupo, azar, eventos); return eventos; }
     const t = blancoEnemigo(grupo, azar);
     if (b.muroLlamas > 0) { b.muroLlamas--; aplicarEstado(u, { tipo: 'quemadura', por_turno: 2, min: 2, max: 3 }, azar, eventos); }
