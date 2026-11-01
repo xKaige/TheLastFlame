@@ -66,7 +66,8 @@
         "id": "grillete",
         "imagen": "grillete",
         "y": 6,
-        "alto": 40
+        "alto": 40,
+        "realce": 0.35
       },
       {
         "id": "estandarte",

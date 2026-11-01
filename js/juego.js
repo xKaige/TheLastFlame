@@ -132,12 +132,12 @@ function muroConAccesorio(base, a) {
   const g = c.getContext('2d', { willReadFrequently: true }), ancho = Math.round(a.alto * 1.32 * VH / VW);
   g.drawImage(a.img, (TEX - ancho) >> 1, a.y, ancho, a.alto);
   const d = g.getImageData(0, 0, TEX, TEX).data, alfa = (x, y) => x >= 0 && y >= 0 && d[(y * TEX + x) * 4 + 3] > 128;
-  const gris = i => (d[i] * 0.35 + d[i + 1] * 0.5 + d[i + 2] * 0.15) / 255;
+  const gris = i => (d[i] * 0.35 + d[i + 1] * 0.5 + d[i + 2] * 0.15) / 255, realce = a.realce || 0.7;
   let tope = 0.01;
   for (let i = 0; i < d.length; i += 4) if (d[i + 3] > 128) tope = Math.max(tope, gris(i));
   return makeTex((x, y) => {
     const i = (y * TEX + x) * 4;
-    if (alfa(x, y)) return Math.pow(gris(i) / tope, 0.7);                                // que se despegue del muro oscuro
+    if (alfa(x, y)) return Math.pow(gris(i) / tope, realce);                             // que se despegue del muro oscuro
     return base[y * TEX + x] * (alfa(x - 1, y - 1) || alfa(x - 2, y - 2) ? 0.4 : 1);       // sombra sobre el muro
   });
 }
@@ -672,7 +672,7 @@ window.openEvent = e => {
 for (const [id, ev] of Object.entries(D.eventos)) {
   ev.img = Object.assign(new Image(), { src: `interfaz/eventos/${id}.png` });
   ev.imgMapa = Object.assign(new Image(), { src: `interfaz/${ev.mapa}.png` });
-  EVENTS[id] = { spr: `ev_${id}`, sprDone: `ev_${id}`, scale: ev.escala, glow: 0.4, doneText: '', title: '', text: '', choices: [] };
+  EVENTS[id] = { spr: `ev_${id}`, sprDone: `ev_${id}`, scale: ev.escala, glow: 0.7, doneText: '', title: '', text: '', choices: [] };
 }
 for (const n of D.notas) EVENTS[`nota_${n.id}`] = { spr: 'ev_nota', sprDone: 'ev_nota', scale: 0.42, glow: 0.5, doneText: '', title: '', text: '', choices: [] };
 const IMG_NOTA = Object.assign(new Image(), { src: 'interfaz/mazmorra/cripta/accesorios/nota.png' });
@@ -741,7 +741,15 @@ function ilustracion(ev) {
   const lado = document.createElement('canvas'); lado.width = lado.height = 480;
   lado.getContext('2d').drawImage(ev.img, 0, 0, 480, 270);
   const c = document.createElement('canvas'); c.width = 480; c.height = 270;
-  c.getContext('2d').drawImage(spriteCanvas(spriteDesdeImagen(lado, 480), 480, S.env, 1.1), 0, 0);
+  const g = c.getContext('2d');
+  g.drawImage(spriteCanvas(spriteDesdeImagen(lado, 480), 480, S.env, 1.1), 0, 0);
+  // la sangre y el fuego son los únicos acentos fijos del juego: conservan su color
+  const orig = lado.getContext('2d').getImageData(0, 0, 480, 270).data, img = g.getImageData(0, 0, 480, 270), d = img.data;
+  for (let i = 0; i < d.length; i += 4) {
+    const r = orig[i], v = orig[i + 1], a = orig[i + 2];
+    if ((r > 60 && v < r * 0.22) || (r > 215 && v > 110 && a < v * 0.75)) { d[i] = r; d[i + 1] = v; d[i + 2] = a; }
+  }
+  g.putImageData(img, 0, 0);
   ev.fondo = { env: S.env, url: c.toDataURL() };
   return ev.fondo.url;
 }
@@ -855,29 +863,13 @@ function casilleroX(n) {
 window.updateHUD = () => {
   baseX.updateHUD();
   const heridos = NUCLEO.vivos(X.grupo).filter(p => p.vida < p.vidaMax * 0.3).length;
-  const objeto = (img, nombre, n) => HUD_X.objetos === 'texto'
-    ? `<div class="obj">${nombre} <b>${n}</b></div>`
-    : `<div class="obj"><i style="background-image:url(${casilleroX(img)})"></i><b>${n}</b></div>`;
+  const objeto = (img, n) => `<div class="obj"><i style="background-image:url(${casilleroX(img)})"></i><b>${n}</b></div>`;
   const i = D.mazmorra.niveles.indexOf(S.level), total = D.mazmorra.niveles.length;
-  const nivel = !S.level ? '<small>Santuario</small>' : { hondo: tr('<small>{0}</small>', i === total - 1 ? 'La guarida' : ['Primer', 'Segundo'][i] + ' descenso'), romano: ` · ${['I', 'II', 'III'][i]}`,
-    rombos: tr('<small>{0}{1}</small>', '◆'.repeat(i + 1), '◇'.repeat(total - i - 1)) }[HUD_X.nivel];
+  const nivel = !S.level ? '<small>Santuario</small>' : tr('<small>{0}</small>', i === total - 1 ? 'La guarida' : ['Primer', 'Segundo'][i] + ' descenso');
   $('xEsq').innerHTML = `<div class="zona">${D.mazmorra.pisos[S.floor - 1].nombre}${nivel}</div>` +
-    `<div class="fila ${HUD_X.objetos}">${objeto('pocion', 'Pociones', P.potions)}${objeto('aceite', 'Aceite', P.oil)}${objeto('antorcha', 'Antorcha', Math.ceil(P.fuel))}</div>` +
+    `<div class="fila">${objeto('pocion', P.potions)}${objeto('aceite', P.oil)}${objeto('antorcha', Math.ceil(P.fuel))}</div>` +
     (heridos ? `<div class="alerta">${heridos} en peligro · ${glyph('inv')}</div>` : '');
 };
-
-// Opciones a prueba: F8 cambia los objetos y F9 cómo se nombra el nivel
-const HUD_X = { objetos: 'sueltos', nivel: 'hondo' };
-try { Object.assign(HUD_X, JSON.parse(localStorage.getItem('expedicion.hud'))); } catch (e) { /* sin almacenamiento */ }
-window.addEventListener('keydown', ev => {
-  const lista = { F8: ['objetos', ['sueltos', 'cinto', 'texto']], F9: ['nivel', ['hondo', 'romano', 'rombos']] }[ev.code];
-  if (!lista || S.mode !== 'explore') return;
-  ev.preventDefault();
-  const [campo, ops] = lista;
-  HUD_X[campo] = ops[(ops.indexOf(HUD_X[campo]) + 1) % ops.length];
-  try { localStorage.setItem('expedicion.hud', JSON.stringify(HUD_X)); } catch (e) { /* sin almacenamiento */ }
-  updateHUD();
-});
 
 // El panel del juego base no se dibuja: sus barras quedan sin efecto y el mapa va arriba a la derecha
 window.drawBar = () => {};

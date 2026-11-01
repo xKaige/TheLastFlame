@@ -29,6 +29,7 @@ html, body { margin: 0; height: 100%; background: #000; overflow: hidden; cursor
 
 /* ---------- Título ---------- */
 #title { position: absolute; inset: 0; text-align: center; text-shadow: 0 0 2px #000, 0 0 6px #000; }
+#title .tfondo { position: absolute; inset: 0; width: 100%; height: 100%; filter: brightness(0.62); }
 #title .t1 { position: absolute; top: 6px; left: 50%; height: 126px; transform: translateX(-50%); filter: drop-shadow(0 0 6px #000); }
 /* el logo va sólo con el menú principal: las otras pantallas del título usan ese lugar */
 #stage:has(#menu.bg-title:not(.compact):not(.hidden)) #title .t1, #stage:has(#menu.bg-title:not(.compact):not(.hidden)) #title .t2 { display: none; }

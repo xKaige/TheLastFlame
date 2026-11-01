@@ -41,9 +41,6 @@
 #xEsq .obj { display: flex; align-items: center; gap: 2px; font-size: 9px; line-height: 12px; }
 #xEsq .obj i { display: block; width: 15px; height: 13px; background-position: center; background-size: 23px 21px; image-rendering: pixelated; }
 #xEsq .obj b { font-weight: 600; }
-#xEsq .fila.cinto { padding: 2px 6px; gap: 7px; background: var(--c0); box-shadow: 0 0 0 1px #000, 0 0 0 2px var(--c3); }
-#xEsq .fila.texto { top: 134px; flex-direction: column; align-items: flex-start; gap: 0; font-size: 9.5px; color: var(--c4); }
-#xEsq .fila.texto b { color: var(--c5); }
 #xEsq .alerta { margin-top: 9px; color: #e0605a; font-size: 7.5px; }
 /* registro arriba a la izquierda, sin caja: aparece con cada novedad y se apaga solo */
 #log { left: 10px; top: 8px; bottom: auto; width: 260px; height: auto; min-height: 0; padding: 0; font-size: 9.5px; line-height: 11.5px; color: var(--c5); background: none; box-shadow: none; text-shadow: 0 1px 0 #000, 0 0 3px #000; transition: opacity 0.2s; }

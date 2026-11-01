@@ -3,7 +3,7 @@
     "titulo": "El altar de sangre",
     "texto": "La sangre del cuenco está fresca. Acá no hay nadie desde hace siglos.",
     "mapa": "mazmorra/cripta/accesorios/altar",
-    "escala": 0.55,
+    "escala": 0.72,
     "opciones": [
       {
         "texto": "Ofrecer sangre",
@@ -35,7 +35,7 @@
     "titulo": "El muerto con mochila",
     "texto": "Alguien llegó hasta acá y no siguió. La mano todavía aprieta la correa.",
     "mapa": "mazmorra/cripta/accesorios/pila_huesos",
-    "escala": 0.4,
+    "escala": 0.55,
     "opciones": [
       {
         "texto": "Revisar con cuidado",
@@ -96,7 +96,7 @@
     "titulo": "La antorcha ajena",
     "texto": "Arde sola, clavada en el piso. Nadie deja una llama acá abajo. Más allá de la luz, algo parpadea.",
     "mapa": "mazmorra/cripta/accesorios/antorcha_apagada",
-    "escala": 0.5,
+    "escala": 0.7,
     "opciones": [
       {
         "texto": "Tomar el fuego",
@@ -129,7 +129,7 @@
     "titulo": "La voz de La Sombra",
     "texto": "Tu sombra se estira por el muro sin que te muevas. Después te tiende la mano. «Tengo algo para vos. Me lo pagás cuando yo diga».",
     "mapa": "enemigos/sombra",
-    "escala": 0.6,
+    "escala": 0.75,
     "opciones": [
       {
         "texto": "Aceptar el trato",
