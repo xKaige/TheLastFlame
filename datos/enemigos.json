@@ -1479,7 +1479,7 @@
       ]
     },
     "imagen": "cazador",
-    "tam_batalla": 150,
+    "tam_batalla": 130,
     "escala_mapa": 1.6,
     "animacion": {
       "base": 128,

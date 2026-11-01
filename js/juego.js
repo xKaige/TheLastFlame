@@ -1153,7 +1153,7 @@ function dibujarCierre(c, k = clamp(Tr.t / Tr.cierre, 0, 1), rojo = Tr.rojo) {
 // Fondo pintado de cada zona; si no cargó, el procedural
 // por ahora todos los pisos pelean en el mismo escenario, pasado por la paleta de cada uno
 const FONDOS = { crypt: Object.assign(new Image(), { src: 'interfaz/batalla/cripta.png' }), castle: Object.assign(new Image(), { src: 'interfaz/batalla/salones.png' }) };
-const ANTORCHAS = { crypt: [[25, 77], [454, 77]], castle: [[19, 72], [458, 72]] };
+const ANTORCHAS = { crypt: [[25, 77], [454, 77]], castle: [[19, 48], [458, 48]] };
 // Dibujos propios de enemigos (campo "imagen" de enemigos.json); los demás usan el sprite del juego base
 const IMG_ENEMIGOS = {};
 for (const d of Object.values(D.enemigos)) if (d.imagen) IMG_ENEMIGOS[d.imagen] = Object.assign(new Image(), { src: tr('interfaz/enemigos/{0}.png', d.imagen) });
