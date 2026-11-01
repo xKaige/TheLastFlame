@@ -2,7 +2,7 @@
 
 El camino del juego es la expedición de grupo. El plan del juego anterior está en `juego_viejo/ROADMAP.md`.
 
-**Versión actual: 0.3.2.** Lo próximo: 0.3.3.
+**Versión actual: 0.3.3.** Lo próximo: 0.3.4.
 
 ## Cómo se numeran las versiones
 
@@ -13,11 +13,6 @@ El camino del juego es la expedición de grupo. El plan del juego anterior está
 Cada parche sube la versión en `package.json` y en `index.html`, y se anota acá: pasa de "Próximas versiones" a "Historial". Lo que surja en el camino se agrega al parche que corresponda.
 
 ## Próximas versiones
-
-### 0.3.3: Más objetos
-
-- Sumar objetos para que el botín no se repita (hoy son 7).
-- Revisar las probabilidades del botín con la lista nueva.
 
 ### 0.3.4: Más historia del piso 1
 
@@ -69,11 +64,17 @@ Cada parche sube la versión en `package.json` y en `index.html`, y se anota ac�
 - **Orden de trabajo:** primero se termina el piso 1, después se remodela el piso 2 y recién entonces el resto.
 - **Zonas:** cada 3 pisos son una zona, con nivel máximo 10, 20, 30... (`zonas` en `datos/mazmorra.json`). En un piso de una zona ya superada el personaje no gana experiencia.
 - **Continuar:** la expedición se guarda sola explorando, nunca en medio de una pelea. Morir no se deshace cerrando el juego.
+- **Botín:** los objetos raros (✦) salen el 20% de las veces, y el 70% si los suelta un jefe (`botin` en `datos/mazmorra.json`).
 - **Primera expedición:** arranca con las 4 clases y no se pueden repetir.
 - **Modelos y clases:** cada retrato tiene su clase fija.
 - **Título:** el logo "The Last Flame" no cambia con el idioma.
 
 ## Historial
+
+### 0.3.3
+
+- Veintiún objetos: los nuevos suman rarezas y objetos raros con contras.
+- El botín prefiere lo que el grupo todavía no tiene, y los jefes sueltan más objetos raros.
 
 ### 0.3.2
 

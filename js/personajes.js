@@ -42,7 +42,8 @@ function cerrarPersonajes() {
   if (MENU.stack.length) renderMenu();
 }
 
-const textoBonos = o => Object.entries(o.bonos).map(([k, v]) => `+${v} ${(REGLAS_ATR.nombres[k] || k).toUpperCase().slice(0, 3)}`).join(' · ');
+const textoBonos = o => Object.entries(o.bonos).map(([k, v]) => `${v > 0 ? '+' : '−'}${Math.abs(v)} ${(REGLAS_ATR.nombres[k] || k).toUpperCase().slice(0, 3)}`).join(' · ');
+const nombreObjeto = o => `${o.rareza === 'rara' ? '✦ ' : ''}${o.nombre}`;
 const textoRequisito = h => Object.entries(h.requisito || {}).map(([k, v]) => `${REGLAS_ATR.nombres[k]} ${v}`).join(' · ');
 const habilidadesConocidas = p => [...D.clases[p.clase].habilidades, ...X.grimorio.filter(id => !D.clases[p.clase].habilidades.includes(id))];
 
@@ -100,13 +101,13 @@ function pintarPj() {
     centro = `${panel('Conocidas', `lleva ${p.habilidades.length} de ${D.mazmorra.max_habilidades}`, `<div class="plista">${lista}</div>`, 'patrs')}<div class="pcol">${panel('Detalle', '', detalle, 'plleno')}</div>`;
   } else {
     const o = filas[PJ.sel] && D.objetos[filas[PJ.sel].obj];
-    const lista = filas.length ? filas.map(f => `<div class="pitem${elegida(f) ? ' sel' : ''}"><span>${D.objetos[f.obj].nombre}</span><em>${textoBonos(D.objetos[f.obj])}</em></div>`).join('') : `<div class="pdesc">${tr('Está vacía.')}</div>`;
-    const detalle = `${o ? `<div class="pnom2">${o.nombre}</div><div class="pdesc">${o.descripcion}</div><div class="pdesc">${tr('Se equipa desde Estado.')}</div>` : ''}<div class="pdesc nota">${P ? `${P.potions || 0} pociones · ${P.oil || 0} de aceite` : ''}</div>`;
+    const lista = filas.length ? filas.map(f => `<div class="pitem${elegida(f) ? ' sel' : ''}"><span>${nombreObjeto(D.objetos[f.obj])}</span><em>${textoBonos(D.objetos[f.obj])}</em></div>`).join('') : `<div class="pdesc">${tr('Está vacía.')}</div>`;
+    const detalle = `${o ? `<div class="pnom2">${nombreObjeto(o)}</div><div class="pdesc">${o.descripcion}</div><div class="pdesc">${tr('Se equipa desde Estado.')}</div>` : ''}<div class="pdesc nota">${P ? `${P.potions || 0} pociones · ${P.oil || 0} de aceite` : ''}</div>`;
     centro = `${panel('Mochila', `${filas.length} objetos`, `<div class="plista">${lista}</div>`, 'patrs')}<div class="pcol">${panel('Detalle', '', detalle, 'plleno')}</div>`;
   }
   const sub = PJ.sub ? `<div class="psubm"><h4>${tr(LUGARES_EQUIPO.find(x => x[0] === PJ.sub.slot)[1])}</h4>${PJ.sub.opciones.map((id, i) => {
     const o = id && D.objetos[id];
-    return `<div class="pitem${i === PJ.sel ? ' sel' : ''}"><span>${o ? o.nombre : tr('Dejar vacío')}</span><em>${o ? textoBonos(o) : ''}</em></div>`;
+    return `<div class="pitem${i === PJ.sel ? ' sel' : ''}"><span>${o ? nombreObjeto(o) : tr('Dejar vacío')}</span><em>${o ? textoBonos(o) : ''}</em></div>`;
   }).join('')}</div>` : '';
   $('personajes').innerHTML = `<div class="ptop"><div class="ptabs">${tecla('Q', 'strafeL')}${pestanas}${tecla('E', 'strafeR')}</div><div class="pgrupo">${uno ? '' : tecla('Z', 'lt')}<span>Grupo</span>${grupo}${uno ? '' : tecla('X', 'rt')}</div></div>
     <div class="pcuerpo">${ficha}<div class="pder">${centro}</div></div>${sub}
@@ -209,11 +210,14 @@ function desbloquear(id) {
 }
 // Lo que deja caer un grupo vencido: un jefe siempre suelta algo
 function soltarBotin(jefe) {
-  const ids = Object.keys(D.objetos);
   if (!jefe && azarX() >= D.mazmorra.botin.enemigo) return '';
-  const id = ids[Math.floor(azarX() * ids.length)];
+  return `${darObjeto(jefe).nombre} en la mochila`;
+}
+// Todo objeto que encuentra el grupo pasa por acá
+function darObjeto(jefe = false) {
+  const tenidos = [...X.mochila, ...[...X.plantel, ...X.grupo].flatMap(p => Object.values(p.equipo))], id = NUCLEO.elegirObjeto(D, azarX, tenidos, jefe);
   X.mochila.push(id); guardarX();
-  return `${D.objetos[id].nombre} en la mochila`;
+  return D.objetos[id];
 }
 
 const sinDesbloquear = fuente => Object.keys(D.habilidades).filter(id => D.habilidades[id].fuente === fuente && !X.grimorio.includes(id));

@@ -56,5 +56,136 @@
       "vit": 1
     },
     "descripcion": "Alguien lo talló con paciencia."
+  },
+  "maza_osario": {
+    "nombre": "Maza del Osario",
+    "tipo": "arma",
+    "bonos": {
+      "fue": 1,
+      "vit": 1
+    },
+    "descripcion": "Le quedó un diente clavado."
+  },
+  "cuchillo_caza": {
+    "nombre": "Cuchillo de Caza",
+    "tipo": "arma",
+    "bonos": {
+      "des": 1,
+      "per": 1
+    },
+    "descripcion": "Sirve para todo lo que respira."
+  },
+  "vara_fresno": {
+    "nombre": "Vara de Fresno",
+    "tipo": "arma",
+    "bonos": {
+      "int": 1,
+      "per": 1
+    },
+    "descripcion": "Viene de un bosque que ya no existe."
+  },
+  "hacha_verdugo": {
+    "nombre": "Hacha del Verdugo",
+    "tipo": "arma",
+    "bonos": {
+      "fue": 4,
+      "des": -1
+    },
+    "descripcion": "Hecha para un solo golpe. Pesa como una condena.",
+    "rareza": "rara"
+  },
+  "estoque_negro": {
+    "nombre": "Estoque Negro",
+    "tipo": "arma",
+    "bonos": {
+      "des": 3,
+      "per": 1
+    },
+    "descripcion": "No refleja la luz de la antorcha.",
+    "rareza": "rara"
+  },
+  "cetro_agrietado": {
+    "nombre": "Cetro Agrietado",
+    "tipo": "arma",
+    "bonos": {
+      "int": 4,
+      "vit": -1
+    },
+    "descripcion": "Por la grieta se le escapa algo de quien lo sostiene.",
+    "rareza": "rara"
+  },
+  "jubon_cuero": {
+    "nombre": "Jubón de Cuero",
+    "tipo": "armadura",
+    "bonos": {
+      "vit": 1,
+      "des": 1
+    },
+    "descripcion": "Remendado muchas veces, por muchas manos."
+  },
+  "habito_gris": {
+    "nombre": "Hábito Gris",
+    "tipo": "armadura",
+    "bonos": {
+      "int": 1,
+      "vit": 1
+    },
+    "descripcion": "Huele a incienso y a encierro."
+  },
+  "peto_placas": {
+    "nombre": "Peto de Placas",
+    "tipo": "armadura",
+    "bonos": {
+      "vit": 4,
+      "des": -2
+    },
+    "descripcion": "Lo que no te mata te hace más lento.",
+    "rareza": "rara"
+  },
+  "manto_ceniza": {
+    "nombre": "Manto de Ceniza",
+    "tipo": "armadura",
+    "bonos": {
+      "int": 2,
+      "per": 2
+    },
+    "descripcion": "Se deshace un poco con cada paso, y nunca se termina.",
+    "rareza": "rara"
+  },
+  "diente_rata": {
+    "nombre": "Collar de Dientes",
+    "tipo": "accesorio",
+    "bonos": {
+      "fue": 1,
+      "per": 1
+    },
+    "descripcion": "Son de rata. Casi todos."
+  },
+  "sello_roto": {
+    "nombre": "Sello Roto",
+    "tipo": "accesorio",
+    "bonos": {
+      "vit": 2
+    },
+    "descripcion": "La orden que lo usaba no dejó a nadie para reclamarlo."
+  },
+  "ojo_vidrio": {
+    "nombre": "Ojo de Vidrio",
+    "tipo": "accesorio",
+    "bonos": {
+      "per": 4,
+      "vit": -1
+    },
+    "descripcion": "Mira para otro lado. Ve más que vos.",
+    "rareza": "rara"
+  },
+  "pluma_negra": {
+    "nombre": "Pluma Negra",
+    "tipo": "accesorio",
+    "bonos": {
+      "des": 3
+    },
+    "descripcion": "No hay pájaros acá abajo.",
+    "rareza": "rara"
   }
 }

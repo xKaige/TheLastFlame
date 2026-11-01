@@ -734,7 +734,7 @@ function aplicarEfectoEvento({ tipo, valor }) {
   if (tipo === 'sangre') return heridos([masSano()]);       // no mata: el precio es quedar débil para la próxima
   if (tipo === 'dolor') return heridos(NUCLEO.vivos(X.grupo));
   if (tipo === 'cura') { for (const p of NUCLEO.vivos(X.grupo)) p.vida = Math.min(p.vidaMax, p.vida + Math.round(p.vidaMax * valor)); sfx('heal'); return tr('El grupo recupera vida.'); }
-  if (tipo === 'objeto') { const l = Object.keys(D.objetos), id = l[Math.floor(azarX() * l.length)]; X.mochila.push(id); return tr('Encuentras {0}.', D.objetos[id].nombre); }
+  if (tipo === 'objeto') return tr('Encuentras {0}.', darObjeto().nombre);
   if (tipo === 'ceniza') { X.ceniza += valor; return tr('+{0} de Ceniza.', valor); }
   if (tipo === 'antorcha') { P.fuel = clamp(P.fuel + valor, 0, 100); return tr(valor > 0 ? 'La antorcha gana {0}.' : 'La antorcha pierde {0}.', Math.abs(valor)); }
   if (tipo === 'impetu') { S.flags.impetu = (S.flags.impetu || 0) + valor; return tr('El grupo empieza la próxima pelea con +{0} de Ímpetu.', valor); }
@@ -759,13 +759,12 @@ function cerrarEvento() {
 window.openChest = c => {
   if (c.open) { log('El cofre está vacío.'); sfx('bump'); return; }
   c.open = true; sfx('chest');
-  const r = azarX(), lista = sinDesbloquear('cofre'), objetos = Object.keys(D.objetos);
+  const r = azarX(), lista = sinDesbloquear('cofre');
   if (lista.length && azarX() < D.mazmorra.botin.habilidad) {
     const id = lista[Math.floor(azarX() * lista.length)];
     desbloquear(id); sfx('level'); log(tr('Un pergamino: {0} queda en el Grimorio.', D.habilidades[id].nombre), 'em');
   } else if (azarX() < D.mazmorra.botin.objeto) {
-    const id = objetos[Math.floor(azarX() * objetos.length)];
-    X.mochila.push(id); guardarX(); log(tr('Encuentras {0}.', D.objetos[id].nombre), 'good');
+    log(tr('Encuentras {0}.', darObjeto().nombre), 'good');
   } else if (r < 0.35 && P.potions < BAL.maxPotions) { P.potions++; log('Encuentras una poción de sangre.', 'good'); }
   else if (r < 0.65 && P.oil < BAL.maxOil) { P.oil++; log('Encuentras un frasco de aceite.', 'good'); }
   else { X.ceniza += 3; log('Ceniza tibia en el fondo del cofre (+3).', 'good'); }

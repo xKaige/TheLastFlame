@@ -81,6 +81,13 @@ const NUCLEO = (() => {
     return out.map(m => crearPersonaje(D, m, azar)).sort(() => azar() - 0.5);
   }
 
+  // Botín: lo que el grupo todavía no tiene sale antes que lo repetido. Si no queda de esa rareza, sale de cualquiera.
+  function elegirObjeto(D, azar, tenidos, jefe) {
+    const rara = azar() < D.mazmorra.botin[jefe ? 'rara_jefe' : 'rara'], todos = Object.keys(D.objetos), nuevos = todos.filter(id => !tenidos.includes(id));
+    const pool = nuevos.length ? nuevos : todos, deRareza = pool.filter(id => (D.objetos[id].rareza === 'rara') === rara);
+    return elegir(azar, deRareza.length ? deRareza : pool);
+  }
+
   // Caídos de partidas anteriores que pueden volver, cada uno con una condición
   function sortearCaidos(D, caidos, azar) {
     const r = D.mazmorra.caidos, out = [];
@@ -296,7 +303,7 @@ const NUCLEO = (() => {
     return eventos;
   }
 
-  return { IMP_TOPE, vivos, crearPersonaje, asegurarPersonaje, ajustarModelo, atributosDe, recalcular, subirAtributo, cumpleRequisito, sortearCandidatos, sortearCaidos, aplicarCondicion, topeNivel, ganarExp, iniciarBatalla, haTerminado, vistaPrevia, proximoTurno, opciones, atacar, defender, usarHabilidad, turnoEnemigo };
+  return { IMP_TOPE, vivos, crearPersonaje, asegurarPersonaje, ajustarModelo, atributosDe, recalcular, subirAtributo, cumpleRequisito, sortearCandidatos, elegirObjeto, sortearCaidos, aplicarCondicion, topeNivel, ganarExp, iniciarBatalla, haTerminado, vistaPrevia, proximoTurno, opciones, atacar, defender, usarHabilidad, turnoEnemigo };
 })();
 
 if (typeof module !== 'undefined') module.exports = NUCLEO;
