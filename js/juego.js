@@ -336,7 +336,8 @@ function pelearDePrueba(ids, piso, jefe) {
   X.sel = X.plantel.slice(0, MAX_GRUPO);
   partir();
   $('xCharla').classList.add('hidden'); CH = null;      // sin los diálogos de la bajada
-  S.floor = piso; S.mode = 'explore';
+  S.mode = 'explore';
+  window.enterLevel(piso, D.mazmorra.niveles.at(jefe ? -1 : 0));     // trae la paleta y el fondo de ese piso
   const ent = { type: 'enemy', def: jefe ? ENEMIES[FLOOR_BOSS[piso]] : ENEMIES.rata, x: 1, y: 1, vx: 1.5, vy: 1.5, hp: 1 };
   W_().ents.push(ent);
   setMusic(jefe ? temaDeJefe() : 'pelea');
