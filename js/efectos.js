@@ -137,6 +137,41 @@ function actualizarFxHabilidad(dt) {
   Bt.fxHab = Bt.fxHab.filter(f => f.t < f.fx.dur);
 }
 
+// Golpes de pixelfx, pasados por los tonos del piso. Cada uno se dibuja sobre el enemigo golpeado.
+const LUGAR_PIXEL = {
+  tajo: (x, m, q) => ({ x: x - 6 * q.dir, y: m + 26, radius: clamp(q.tam * 0.42, 28, 58) }),
+  estocada: (x, m, q) => ({ x: x - 33 * q.dir, y: m + 14 }),
+  golpe: (x, m) => ({ x, y: m + 22 }),
+  chispa: (x, m) => ({ x, y: m + 20 }),
+  critico: (x, m) => ({ x, y: m + 26 }),
+};
+let capaPixel = null;
+
+function golpePixel(id, q) {
+  const R = RAMPS[S.env], palette = id === 'critico' ? ['#2a0510', '#5c0a1c', '#a3142a', '#e0302c', R[4], R[5], '#fff09a', '#ffffff'] : [...R, '#ffffff'];
+  const f = PIXELFX.createFx(PIXELFX.EFECTOS[id], { ...LUGAR_PIXEL[id](q.x, FBASE - q.tam * 0.5, q), flip: q.dir < 0, seed: 1 + Math.floor(azarX() * 9999), palette, sparks: [R[5], R[4], R[3], '#ffffff'], warm: R[4], dust: R[3], clod: R[2] });
+  f.update(0.07);   // arranca ya en el impacto: es el cuadro que queda congelado
+  Bt.fxPixel.push(f);
+}
+
+function actualizarFxPixel(dt) {
+  for (const f of Bt.fxPixel) f.update(dt);
+  Bt.fxPixel = Bt.fxPixel.filter(f => !f.done());
+}
+
+function dibujarFxPixel(c) {
+  if (!Bt.fxPixel.length) return;
+  if (!capaPixel) {
+    const lienzo = document.createElement('canvas'); lienzo.width = 480; lienzo.height = 270;
+    capaPixel = { lienzo, g: lienzo.getContext('2d'), marco: PIXELFX.createFrame(480, 270), img: new ImageData(480, 270) };
+  }
+  PIXELFX.clearFrame(capaPixel.marco);
+  for (const f of Bt.fxPixel) f.draw(capaPixel.marco);
+  PIXELFX.composite(capaPixel.marco, capaPixel.img.data);
+  capaPixel.g.putImageData(capaPixel.img, 0, 0);
+  c.drawImage(capaPixel.lienzo, 0, 0);
+}
+
 function dibujarFxHabilidad(c) {
   for (const f of Bt.fxHab) {
     c.save(); c.translate(f.x, f.y); c.lineCap = 'butt';

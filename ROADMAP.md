@@ -2,7 +2,7 @@
 
 El camino del juego es la expedición de grupo. El plan del juego anterior está en `juego_viejo/ROADMAP.md`.
 
-**Versión actual: 0.3.35.** Lo próximo: 0.4.0.
+**Versión actual: 0.3.36.** Lo próximo: 0.4.0.
 
 ## Cómo se numeran las versiones
 
@@ -53,6 +53,7 @@ Cada parche sube la versión en `package.json` y en `index.html`, y se anota ac�
 
 ### 1.0.0: Publicación
 
+- Mostrar en los créditos los avisos de `js/pixelfx.LICENCIA.txt`.
 - Steam sigue en pausa hasta que el juego esté pulido. Sus notas están en `juego_viejo/STEAM.md`.
 
 ## Historia
@@ -97,6 +98,11 @@ La idea que une todo es una regla de las Guardianas: "quien le pida algo va a re
 - **Título:** el logo "The Last Flame" no cambia con el idioma.
 
 ## Historial
+
+### 0.3.36
+
+- Golpes nuevos con efectos de pixelfx, en los tonos de cada zona: tajo, estocada, golpe seco y crítico.
+- La pelea se congela un instante al impactar.
 
 ### 0.3.35
 

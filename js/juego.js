@@ -1210,7 +1210,7 @@ function iniciarPelea(ent, ids, entrada = 0.95, emboscada = false) {
   const fx = ids.length === 1 ? [240] : ids.length === 2 ? [190, 290] : ids.some(id => D.enemigos[id].tam_batalla) ? [92, 240, 388] : FX3;   // un jefe grande necesita lugar
   for (const e of b.enemigos) { e.x = fx[e.i]; prepararEnemigo(e); }
   for (const u of b.aliados) u.golpeado = 0;
-  Bt = { b, lugares: fx, ent, fase: 'espera', sel: 0, tsel: 0, ops: [], msg: 'Te cierran el paso.', t: 0, gris: fondoBatalla(), fx: [], fxHab: [], part: [], temblor: 0, destello: 0, golpe: 'tajo', ini: 0, entrada };
+  Bt = { b, lugares: fx, ent, fase: 'espera', sel: 0, tsel: 0, ops: [], msg: 'Te cierran el paso.', t: 0, gris: fondoBatalla(), fx: [], fxHab: [], fxPixel: [], congelado: 0, part: [], temblor: 0, destello: 0, golpe: 'tajo', ini: 0, entrada };
   S.mode = 'xbat';
   $('battle').classList.remove('hidden');
   $('bMenu').classList.add('hidden');
@@ -1314,32 +1314,24 @@ function efectoEstado(q, estado) {
 function efectoGolpe(q, tipo = 'tajo', critico = false) {
   const x = q.x, y = FBASE - q.tam * 0.5, cols = coloresFx(tipo), m = critico ? 1.5 : 1;
   q.retro = critico ? 9 : 5; q.dir = azarX() < 0.5 ? -1 : 1;
-  Bt.fx.push({ tipo, x, y, t: 0, dur: tipo === 'fuego' ? 0.4 : 0.22, m, giro: azarX() * 0.8 - 0.4 });
+  if (tipo === 'fuego') Bt.fx.push({ tipo, x, y, t: 0, dur: 0.4, m, giro: azarX() * 0.8 - 0.4 });
+  else golpePixel(tipo === 'propio' ? 'chispa' : tipo, q);
+  Bt.congelado = Math.max(Bt.congelado, critico ? 0.11 : 0.05);
   chispas(x, y, Math.round((tipo === 'fuego' ? 22 : 12) * m), cols, tipo === 'fuego' ? -50 : -30);
   Bt.temblor = Math.max(Bt.temblor, critico ? 4 : 2);
   Bt.destello = Math.max(Bt.destello, tipo === 'fuego' ? 0.45 : critico ? 0.35 : 0.15);
-  if (critico) { Bt.fx.push({ tipo: 'anillo', x, y, t: 0, dur: 0.28, m }); sfx('slash'); }
+  if (critico) { golpePixel('critico', q); sfx('slash'); }
 }
 
 function dibujarFx(c) {
   for (const f of Bt.fx) {
     const k = clamp(f.t / f.dur, 0, 1), cols = coloresFx(f.tipo);
     c.save(); c.translate(f.x, f.y); c.rotate(f.giro || 0); c.lineCap = 'butt';
-    if (f.tipo === 'tajo' || f.tipo === 'golpe') {
-      // medialuna que cruza al enemigo en diagonal
-      const r = 34 * f.m;
-      c.strokeStyle = cols[1]; c.lineWidth = (1 - k) * 7 * f.m; c.beginPath(); c.arc(-r * 0.7, -r * 0.2, r, -0.9 + k * 0.5, 0.9 + k * 0.5); c.stroke();
-      c.strokeStyle = cols[0]; c.lineWidth = (1 - k) * 3 * f.m; c.beginPath(); c.arc(-r * 0.7, -r * 0.2, r, -0.8 + k * 0.5, 0.8 + k * 0.5); c.stroke();
-    } else if (f.tipo === 'estocada') {
-      const l = 40 * f.m * (0.4 + k * 0.6);
-      c.fillStyle = cols[0]; c.beginPath(); c.moveTo(-l, -1); c.lineTo(l, 0); c.lineTo(-l, 2 * (1 - k) + 1); c.closePath(); c.fill();
-    } else if (f.tipo === 'fuego') {
+    if (f.tipo === 'fuego') {
       for (let n = 0; n < 3; n++) { c.fillStyle = cols[n]; const r = (10 + 26 * k) * (1 - n * 0.28) * f.m; c.beginPath(); c.arc(0, 0, r * (1 - k * 0.3), 0, Math.PI * 2); c.globalAlpha = 1 - k; c.fill(); }
     } else if (f.tipo === 'veneno') {
       c.fillStyle = cols[0]; c.globalAlpha = 1 - k;
       for (let n = 0; n < 6; n++) c.fillRect(Math.round(Math.sin(n * 2.4) * 16), Math.round(10 - n * 4 - k * 18), 2, 2);
-    } else if (f.tipo === 'anillo') {
-      c.strokeStyle = RAMPS[S.env][5]; c.lineWidth = (1 - k) * 3; c.beginPath(); c.arc(0, 0, 10 + 34 * k, 0, Math.PI * 2); c.stroke();
     }
     c.restore();
   }
@@ -1941,6 +1933,7 @@ function dibujarBatalla(c) {
     }
   }
   dibujarFx(c);
+  dibujarFxPixel(c);
   dibujarFxHabilidad(c);
   if (Bt.fase === 'menu' || Bt.fase === 'objetivo') dibujarMenu(c);
   if (Bt.ini >= Bt.entrada * 0.8 && Bt.fase !== 'botin') dibujarLinea(capaNitida());
@@ -1981,7 +1974,9 @@ window.update = dt => {
   baseX.update(dt);
   if (S.mode === 'xtrans' && Tr) actualizarTransicion(dt);
   if (S.mode === 'xsal' && Sal) actualizarSalida(dt);
-  if (S.mode === 'xbat' && Bt) { Bt.t += dt; Bt.ini += dt; for (const u of Bt.b.unidades) u.golpeado = Math.max(0, (u.golpeado || 0) - dt); actualizarFx(dt); actualizarFxHabilidad(dt); }
+  // al impactar, la pelea se congela un instante
+  if (S.mode === 'xbat' && Bt && Bt.congelado > 0) Bt.congelado -= dt;
+  else if (S.mode === 'xbat' && Bt) { Bt.t += dt; Bt.ini += dt; for (const u of Bt.b.unidades) u.golpeado = Math.max(0, (u.golpeado || 0) - dt); actualizarFx(dt); actualizarFxHabilidad(dt); actualizarFxPixel(dt); }
 };
 window.draw = () => {
   limpiarCapa();
