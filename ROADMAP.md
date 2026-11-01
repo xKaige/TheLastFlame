@@ -27,6 +27,7 @@ Cada parche sube la versión en `package.json` y en `index.html`, y se anota ac�
 - Escenario de batalla propio.
 - Eventos propios.
 - Animar a su jefe cuando tenga el dibujo definitivo.
+- Reescribir el final: Aldemar pasa a ser el jefe del acto I, y al vencerlo se abre el suelo hacia la zona 4.
 
 ### 0.6.0: Runas
 
@@ -36,7 +37,8 @@ Cada parche sube la versión en `package.json` y en `index.html`, y se anota ac�
 ### 0.7.0 a 0.12.0: Zonas 4 a 9
 
 - Una zona por versión, con arte y música propios, hechos como los anteriores.
-- El contenido y los nombres de cada zona se definen cuando llegue su turno.
+- La historia de cada zona está en "Historia", más abajo.
+- La zona 9 suma los tres finales.
 
 ### 0.13.0: Idiomas
 
@@ -52,6 +54,32 @@ Cada parche sube la versión en `package.json` y en `index.html`, y se anota ac�
 ### 1.0.0: Publicación
 
 - Steam sigue en pausa hasta que el juego esté pulido. Sus notas están en `juego_viejo/STEAM.md`.
+
+## Historia
+
+La idea que une todo es una regla de las Guardianas: "quien le pida algo va a recibirlo". Cada zona es un pedido que la Llama concedió y salió horrible. Aldemar fue el último, no el primero.
+
+**Acto I: El Rey**
+
+1. La Cripta. Jefe: El Rey del Osario.
+2. Los Salones. Jefe: El Cazador Gris.
+3. El Fondo. Jefe y cierre del acto: Aldemar, El Que Habita la Oscuridad. Sin la Llama, el suelo se abre: ese fondo no era el fondo.
+
+**Acto II: Los que pidieron**
+
+4. La Veta. Mina infinita, oro que crece como una enfermedad, tonos ocre. Los mineros pidieron riqueza sin fin y siguen cavando, con oro en lugar de carne. Jefe: El Capataz, que todavía lleva la cuenta.
+5. La Ciudad Anegada. Pueblo bajo un lago negro, tonos verdosos. Pidieron agua en una sequía y nunca dejó de subir. Jefe: La Ahogada, quien hizo el pedido.
+6. El Claustro. Convento de las Guardianas, tonos blancos. No pidieron nada: su pecado fue permitirlo todo. Se aclara quién fue La Sombra, y las 40 hermanas del incendio hacen eco de los 40 caballeros. Jefe y cierre del acto, con fase: La Primera Guardiana.
+
+**Acto III: Lo que había antes**
+
+7. El Bosque sin Sol. Bosque subterráneo pálido, tonos de hueso y musgo. Alguien pidió que nada muriera, y todo crece encima de lo anterior. Jefe: El Primer Árbol.
+8. El Campo de Ceniza. Llanura gris con ejércitos fósiles, tonos rojo y gris. Dos reyes pidieron ganar la misma guerra y todavía pelean. Jefe doble: Los Dos Reyes.
+9. La Última Llama. Oscuridad casi total; la única luz es la antorcha del grupo. Jefe final, con fase: La Llama.
+
+**Final:** la Llama nunca fue un fuego, es el hambre que olió el Cazador Gris. La antorcha del grupo es la última que queda. Antes de la pelea ofrece lo que quieras, y hay tres finales: pedir, ofrecerte o no decir nada. Los dos primeros terminan mal, de maneras distintas, y el tercero es el verdadero.
+
+**Runas:** cada runa puede ser un resto de esos pedidos.
 
 ## Reglas decididas
 
