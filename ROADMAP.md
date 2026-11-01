@@ -7,22 +7,22 @@ El camino del juego es la expedición de grupo. El plan del juego anterior está
 ## Cómo se numeran las versiones
 
 - **Parche (0.3.x):** cada tanda de cambios que se sube al juego. Arreglos, ajustes y contenido dentro de lo que ya existe.
-- **Versión (0.x.0):** una etapa grande terminada, como un piso remodelado.
+- **Versión (0.x.0):** una etapa grande terminada, como una zona remodelada.
 - **1.0.0:** el juego completo, listo para publicar.
 
 Cada parche sube la versión en `package.json` y en `index.html`, y se anota acá: pasa de "Próximas versiones" a "Historial". Lo que surja en el camino se agrega al parche que corresponda.
 
 ## Próximas versiones
 
-### 0.4.0: Piso 2 (Los Salones)
+### 0.4.0: Zona 2 (Los Salones)
 
 - Falta un adorno de pared: el candelabro.
 - Eventos y misiones propios.
 - Música de exploración.
 
-### 0.5.0: Piso 3 (El Fondo)
+### 0.5.0: Zona 3 (El Fondo)
 
-- Remodelar el piso y hacerlo más grande.
+- Remodelar la zona y hacerla más grande.
 - Cambiar los dibujos de sus enemigos.
 - Escenario de batalla propio.
 - Eventos propios.
@@ -31,12 +31,12 @@ Cada parche sube la versión en `package.json` y en `index.html`, y se anota ac�
 ### 0.6.0: Runas
 
 - Traer al grupo las runas del juego anterior (`juego_viejo/js/runes.js`: 8 runas, 2 ranuras y una tercera tras vencer a un jefe).
-- Son la base de la rejugabilidad: entran antes que los pisos nuevos para que cada uno pueda sumar las suyas.
+- Son la base de la rejugabilidad: entran antes que las zonas nuevas para que cada una pueda sumar las suyas.
 
-### 0.7.0 a 0.12.0: Pisos 4 a 9
+### 0.7.0 a 0.12.0: Zonas 4 a 9
 
-- Un piso por versión, con arte y música propios, hechos como los anteriores.
-- El contenido y los nombres de cada piso se definen cuando llegue su turno.
+- Una zona por versión, con arte y música propios, hechos como los anteriores.
+- El contenido y los nombres de cada zona se definen cuando llegue su turno.
 
 ### 0.13.0: Idiomas
 
@@ -55,9 +55,10 @@ Cada parche sube la versión en `package.json` y en `index.html`, y se anota ac�
 
 ## Reglas decididas
 
-- **Orden de trabajo:** primero se termina el piso 1, después se remodela el piso 2 y recién entonces el resto.
-- **Extensión:** el juego tiene 9 pisos. Una expedición completa dura de 3 a 4 horas, unos 20 a 25 minutos por piso, y se puede guardar entre piso y piso.
-- **Nivel máximo:** cada piso sube el tope 10 niveles: 10, 20, 30... hasta 90 en el piso 9 (`zonas` en `datos/mazmorra.json`). En un piso ya superado el personaje no gana experiencia.
+- **Orden de trabajo:** primero se termina la zona 1, después se remodela la zona 2 y recién entonces el resto.
+- **Extensión:** el juego tiene 9 zonas de unos 3 pisos cada una; la zona 9 es la final. Una expedición completa dura de 3 a 4 horas, unos 20 a 25 minutos por zona, y se puede guardar entre piso y piso.
+- **Nombres:** lo que acá se llama zona, en el código es `piso` (`pisos` en `datos/mazmorra.json`), y lo que acá se llama piso, en el código es `nivel`.
+- **Nivel máximo:** cada zona sube el tope 10 niveles: 10, 20, 30... hasta 90 en la zona 9 (`zonas` en `datos/mazmorra.json`). En una zona ya superada el personaje no gana experiencia.
 - **Continuar:** la expedición se guarda sola explorando, nunca en medio de una pelea. Morir no se deshace cerrando el juego.
 - **Botín:** los objetos raros (✦) salen el 20% de las veces, y el 70% si los suelta un jefe (`botin` en `datos/mazmorra.json`).
 - **Personajes:** no hay protagonistas fijos. Son al azar, se conocen entre sí, y la historia importante está en notas por la mazmorra.
@@ -71,8 +72,8 @@ Cada parche sube la versión en `package.json` y en `index.html`, y se anota ac�
 
 ### 0.3.35
 
-- El nivel máximo sube 10 por piso, rumbo a 90 en el piso 9.
-- El roadmap pasa a 9 pisos y suma las runas.
+- El nivel máximo sube 10 por zona, rumbo a 90 en la zona 9.
+- El roadmap pasa a 9 zonas y suma las runas.
 
 ### 0.3.34
 
