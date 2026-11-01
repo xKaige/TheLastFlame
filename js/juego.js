@@ -127,8 +127,14 @@ function aplicarTexturas() {
 
 // Accesorios de pared: cada uno es una variante del muro, así reciben la perspectiva y la luz del motor.
 // Se eligen por posición, para que un nivel quede siempre igual.
-const ACC_BASE = 10, ACCESORIOS = D.mazmorra.accesorios;
-for (const a of ACCESORIOS.lista) a.img = Object.assign(new Image(), { src: tr('interfaz/mazmorra/cripta/accesorios/{0}.png', a.imagen) });
+// Cada piso con arte propio tiene sus adornos; los demás usan los de la cripta.
+const ACC_BASE = 10, DECORADO = { crypt: { ...D.mazmorra.accesorios, carpeta: 'cripta' }, castle: { ...D.mazmorra.accesorios_salones, carpeta: 'salones' } };
+const imagenAdorno = (dec, n) => Object.assign(new Image(), { src: `interfaz/mazmorra/${dec.carpeta}/accesorios/${n}.png` });
+for (const dec of Object.values(DECORADO)) {
+  for (const a of [...dec.lista, ...dec.piso.lista]) a.img = imagenAdorno(dec, a.imagen);
+  dec.techo.imgs = dec.techo.lista.map(n => imagenAdorno(dec, n)); dec.techo.sprs = [];
+}
+const decoradoDe = w => DECORADO[w.theme] || DECORADO.crypt;
 function muroConAccesorio(base, a) {
   const c = document.createElement('canvas'); c.width = c.height = TEX;
   // el motor ensancha los muros (el ancho de pantalla rinde más que el alto): se compensa para que el dibujo no se deforme
@@ -145,12 +151,13 @@ function muroConAccesorio(base, a) {
   });
 }
 function prepararMuros(w) {
-  const T = TEXTURES[w.theme || 'crypt'], lista = ACCESORIOS.lista.filter(a => a.img.complete && a.img.naturalWidth);
-  lista.forEach(a => { const k = ACC_BASE + ACCESORIOS.lista.indexOf(a); if (!T.walls[k]) T.walls[k] = muroConAccesorio(T.walls[0], a); });
+  const T = TEXTURES[w.theme || 'crypt'], dec = decoradoDe(w), lista = dec.lista.filter(a => a.img.complete && a.img.naturalWidth);
+  lista.forEach(a => { const k = ACC_BASE + dec.lista.indexOf(a); if (!T.walls[k]) T.walls[k] = muroConAccesorio(T.walls[0], a); });
+  for (let k = ACC_BASE; k < ACC_BASE + 8; k++) if (!T.walls[k]) T.walls[k] = T.walls[0];     // guardados con adornos de otra lista
   return lista;
 }
 function decorarMuros(w, nivel) {
-  const lista = prepararMuros(w), puestos = [];
+  const lista = prepararMuros(w), dec = decoradoDe(w), puestos = [];
   if (!lista.length) return;
   const muro = (x, y) => x < 0 || y < 0 || x >= MW || y >= MH || w.map[y * MW + x] === 1;
   const azar = (x, y, s) => { let h = Math.imul(x + 1, 73856093) ^ Math.imul(y + 1, 19349663) ^ Math.imul(nivel + s, 83492791); h = Math.imul(h ^ (h >>> 13), 1274126177); return ((h ^ (h >>> 16)) >>> 0) / 4294967296; };
@@ -160,23 +167,22 @@ function decorarMuros(w, nivel) {
     // sólo en pared plana: una cara libre y sus dos costados también muro
     const libres = [[1, 0], [-1, 0], [0, 1], [0, -1]].filter(([ax, ay]) => !muro(x + ax, y + ay));
     if (libres.length !== 1 || !muro(x + libres[0][1], y + libres[0][0]) || !muro(x - libres[0][1], y - libres[0][0])) continue;
-    if (azar(x, y, 1) > ACCESORIOS.densidad || puestos.some(p => Math.abs(p[0] - x) + Math.abs(p[1] - y) < ACCESORIOS.separacion)) continue;
-    w.wtype[i] = ACC_BASE + ACCESORIOS.lista.indexOf(lista[Math.floor(azar(x, y, 2) * lista.length)]);
+    if (azar(x, y, 1) > dec.densidad || puestos.some(p => Math.abs(p[0] - x) + Math.abs(p[1] - y) < dec.separacion)) continue;
+    w.wtype[i] = ACC_BASE + dec.lista.indexOf(lista[Math.floor(azar(x, y, 2) * lista.length)]);
     puestos.push([x, y]);
   }
 }
 
 // Accesorios de techo: sprites de la altura del muro con el dibujo arriba, así siempre tocan el techo.
 // Nunca bajan de la línea de los ojos: el grupo pasa por debajo y no chocan con nada.
-const TECHO = ACCESORIOS.techo, IMG_TECHO = TECHO.lista.map(n => Object.assign(new Image(), { src: tr('interfaz/mazmorra/cripta/accesorios/{0}.png', n) }));
-const SPR_TECHO = [];
-function spriteTecho(n) {
-  const img = IMG_TECHO[n];
-  if (!SPR_TECHO[n] && img.complete && img.naturalWidth) SPR_TECHO[n] = spriteDesdeImagen(img, img.naturalWidth);
-  return SPR_TECHO[n];
+function spriteTecho(w, n) {
+  const t = decoradoDe(w).techo, img = t.imgs[n];
+  if (img && !t.sprs[n] && img.complete && img.naturalWidth) t.sprs[n] = spriteDesdeImagen(img, img.naturalWidth);
+  return t.sprs[n];
 }
 function colgarDelTecho(w, nivel) {
   w.colgantes = [];
+  const TECHO = decoradoDe(w).techo;
   const azar = (x, y, s) => { let h = Math.imul(x + 3, 19349663) ^ Math.imul(y + 5, 73856093) ^ Math.imul(nivel + s, 83492791); h = Math.imul(h ^ (h >>> 13), 1274126177); return ((h ^ (h >>> 16)) >>> 0) / 4294967296; };
   for (let y = 1; y < MH - 1; y++) for (let x = 1; x < MW - 1; x++) {
     if (w.map[y * MW + x] !== 0 || azar(x, y, 7) > TECHO.densidad) continue;
@@ -185,8 +191,6 @@ function colgarDelTecho(w, nivel) {
   }
 }
 // Accesorios de piso: sprites sólidos, siempre en esquinas de sala y donde no dejan nada aislado.
-const PISO = ACCESORIOS.piso;
-for (const a of PISO.lista) a.img = Object.assign(new Image(), { src: tr('interfaz/mazmorra/cripta/accesorios/{0}.png', a.imagen) });
 function zonaAlcanzable(w, tapado) {
   const pila = [w.start[1] * MW + w.start[0]], visto = new Set(pila);
   while (pila.length) {
@@ -206,18 +210,18 @@ function esquinaDeSala(w, x, y) {
   }
   return false;
 }
-function prepararAdornos() {
-  const lista = PISO.lista.filter(a => a.img.complete && a.img.naturalWidth);
+function prepararAdornos(w) {
+  const lista = decoradoDe(w).piso.lista.filter(a => a.img.complete && a.img.naturalWidth);
   for (const a of lista) {
     if (!a.spr) a.spr = spriteDesdeImagen(a.img, a.img.naturalWidth);
     if (a.reemplaza) SPRITES[a.reemplaza].w = a.spr;      // el adorno viejo del juego base usa el dibujo nuevo
   }
   return lista;
 }
-const adornoEn = (x, y, a) => ({ x, y, spr: a.spr, scale: a.escala, ramp: 0, glow: 0.3, n: PISO.lista.indexOf(a) });
+const adornoEn = (w, x, y, a) => ({ x, y, spr: a.spr, scale: a.escala, ramp: 0, glow: 0.3, n: decoradoDe(w).piso.lista.indexOf(a) });
 function ponerEnElPiso(w, nivel) {
   w.adornos = []; w.solidos = new Set();
-  const lista = prepararAdornos();
+  const lista = prepararAdornos(w), PISO = decoradoDe(w).piso;
   if (!lista.length) return;
   const azar = (x, y, s) => { let h = Math.imul(x + 7, 83492791) ^ Math.imul(y + 11, 19349663) ^ Math.imul(nivel + s, 73856093); h = Math.imul(h ^ (h >>> 13), 1274126177); return ((h ^ (h >>> 16)) >>> 0) / 4294967296; };
   let total = zonaAlcanzable(w, -1);
@@ -227,7 +231,7 @@ function ponerEnElPiso(w, nivel) {
     if (w.ents.some(e => e.x === x && e.y === y) || w.adornos.some(p => Math.abs(p.x - x - 0.5) + Math.abs(p.y - y - 0.5) < PISO.separacion)) continue;
     if (zonaAlcanzable(w, i) !== total - 1) continue;
     const a = lista[Math.floor(azar(x, y, 4) * lista.length)];
-    w.adornos.push(adornoEn(x + 0.5, y + 0.5, a));
+    w.adornos.push(adornoEn(w, x + 0.5, y + 0.5, a));
     w.solidos.add(i); total--;
   }
 }
@@ -237,7 +241,7 @@ window.isWall = (x, y) => baseIsWall(x, y) || !!W_().solidos?.has(y * MW + x);
 const baseRenderScene = renderScene;
 window.renderScene = (w, v, sprites, h) => {
   const extra = [];
-  for (const c of w.colgantes || []) { const spr = spriteTecho(c.n); if (spr) extra.push({ x: c.x, y: c.y, spr, scale: 1, ramp: 0, glow: 0.3 * flick }); }
+  for (const c of w.colgantes || []) { const spr = spriteTecho(w, c.n); if (spr) extra.push({ x: c.x, y: c.y, spr, scale: 1, ramp: 0, glow: 0.3 * flick }); }
   baseRenderScene(w, v, sprites.concat(extra, w.adornos || []), h);
 };
 
@@ -660,10 +664,10 @@ function continuarExpedicion() {
   audioInit(); sfx('stairs');
   aplicarTexturas();
   restore(d.snap);
-  const w = W_(), lista = prepararAdornos();
+  const w = W_(), lista = prepararAdornos(w), PISO = decoradoDe(w).piso;
   prepararMuros(w);
   colgarDelTecho(w, S.level);
-  w.adornos = d.adornos.filter(a => lista.includes(PISO.lista[a.n])).map(a => adornoEn(a.x, a.y, PISO.lista[a.n]));
+  w.adornos = d.adornos.filter(a => lista.includes(PISO.lista[a.n])).map(a => adornoEn(w, a.x, a.y, PISO.lista[a.n]));
   w.solidos = new Set(w.adornos.map(a => Math.floor(a.y) * MW + Math.floor(a.x)));
   log('El grupo sigue adelante.', 'em');
   updateHUD();

@@ -120,6 +120,61 @@
       "abierto": "cofre_abierto"
     }
   },
+  "accesorios_salones": {
+    "densidad": 0.14,
+    "separacion": 3,
+    "lista": [
+      {
+        "id": "tapiz_roto",
+        "imagen": "tapiz_roto",
+        "y": 2,
+        "alto": 54
+      },
+      {
+        "id": "escudo_armas",
+        "imagen": "escudo_armas",
+        "y": 8,
+        "alto": 44
+      },
+      {
+        "id": "retrato_rajado",
+        "imagen": "retrato_rajado",
+        "y": 6,
+        "alto": 46
+      }
+    ],
+    "piso": {
+      "densidad": 0.3,
+      "separacion": 3,
+      "lista": [
+        {
+          "imagen": "armadura_vacia",
+          "escala": 0.85,
+          "reemplaza": "armorStand"
+        },
+        {
+          "imagen": "silla_rota",
+          "escala": 0.55
+        },
+        {
+          "imagen": "mesa_banquete",
+          "escala": 0.6
+        },
+        {
+          "imagen": "jarron_roto",
+          "escala": 0.55
+        }
+      ]
+    },
+    "techo": {
+      "densidad": 0.06,
+      "separacion": 5,
+      "lista": [
+        "arana_salon",
+        "estandarte_techo"
+      ]
+    }
+  },
   "pisos": [
     {
       "nombre": "La Cripta"
