@@ -282,6 +282,7 @@ window.openTitleMenu = () => {
   else if (hay) items.push({ label: 'Continuar', sub: tr('{0} de Ceniza · {1} en el plantel · {2} expedicion{3}', X.ceniza, X.plantel.length, X.corridas, X.corridas === 1 ? '' : 'es'), fn: abrirHogar });
   items.push({ label: 'Nueva partida', fn: () => (hay ? confirmMenu('¿Empezar de nuevo? Se borra todo el progreso.', nuevaPartida) : nuevaPartida()) });
   items.push({ label: 'Opciones', fn: openOptionsMenu });
+  if (PRUEBA) items.push({ label: 'Explorar de prueba', sub: 'Va directo a cualquier piso. No se guarda nada.', fn: abrirPisosDePrueba });
   if (PRUEBA) items.push({ label: 'Peleas de prueba', sub: 'Va directo a una pelea. No se guarda nada.', fn: abrirPeleasDePrueba });
   if (/Electron/i.test(navigator.userAgent)) items.push({ label: 'Salir', fn: () => window.close() });
   openMenu({ back: false, cls: 'compact', items }, 'title');
@@ -293,6 +294,28 @@ function nuevaPartida() {
   guardarX();
   borrarExpedicion();
   verIntro();
+}
+
+// Sólo en modo prueba: un grupo con las 4 clases, con nivel acorde, en el piso que elijas
+function abrirPisosDePrueba() {
+  const nombres = ['Primer descenso', 'Segundo descenso', 'La guarida'], items = [];
+  D.mazmorra.pisos.forEach((p, i) => D.mazmorra.niveles.forEach((nivel, k) => {
+    items.push({ label: tr('{0} <small>· {1}</small>', p.nombre, nombres[k]), fn: () => explorarDePrueba(i + 1, nivel) });
+  }));
+  openMenu({ title: 'Explorar de prueba', cls: 'altar', items });
+}
+
+function explorarDePrueba(piso, nivel) {
+  X.corridas = Math.max(X.corridas, 2);
+  X.plantel = NUCLEO.sortearCandidatos(D, azarX).filter((p, i, l) => l.findIndex(q => q.clase === p.clase) === i).slice(0, MAX_GRUPO);
+  for (const p of X.plantel) while (p.nivel < 1 + (piso - 1) * 3) { p.exp = 0; NUCLEO.ganarExp(D, p, p.nivel * D.mazmorra.exp_por_nivel); }
+  X.sel = X.plantel.slice();
+  partir();
+  $('xCharla').classList.add('hidden'); CH = null;      // sin los diálogos de la bajada
+  S.mode = 'explore';
+  window.enterLevel(piso, nivel);
+  guardarExpedicion();
+  updateHUD();
 }
 
 // Sólo en modo prueba: elegís una pelea y arranca, sin pasar por la expedición
