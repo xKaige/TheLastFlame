@@ -17,7 +17,6 @@ Cada parche sube la versión en `package.json` y en `index.html`, y se anota ac�
 ### 0.3.13: Archivos pendientes del piso 1
 
 - Música de exploración, cuando esté el archivo.
-- Retratos: conseguir los PNG originales sin marco.
 
 ### 0.4.0: Piso 2 (Los Salones)
 
