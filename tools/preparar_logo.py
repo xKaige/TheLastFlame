@@ -1,4 +1,4 @@
-# Quita el fondo magenta del logo y lo recorta. Uso: python tools/preparar_logo.py origen.webp
+# Quita el fondo magenta del logo y lo recorta; después va tools/pixelar_logo.py. Uso: python tools/preparar_logo.py origen.webp
 import sys
 import numpy as np
 from PIL import Image
@@ -13,5 +13,5 @@ exceso = np.clip(b - g, 0, None) * (alfa < 1)
 sal = np.dstack([np.clip(r - exceso, 0, 255), g, np.clip(b - exceso, 0, 255), alfa * 255]).astype('uint8')
 im = Image.fromarray(sal, 'RGBA')
 im = im.crop(im.getchannel('A').point(lambda v: 255 if v > 16 else 0).getbbox())
-im.save('interfaz/logo.png', optimize=True)
+im.save("interfaz/logo_original.png", optimize=True)
 print(im.size)
