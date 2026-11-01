@@ -2,7 +2,7 @@
 
 El camino del juego es la expedición de grupo. El plan del juego anterior está en `juego_viejo/ROADMAP.md`.
 
-**Versión actual: 0.3.27.** Lo próximo: 0.4.0.
+**Versión actual: 0.3.28.** Lo próximo: 0.4.0.
 
 ## Cómo se numeran las versiones
 
@@ -56,6 +56,10 @@ Cada parche sube la versión en `package.json` y en `index.html`, y se anota ac�
 - **Título:** el logo "The Last Flame" no cambia con el idioma.
 
 ## Historial
+
+### 0.3.28
+
+- Íconos de estado: blanco rojo para la presa, flecha azul para debilitado y flecha roja para los bonus propios.
 
 ### 0.3.27
 

@@ -1637,7 +1637,7 @@ function rombo(c, x, y, lleno) {
 // Fila de estados: lo que afecta a cada personaje ahora
 function estadosDe(q) {
   const on = [q.guardia && ['escudo', icon('shield'), 'En guardia'], q.provoca > 0 && ['ira', icon('cross'), 'Provocando'],
-    q.defensaExtra > 0 && ['mas', '▲', `Defensa +${q.defensaExtra}`], q.marcado && ['marca', icon('ash'), 'Marcado'], q.presa > 0 && ['ira', '◎', 'Presa'], q.enganchado && ['aturdido', iconoEstado('aturdido'), 'Pierde el turno'], q.debil > 0 && ['debil', '▽', 'Debilitado'],
+    q.defensaExtra > 0 && ['bonus', iconoEstado('bonus'), `Defensa +${q.defensaExtra}`], q.marcado && ['marca', icon('ash'), 'Marcado'], q.presa > 0 && ['presa', iconoEstado('presa'), 'Presa'], q.enganchado && ['aturdido', iconoEstado('aturdido'), 'Pierde el turno'], q.debil > 0 && ['debil', iconoEstado('debil'), 'Debilitado'],
     ...(q.estados || []).map(v => [v.tipo, ICONOS[v.tipo] ? iconoEstado(v.tipo) : '●', v.tipo])].filter(Boolean).slice(-4);
   return Array.from({ length: 4 }, (_, i) => (on[i] ? `<i class="${on[i][0]}" title="${on[i][2]}">${on[i][1]}</i>` : '<i></i>')).join('');
 }
@@ -1735,12 +1735,15 @@ function dibujarMenu(c) {
 }
 
 // ---------- Vida y estados de los enemigos ----------
-const COLOR_ESTADO = { veneno: ['#2f6a2a', '#5fbf4a', '#b6e36a'], quemadura: ['#8a3a10', '#e8761c', '#fbbf5a'], sangrado: ['#6a1518', '#b52a2a', '#e0605a'], aturdido: ['#6a5a10', '#c8a81c', '#ffe14a'] };
+const COLOR_ESTADO = { veneno: ['#2f6a2a', '#5fbf4a', '#b6e36a'], quemadura: ['#8a3a10', '#e8761c', '#fbbf5a'], sangrado: ['#6a1518', '#b52a2a', '#e0605a'], aturdido: ['#6a5a10', '#c8a81c', '#ffe14a'], presa: ['', '', '#e0261c'], debil: ['', '', '#5aa0e8'], bonus: ['', '', '#e0261c'] };
 const ICONOS = {
   veneno: ['.#####.', '#######', '#..#..#', '#######', '.##.##.', '.#####.', '.#.#.#.'],
   quemadura: ['...#...', '..##...', '..###..', '.#####.', '.##.##.', '.#####.', '..###..'],
   sangrado: ['...#...', '...#...', '..###..', '.#####.', '.#####.', '.#####.', '..###..'],
   aturdido: ['..#....', '.###.#.', '..#.###', '.....#.', '.#.....', '###....', '.#.....'],
+  presa: ['..###..', '.#.#.#.', '#..#..#', '#######', '#..#..#', '.#.#.#.', '..###..'],
+  debil: ['..###..', '..###..', '..###..', '#######', '.#####.', '..###..', '...#...'],
+  bonus: ['...#...', '..###..', '.#####.', '#######', '..###..', '..###..', '..###..'],
 };
 // El mismo dibujo para las tarjetas del grupo
 const ICONO_URL = {};
