@@ -1,0 +1,155 @@
+{
+  "altar_sangre": {
+    "titulo": "El altar de sangre",
+    "texto": "La sangre del cuenco está fresca. Acá no hay nadie desde hace siglos.",
+    "mapa": "mazmorra/cripta/accesorios/altar",
+    "escala": 0.55,
+    "opciones": [
+      {
+        "texto": "Ofrecer sangre",
+        "exito": {
+          "texto": "El cuchillo corta sin dolor. Algo sube desde el fondo del cuenco.",
+          "efectos": [{ "tipo": "sangre", "valor": 0.3 }, { "tipo": "objeto" }]
+        }
+      },
+      {
+        "texto": "Beber del cuenco",
+        "sub": "Puede salir bien.",
+        "prob": 0.5,
+        "exito": {
+          "texto": "Es tibia. El cansancio se va como si nunca hubiera estado.",
+          "efectos": [{ "tipo": "cura", "valor": 0.35 }]
+        },
+        "fallo": {
+          "texto": "Quema al bajar. La cripta se ríe por lo bajo.",
+          "efectos": [{ "tipo": "dolor", "valor": 0.15 }]
+        }
+      },
+      {
+        "texto": "Seguir de largo",
+        "exito": { "texto": "El cuchillo sigue ahí. Va a seguir ahí.", "efectos": [] }
+      }
+    ]
+  },
+  "muerto_mochila": {
+    "titulo": "El muerto con mochila",
+    "texto": "Alguien llegó hasta acá y no siguió. La mano todavía aprieta la correa.",
+    "mapa": "mazmorra/cripta/accesorios/pila_huesos",
+    "escala": 0.4,
+    "opciones": [
+      {
+        "texto": "Revisar con cuidado",
+        "requisito": { "per": 12 },
+        "exito": {
+          "texto": "Soltás los dedos uno por uno. Nada se mueve en la oscuridad.",
+          "efectos": [{ "tipo": "objeto" }, { "tipo": "ceniza", "valor": 3 }]
+        }
+      },
+      {
+        "texto": "Tirar de la mochila",
+        "sub": "Rápido y con ruido.",
+        "prob": 0.5,
+        "exito": {
+          "texto": "El cuerpo se desarma. La mochila es tuya.",
+          "efectos": [{ "tipo": "objeto" }]
+        },
+        "fallo": {
+          "texto": "Los huesos caen con estrépito. Algo contesta desde el pasillo.",
+          "efectos": [{ "tipo": "emboscada" }]
+        }
+      },
+      {
+        "texto": "Dejarlo descansar",
+        "exito": { "texto": "Alguien le cierra la capucha. Seguís.", "efectos": [] }
+      }
+    ]
+  },
+  "inscripcion_muro": {
+    "titulo": "La inscripción en el muro",
+    "texto": "Runas alrededor de una llama tallada. Entre las piedras se filtra una luz que no es de antorcha.",
+    "mapa": "mazmorra/cripta/accesorios/columna_rota",
+    "escala": 0.72,
+    "opciones": [
+      {
+        "texto": "Descifrar las runas",
+        "requisito": { "int": 14 },
+        "exito": {
+          "texto": "Leés en voz baja. El muro se abre solo y deja ver un cofre.",
+          "efectos": [{ "tipo": "cofre" }]
+        }
+      },
+      {
+        "texto": "Forzar las piedras",
+        "requisito": { "fue": 14 },
+        "exito": {
+          "texto": "La piedra cede y aplasta un brazo antes de abrirse. Atrás hay un cofre.",
+          "efectos": [{ "tipo": "sangre", "valor": 0.15 }, { "tipo": "cofre" }]
+        }
+      },
+      {
+        "texto": "Seguir de largo",
+        "exito": { "texto": "La luz se apaga cuando le das la espalda.", "efectos": [] }
+      }
+    ]
+  },
+  "antorcha_ajena": {
+    "titulo": "La antorcha ajena",
+    "texto": "Arde sola, clavada en el piso. Nadie deja una llama acá abajo. Más allá de la luz, algo parpadea.",
+    "mapa": "mazmorra/cripta/accesorios/antorcha_apagada",
+    "escala": 0.5,
+    "opciones": [
+      {
+        "texto": "Tomar el fuego",
+        "sub": "La luz es luz.",
+        "exito": {
+          "texto": "Tu llama crece. Los ojos dejan de parpadear y empiezan a acercarse.",
+          "efectos": [{ "tipo": "antorcha", "valor": 40 }, { "tipo": "emboscada" }]
+        }
+      },
+      {
+        "texto": "Juntar lo que quedó en el piso",
+        "sub": "Sin tocar la antorcha.",
+        "prob": 0.6,
+        "exito": {
+          "texto": "Monedas viejas y Ceniza. Nadie se mueve.",
+          "efectos": [{ "tipo": "ceniza", "valor": 6 }]
+        },
+        "fallo": {
+          "texto": "Una moneda rueda demasiado lejos.",
+          "efectos": [{ "tipo": "ceniza", "valor": 6 }, { "tipo": "emboscada" }]
+        }
+      },
+      {
+        "texto": "Alejarse despacio",
+        "exito": { "texto": "Nadie te sigue. Eso es lo peor.", "efectos": [] }
+      }
+    ]
+  },
+  "voz_sombra": {
+    "titulo": "La voz de La Sombra",
+    "texto": "Tu sombra se estira por el muro sin que te muevas. Después te tiende la mano. «Tengo algo para vos. Me lo pagás cuando yo diga».",
+    "mapa": "enemigos/sombra",
+    "escala": 0.6,
+    "opciones": [
+      {
+        "texto": "Aceptar el trato",
+        "sub": "Te lo va a cobrar.",
+        "exito": {
+          "texto": "«Qué fácil.» En tu mano aparece algo frío. Cuando menos lo esperes, va a cobrar.",
+          "efectos": [{ "tipo": "objeto" }, { "tipo": "ceniza", "valor": 8 }, { "tipo": "trato" }]
+        }
+      },
+      {
+        "texto": "Alzar la antorcha contra ella",
+        "exito": {
+          "texto": "La sombra retrocede, y la llama paga el precio. El grupo se endereza.",
+          "efectos": [{ "tipo": "antorcha", "valor": -15 }, { "tipo": "impetu", "valor": 2 }]
+        }
+      },
+      {
+        "texto": "No contestar",
+        "exito": { "texto": "«Ya vas a hablar.» La mano baja despacio.", "efectos": [] }
+      }
+    ]
+  }
+}

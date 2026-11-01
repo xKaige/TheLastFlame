@@ -6,7 +6,7 @@
 
 // ---------- Datos y estado ----------
 const D = {};
-for (const f of ['clases', 'habilidades', 'objetos', 'modelos', 'enemigos', 'mazmorra', 'dialogos', 'historia']) {
+for (const f of ['clases', 'habilidades', 'objetos', 'modelos', 'enemigos', 'mazmorra', 'dialogos', 'historia', 'eventos']) {
   const x = new XMLHttpRequest();
   x.open('GET', `datos/${f}.json`, false); x.send();
   D[f] = JSON.parse(x.responseText);
@@ -109,6 +109,7 @@ function aplicarEnemigosEnMapa() {
 
 function aplicarTexturas() {
   aplicarEnemigosEnMapa();
+  prepararEventos();
   for (const t of TEXTURAS_X) {
     if (t.hecha || !t.img.complete || !t.img.naturalWidth) continue;
     const c = document.createElement('canvas'); c.width = c.height = TEX;
@@ -646,13 +647,114 @@ window.enterLevel = (floor, level) => {
     if (q) Object.assign(q, { type: 'event', ev: 'peregrino', done: false, rescate: true });
   }
   w.ents = w.ents.filter(e => e.type !== 'prop' || esquinaDeSala(w, e.x, e.y));     // los adornos del juego base tampoco van en el camino
+  ponerEventos(w, level);
 };
 
 window.openEvent = e => {
+  if (D.eventos[e.ev]) return abrirEvento(e);
   // el portador se va del mapa, se quede o no con el grupo
   W_().ents.splice(W_().ents.indexOf(e), 1);
   charla('rescate');
 };
+
+// ---------- Eventos ----------
+// Están en datos/eventos.json. Cada expedición cruza cada uno una sola vez, en una esquina de sala que no tape el paso.
+for (const [id, ev] of Object.entries(D.eventos)) {
+  ev.img = Object.assign(new Image(), { src: `interfaz/eventos/${id}.png` });
+  ev.imgMapa = Object.assign(new Image(), { src: `interfaz/${ev.mapa}.png` });
+  EVENTS[id] = { spr: `ev_${id}`, sprDone: `ev_${id}`, scale: ev.escala, glow: 0.4, doneText: '', title: '', text: '', choices: [] };
+}
+function prepararEventos() {
+  for (const [id, ev] of Object.entries(D.eventos)) {
+    if (!SPRITES[`ev_${id}`] && ev.imgMapa.complete && ev.imgMapa.naturalWidth) SPRITES[`ev_${id}`] = { w: spriteDesdeImagen(ev.imgMapa, ev.imgMapa.naturalWidth) };
+  }
+}
+function ponerEventos(w, nivel) {
+  const R = D.mazmorra.eventos;
+  if (nivel === 0 || isBossLevel() || !R.pisos.includes(S.floor)) return;
+  const vistos = S.flags.eventos || (S.flags.eventos = []), pendientes = Object.keys(D.eventos).filter(id => !vistos.includes(id) && SPRITES[`ev_${id}`]).sort(() => azarX() - 0.5), libres = [];
+  for (let y = 1; y < MH - 1; y++) for (let x = 1; x < MW - 1; x++) {
+    if (w.map[y * MW + x] === 0 && esquinaDeSala(w, x, y) && !w.solidos?.has(y * MW + x) && !w.ents.some(e => e.x === x && e.y === y) && Math.abs(x - w.start[0]) + Math.abs(y - w.start[1]) >= 6) libres.push([x, y]);
+  }
+  libres.sort(() => azarX() - 0.5);
+  for (const id of pendientes.slice(0, R.por_nivel)) {
+    const lugar = libres.pop();
+    if (!lugar) return;
+    const [x, y] = lugar;
+    w.ents.push({ type: 'event', ev: id, done: false, x, y, vx: x + 0.5, vy: y + 0.5 });
+    vistos.push(id);
+  }
+}
+
+// La ilustración pasa por la paleta del piso, como todo lo demás
+function ilustracion(ev) {
+  if (ev.fondo && ev.fondo.env === S.env) return ev.fondo.url;
+  const lado = document.createElement('canvas'); lado.width = lado.height = 480;
+  lado.getContext('2d').drawImage(ev.img, 0, 0, 480, 270);
+  const c = document.createElement('canvas'); c.width = 480; c.height = 270;
+  c.getContext('2d').drawImage(spriteCanvas(spriteDesdeImagen(lado, 480), 480, S.env, 1.1), 0, 0);
+  ev.fondo = { env: S.env, url: c.toDataURL() };
+  return ev.fondo.url;
+}
+
+let EV = null;
+const opcionesEvento = ev => ev.opciones.map(o => {
+  const falta = Object.entries(o.requisito || {}).find(([a, v]) => !NUCLEO.vivos(X.grupo).some(p => NUCLEO.atributosDe(D, p)[a] >= v));
+  return { ...o, off: !!falta, nota: Object.entries(o.requisito || {}).map(([a, v]) => `${D.mazmorra.atributos.nombres[a]} ${v}`).join(', ') };
+});
+function abrirEvento(e) {
+  EV = { e, ev: D.eventos[e.ev], sel: 0, res: null };
+  EV.ops = opcionesEvento(EV.ev);
+  S.mode = 'xevento'; sfx('whisper');
+  $('evento').classList.remove('hidden');
+  pintarEvento();
+}
+function pintarEvento() {
+  const { ev, ops, sel, res } = EV;
+  const cuerpo = res
+    ? `<div class="etxt">${tr(res.texto)}</div>${EV.lineas.map(l => `<div class="eres">${l}</div>`).join('')}<div class="esig">Enter</div>`
+    : `<div class="etxt">${tr(ev.texto)}</div>${ops.map((o, i) => `<div class="eop${i === sel ? ' sel' : ''}${o.off ? ' off' : ''}">${tr(o.texto)}${o.nota ? ` <small>· ${tr('Requiere {0}', o.nota)}</small>` : o.sub ? ` <small>· ${tr(o.sub)}</small>` : ''}</div>`).join('')}`;
+  $('evento').innerHTML = `<img src="${ilustracion(ev)}" alt=""><div class="ecaja"><div class="etit">${tr(ev.titulo)}</div>${cuerpo}</div>`;
+}
+function eventoAction(act) {
+  if (EV.res) { if (act === 'ok') { sfx('select'); cerrarEvento(); } return; }
+  const n = EV.ops.length;
+  if (act === 'fwd' || act === 'back') { EV.sel = (EV.sel + (act === 'fwd' ? n - 1 : 1)) % n; sfx('select'); pintarEvento(); return; }
+  if (act !== 'ok') return;
+  const o = EV.ops[EV.sel];
+  if (o.off) { sfx('bump'); return; }
+  sfx('select');
+  EV.res = o.prob === undefined || azarX() < o.prob ? o.exito : o.fallo;
+  EV.lineas = EV.res.efectos.map(aplicarEfectoEvento).filter(Boolean);
+  guardarX(); updateHUD(); pintarEvento();
+}
+const masSano = () => NUCLEO.vivos(X.grupo).sort((a, b) => b.vida - a.vida)[0];
+function aplicarEfectoEvento({ tipo, valor }) {
+  const heridos = lista => lista.map(p => { const d = Math.round(p.vidaMax * valor); p.vida = Math.max(1, p.vida - d); return tr('{0} pierde {1} de vida.', p.nombre, d); }).join(' ');
+  if (tipo === 'sangre') return heridos([masSano()]);       // no mata: el precio es quedar débil para la próxima
+  if (tipo === 'dolor') return heridos(NUCLEO.vivos(X.grupo));
+  if (tipo === 'cura') { for (const p of NUCLEO.vivos(X.grupo)) p.vida = Math.min(p.vidaMax, p.vida + Math.round(p.vidaMax * valor)); sfx('heal'); return tr('El grupo recupera vida.'); }
+  if (tipo === 'objeto') { const l = Object.keys(D.objetos), id = l[Math.floor(azarX() * l.length)]; X.mochila.push(id); return tr('Encuentras {0}.', D.objetos[id].nombre); }
+  if (tipo === 'ceniza') { X.ceniza += valor; return tr('+{0} de Ceniza.', valor); }
+  if (tipo === 'antorcha') { P.fuel = clamp(P.fuel + valor, 0, 100); return tr(valor > 0 ? 'La antorcha gana {0}.' : 'La antorcha pierde {0}.', Math.abs(valor)); }
+  if (tipo === 'impetu') { S.flags.impetu = (S.flags.impetu || 0) + valor; return tr('El grupo empieza la próxima pelea con +{0} de Ímpetu.', valor); }
+  if (tipo === 'cofre') { window.openChest({ open: false }); return tr('Lo que había adentro ya es del grupo.'); }
+  if (tipo === 'trato') { S.flags.trato = 1; return ''; }
+  return '';     // la emboscada arranca al cerrar el evento
+}
+function cerrarEvento() {
+  const { e, res } = EV, ents = W_().ents;
+  EV = null;
+  $('evento').classList.add('hidden');
+  S.mode = 'explore';
+  if (res.efectos.some(f => f.tipo === 'emboscada')) {
+    // lo que estaba ahí pasa a ser el enemigo: al ganar se lo saca del mapa como a cualquier otro
+    Object.assign(e, { type: 'enemy', kind: 'rata', def: ENEMIES.rata, hp: 1, maxhp: 1, aware: true, stun: 0 });
+    return startCombat(e, true);
+  }
+  ents.splice(ents.indexOf(e), 1);
+  guardarExpedicion();
+}
 
 window.openChest = c => {
   if (c.open) { log('El cofre está vacío.'); sfx('bump'); return; }
@@ -908,6 +1010,7 @@ const CX = [10, 128, 246, 364], CY = 216, CW = 106, FX3 = [145, 240, 335], FBASE
 let Bt = null;
 window.startCombat = (e, emboscada) => {
   if (Bt || S.mode !== 'explore') return;
+  if (S.flags.trato && !e.def.boss) { delete S.flags.trato; emboscada = true; log('La Sombra cobra lo suyo.', 'bad'); }
   guardarExpedicion();
   const jefe = e.def.boss, tipo = jefe ? 'jefe' : emboscada ? 'emboscada' : 'comun';
   const ids = jefe ? D.mazmorra.jefes[S.floor] : (p => p[Math.floor(azarX() * p.length)])(D.mazmorra.grupos_por_piso[S.floor]);
@@ -995,6 +1098,7 @@ function grisDeEnemigo(e) {
 
 function iniciarPelea(ent, ids, entrada = 0.95, emboscada = false) {
   const b = NUCLEO.iniciarBatalla(D, X.grupo, ids, emboscada);
+  if (S.flags.impetu) { for (const u of b.aliados) u.impetu = Math.min(NUCLEO.IMP_TOPE, u.impetu + S.flags.impetu); delete S.flags.impetu; }
   const fx = ids.length === 1 ? [240] : ids.length === 2 ? [190, 290] : ids.some(id => D.enemigos[id].tam_batalla) ? [92, 240, 388] : FX3;   // un jefe grande necesita lugar
   for (const e of b.enemigos) { e.x = fx[e.i]; const propia = IMG_ENEMIGOS[e.imagen], lista = propia && propia.complete && propia.naturalWidth; const tam = lista ? D.enemigos[e.tipo].tam_batalla || propia.naturalWidth : e.jefe ? FTAM + 14 : FTAM; e.tam = tam; e.img = lista ? propia : spriteCanvas(SPRITES[e.sprite].p, tam, S.env, 1); e.golpeado = 0; e.luz = luzDeEnemigo(e); e.gris = grisDeEnemigo(e); e.icono = spriteCanvas(e.gris, e.tam, S.env, 1); prepararPoses(e); }
   for (const u of b.aliados) u.golpeado = 0;
@@ -1725,6 +1829,7 @@ window.onAction = (act, pad) => {
   if (['skills', 'attrs', 'runes'].includes(act)) return;     // son del juego base
   if (S.mode === 'xbat') return batallaAction(act);
   if (S.mode === 'xcharla') return charlaAction(act);
+  if (S.mode === 'xevento') return eventoAction(act);
   if (S.mode === 'xsal') return;
   if (S.mode === 'xpj') return pjAction(act, pad);
   if (S.mode === 'xtrans') { if (act === 'ok' && Tr) Tr.t = Math.max(Tr.t, Tr.cierre + Tr.negro); return; }

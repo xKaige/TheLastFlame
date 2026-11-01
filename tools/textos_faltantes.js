@@ -18,7 +18,7 @@ function recorrer(v, clave, out) {
 const PATRON = /(?:\btr\(|label: |sub: |title: |text: |log\(|banner\(|msg = |confirmMenu\()\s*'((?:[^'\\]|\\.)+)'/g;
 function textos() {
   const out = new Set();
-  for (const f of ['clases', 'habilidades', 'objetos', 'modelos', 'enemigos', 'dialogos', 'historia']) recorrer(leer(`${f}.json`), '', out);
+  for (const f of ['clases', 'habilidades', 'objetos', 'modelos', 'enemigos', 'dialogos', 'historia', 'eventos']) recorrer(leer(`${f}.json`), '', out);
   const m = leer('mazmorra.json');
   for (const p of m.pisos) out.add(p.nombre);
   for (const n of Object.values(m.atributos.nombres)) out.add(n);

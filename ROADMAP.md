@@ -6,7 +6,7 @@ Steam sigue en pausa hasta que el juego esté pulido; sus notas están en `juego
 ## Orden de trabajo
 
 Por partes: primero la base y el piso 1 (La Cripta) terminado. Después se remodela el piso 2, y recién entonces el resto.
-Lo próximo son los eventos propios del piso 1.
+Lo próximo son más objetos y más historia para el piso 1.
 
 ## Reglas decididas
 
@@ -20,11 +20,11 @@ Lo próximo son los eventos propios del piso 1.
 
 ## Falta para que sea un juego completo
 
-- **Eventos propios:** se quitaron los del juego anterior y sólo queda el peregrino. Acá entran misiones y cofres secretos.
+- **Eventos:** el piso 1 tiene cinco y el peregrino (`datos/eventos.json`); faltan los de los otros pisos y las misiones.
 - **Más variedad:** hoy son 7 objetos, 18 habilidades y 10 enemigos; faltan escenarios de batalla propios para Los Salones y El Fondo.
 - **Más historia:** diálogos entre personajes del grupo, y Aldemar y La Sombra con más escenas.
 - **Traducciones:** el sistema de idiomas está listo; faltan textos en inglés (`node tools/textos_faltantes.js en`).
-- **Logo y música de exploración:** pendientes de los archivos.
+- **Música de exploración:** pendiente del archivo.
 
 ## Arte
 
