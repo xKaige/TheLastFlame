@@ -1250,9 +1250,11 @@ function mostrarEvento(e) {
   if (e.tipo === 'dano') {
     q.golpeado = 0.3; golpeBarra(q);
     numero(x, y, q.enemigo ? String(e.valor) : `−${e.valor}`, e.estado ? tr('est-{0}', e.estado) : e.critico ? 'crit' : q.enemigo ? 'hit' : 'hurt');
-    if (e.estado) efectoEstado(q, e.estado);
+    if (e.estado && q.enemigo) efectoEstado(q, e.estado);
+    else if (e.estado) sfx('hurt');
     else if (q.enemigo) { efectoGolpe(q, Bt.golpe, e.critico); sfx('hit'); } else { Bt.temblor = Math.max(Bt.temblor, 2); sfx('hurt'); }
-    Bt.msg = e.estado === 'estallido' ? '¡La herida se abre!' : '';       // el daño ya se ve en el número que salta
+    // el daño ya se ve en el número que salta; al grupo no se le borra lo que acaba de hacer el enemigo
+    if (e.estado === 'estallido') Bt.msg = '¡La herida se abre!'; else if (q.enemigo) Bt.msg = '';
   }
   if (e.tipo === 'cura') { numero(x, y, `+${e.valor}`, 'heal'); sfx('heal'); chispas(x, CY - 6, 10, [RAMPS[S.env][5], RAMPS[S.env][4]], -30); Bt.msg = tr('{0} recupera {1}.', q.nombre, e.valor); }
   if (e.tipo === 'esquiva') { sfx('miss'); Bt.msg = tr('{0} esquiva.', q.nombre); }
@@ -1260,6 +1262,7 @@ function mostrarEvento(e) {
     Bt.msg = q.enemigo ? tr('{0} cae.', q.nombre) : tr('{0} cae. Su chispa se apaga.', q.nombre);
     if (q.enemigo) { q.muriendo = 0.6; chispas(q.x, FBASE - q.tam * 0.45, 24, [RAMPS[S.env][2], RAMPS[S.env][3], RAMPS[S.env][4]], -18); }
   }
+  if (e.tipo === 'antorcha') { P.fuel = Math.max(0, P.fuel - e.valor); updateHUD(); }
   if (e.tipo === 'invoca') { for (const n of e.nuevos) { n.x = Bt.lugares[n.i]; prepararEnemigo(n); chispas(n.x, FBASE - 24, 18, MARCO.vida, -24); } sfx('encounter'); Bt.temblor = 4; }
   if (e.tipo === 'fase') { Bt.msg = tr(q.fase.mensaje || '{0} se enfurece y se cubre de escudos.', q.nombre); Bt.temblor = 6; Bt.destello = 0.5; sfx('encounter'); chispas(q.x, FBASE - q.tam * 0.5, 30, VIDA_ESCUDO, -24); }
   if (e.tipo === 'escudo') {
@@ -1273,6 +1276,9 @@ function mostrarEvento(e) {
   if (e.tipo === 'texto' && e.clave === 'jefe_resiste') Bt.msg = tr('{0} ni se inmuta.', q.nombre);
   if (e.tipo === 'texto' && e.clave === 'resiste') Bt.msg = tr('{0} ya tiene ese efecto: no se renueva.', q.nombre);
   if (e.tipo === 'texto' && e.clave === 'especial') { Bt.msg = `${q.nombre} ${e.texto}.`; Bt.temblor = 5; Bt.destello = 0.5; }
+  if (e.tipo === 'texto' && e.clave === 'estado' && !q.enemigo) Bt.msg = tr('{0} sufre {1}.', q.nombre, tr(e.estado));
+  if (e.tipo === 'texto' && e.clave === 'debilitado') Bt.msg = tr('{0} queda debilitado: pega menos fuerte.', q.nombre);
+  if (e.tipo === 'texto' && e.clave === 'aturdido_grupo') Bt.msg = tr('{0} queda aturdido y pierde su próximo turno.', q.nombre);
   if (e.tipo === 'texto' && e.clave === 'enganchado') Bt.msg = tr('{0} queda enganchado y pierde su próximo turno.', q.nombre);
   if (e.tipo === 'texto' && e.clave === 'presa') Bt.msg = tr('{0} es la presa: lo persiguen y le pegan más fuerte.', q.nombre);
   if (e.tipo === 'texto' && e.clave === 'roba') Bt.msg = tr('El Soplo le roba Ímpetu a {0}.', q.nombre);
@@ -1635,7 +1641,8 @@ function rombo(c, x, y, lleno) {
 // Fila de estados: lo que afecta a cada personaje ahora
 function estadosDe(q) {
   const on = [q.guardia && ['escudo', icon('shield'), 'En guardia'], q.provoca > 0 && ['ira', icon('cross'), 'Provocando'],
-    q.defensaExtra > 0 && ['mas', '▲', `Defensa +${q.defensaExtra}`], q.marcado && ['marca', icon('ash'), 'Marcado'], q.presa > 0 && ['ira', '◎', 'Presa'], q.enganchado && ['ira', '▼', 'Enganchado']].filter(Boolean);
+    q.defensaExtra > 0 && ['mas', '▲', `Defensa +${q.defensaExtra}`], q.marcado && ['marca', icon('ash'), 'Marcado'], q.presa > 0 && ['ira', '◎', 'Presa'], q.enganchado && ['ira', '▼', 'Pierde el turno'], q.debil > 0 && ['debil', '▽', 'Debilitado'],
+    ...(q.estados || []).map(v => [v.tipo, '●', v.tipo])].filter(Boolean).slice(-4);
   return Array.from({ length: 4 }, (_, i) => (on[i] ? `<i class="${on[i][0]}" title="${on[i][2]}">${on[i][1]}</i>` : '<i></i>')).join('');
 }
 

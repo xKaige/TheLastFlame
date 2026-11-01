@@ -11,6 +11,7 @@ const NUCLEO = (() => {
   const vivos = lista => lista.filter(u => u.vida > 0);
 
   const PRESA_DANO = 1.5;     // cuánto más le pegan a la presa marcada
+  const DEBIL_DANO = 0.7;     // lo que pega quien quedó debilitado
   // ---------- Personajes ----------
   // Un personaje es un modelo (quién es); cada modelo tiene su clase (qué hace), así el retrato siempre la muestra
   function crearPersonaje(D, modeloId, azar, nombre) {
@@ -128,7 +129,7 @@ const NUCLEO = (() => {
   const crearEnemigo = (D, id, i, fuerza, nombre) => {
     const d = D.enemigos[id];
     return { enemigo: true, tipo: id, i, nombre, sprite: d.sprite, imagen: d.imagen || null, vida: Math.round(d.vida * fuerza), vidaMax: Math.round(d.vida * fuerza),
-      golpe: d.ataque, defensa: d.defensa, velocidad: d.velocidad, critico: 0.05, esquiva: 0, exp: d.exp, jefe: !!d.jefe, especial: d.especial || null, robaImpetu: !!d.roba_impetu, turnos: 0, estados: [], fase: d.fase || null, escudos: 0, enfurecido: false, pasoFase: 0 };
+      golpe: d.ataque, defensa: d.defensa, velocidad: d.velocidad, critico: 0.05, esquiva: 0, exp: d.exp, jefe: !!d.jefe, especial: d.especial || null, robaImpetu: !!d.roba_impetu, turnos: 0, estados: [], fase: d.fase || null, escudos: 0, enfurecido: false, pasoFase: 0, habilidades: d.habilidades || [] };
   };
 
   function iniciarBatalla(D, grupo, ids, emboscada = false) {
@@ -139,7 +140,7 @@ const NUCLEO = (() => {
       return crearEnemigo(D, id, i, fuerza, D.enemigos[id].nombre + (n > 1 ? ` ${'ABCD'[letras[id] - 1]}` : ''));
     });
     const aliados = vivos(grupo);
-    aliados.forEach((u, i) => Object.assign(u, { i, impetu: u.impetuInicial, guardia: false, provoca: 0, defensaExtra: 0, esquivaSegura: false, presa: 0, enganchado: false }));
+    aliados.forEach((u, i) => Object.assign(u, { i, impetu: u.impetuInicial, guardia: false, provoca: 0, defensaExtra: 0, esquivaSegura: false, presa: 0, enganchado: false, estados: [], debil: 0 }));
     const unidades = [...aliados, ...enemigos];
     for (const u of unidades) u.reloj = 100 / u.velocidad;
     if (emboscada) enemigos.forEach((u, i) => { u.reloj = i * 0.01; });     // te sorprenden: todos actúan antes que el grupo
@@ -166,18 +167,19 @@ const NUCLEO = (() => {
     for (const x of b.unidades) x.reloj -= base;
     u.reloj = 100 / u.velocidad;
     b.actual = u;
-    if (u.enemigo) {
-      // veneno y quemadura lastiman al empezar su turno; el sangrado sólo acumula
-      for (const v of u.estados) if (v.turnos) {
-        v.turnos--;
-        if (u.escudos) continue;      // mientras tenga escudos, los estados no le bajan la vida
-        restarVida(u, v.por_turno, eventos); eventos.push({ tipo: 'dano', quien: u, valor: v.por_turno, estado: v.tipo });
-      }
-      u.estados = u.estados.filter(v => v.tipo === 'sangrado' || v.turnos > 0);
-      if (u.vida <= 0) eventos.push({ tipo: 'muerte', quien: u });
-    } else {
-      u.guardia = false;
+    // veneno y quemadura lastiman al empezar su turno; el sangrado sólo acumula
+    for (const v of u.estados) if (v.turnos) {
+      v.turnos--;
+      if (u.escudos) continue;      // mientras tenga escudos, los estados no le bajan la vida
+      restarVida(u, v.por_turno, eventos); eventos.push({ tipo: 'dano', quien: u, valor: v.por_turno, estado: v.tipo });
+    }
+    u.estados = u.estados.filter(v => v.tipo === 'sangrado' || v.turnos > 0);
+    if (u.vida <= 0) eventos.push({ tipo: 'muerte', quien: u });
+    u.guardia = false;
+    if (!u.enemigo) {
+      if (u.vida <= 0) return { unidad: u, eventos };
       if (u.provoca > 0) u.provoca--;
+      if (u.debil > 0) u.debil--;
       if (u.presa > 0) u.presa--;
       if (u.enganchado) {
         u.enganchado = false;
@@ -191,6 +193,7 @@ const NUCLEO = (() => {
   const opciones = (D, u) => u.habilidades.filter(id => cumpleRequisito(D, u, id)).map(id => ({ id, ...D.habilidades[id], apagada: u.impetu < D.habilidades[id].costo }));
 
   function golpear(azar, u, t, eventos, { mult = 1, criticoSeguro = false, ignoraDefensa = false } = {}) {
+    if (u.debil > 0) mult *= DEBIL_DANO;
     if (azar() < t.esquiva) {
       eventos.push({ tipo: 'esquiva', quien: t });
       if (!t.enemigo) t.impetu = Math.min(IMP_TOPE, t.impetu + 1);
@@ -335,22 +338,53 @@ const NUCLEO = (() => {
     return true;
   }
 
+  // El golpe de un enemigo a un personaje. Devuelve el daño hecho, o 0 si lo esquivó.
+  function golpeEnemigo(u, t, azar, eventos, mult = 1, ignoraDefensa = false) {
+    if (t.esquivaSegura || azar() < t.esquiva) {
+      t.esquivaSegura = false;
+      t.impetu = Math.min(IMP_TOPE, t.impetu + 1);
+      eventos.push({ tipo: 'esquiva', quien: t });
+      return 0;
+    }
+    const dano = Math.max(1, Math.round(entre(azar, ...u.golpe) * mult) - (ignoraDefensa ? 0 : Math.floor((t.defensa + t.defensaExtra) / 2)));
+    const total = t.presa > 0 ? Math.round(dano * PRESA_DANO) : dano;
+    herir(t, total, eventos);
+    return total;
+  }
+
+  // Lo propio de cada enemigo (campo "habilidades" de enemigos.json)
+  function habilidadEnemiga(u, h, grupo, azar, eventos) {
+    eventos.push({ tipo: 'texto', clave: 'especial', quien: u, texto: h.nombre });
+    if (h.propia === 'guardia') { u.guardia = true; return; }
+    if (h.apaga) eventos.push({ tipo: 'antorcha', quien: u, valor: h.apaga });
+    const herido = grupo.find(t => t.provoca > 0) || grupo.slice().sort((x, y) => x.vida / x.vidaMax - y.vida / y.vidaMax)[0];
+    const blancos = h.blanco === 'todos' ? grupo : [h.blanco === 'herido' ? herido : blancoEnemigo(grupo, azar)], mult = h.mult ?? 1;
+    for (const t of blancos) {
+      let acierta = !mult;
+      for (let n = 0; mult && n < (h.veces || 1) && t.vida > 0; n++) {
+        const dano = golpeEnemigo(u, t, azar, eventos, mult, h.ignora_defensa);
+        if (dano) acierta = true;
+        if (dano && h.roba_vida) { const v = Math.round(dano * h.roba_vida); u.vida = clampN(u.vida + v, 0, u.vidaMax); eventos.push({ tipo: 'cura', quien: u, valor: v }); }
+      }
+      if (!acierta || t.vida <= 0) continue;
+      if (h.estado) aplicarEstado(t, h.estado, azar, eventos);
+      if (h.sangrado) sangrar(t, { estallido: h.sangrado }, azar, eventos);
+      if (h.debilita) { t.debil = h.debilita; eventos.push({ tipo: 'texto', clave: 'debilitado', quien: t }); }
+      if (h.aturde) { t.enganchado = true; eventos.push({ tipo: 'texto', clave: 'aturdido_grupo', quien: t }); }
+    }
+  }
+
   function turnoEnemigo(D, b, u, azar) {
     const eventos = [], grupo = vivos(b.aliados);
     if (u.aturdido) { u.aturdido = false; eventos.push({ tipo: 'texto', clave: 'pierde_turno', quien: u }); return eventos; }
     u.turnos++;
     if (u.enfurecido && u.fase.ciclo) { if (habilidadDeFase(D, b, u, grupo, azar, eventos)) return eventos; }
     else if (u.especial && u.turnos % u.especial.cada === 0) { especialDeJefe(u, grupo, azar, eventos); return eventos; }
+    const propia = u.habilidades.find(h => azar() < h.prob);
+    if (propia) { habilidadEnemiga(u, propia, grupo, azar, eventos); return eventos; }
     const t = blancoEnemigo(grupo, azar);
     if (b.muroLlamas > 0) { b.muroLlamas--; aplicarEstado(u, { tipo: 'quemadura', por_turno: 2, min: 2, max: 3 }, azar, eventos); }
-    if (t.esquivaSegura || azar() < t.esquiva) {
-      t.esquivaSegura = false;
-      t.impetu = Math.min(IMP_TOPE, t.impetu + 1);
-      eventos.push({ tipo: 'esquiva', quien: t });
-      return eventos;
-    }
-    const dano = Math.max(1, entre(azar, ...u.golpe) - Math.floor((t.defensa + t.defensaExtra) / 2));
-    herir(t, t.presa > 0 ? Math.round(dano * PRESA_DANO) : dano, eventos);
+    if (!golpeEnemigo(u, t, azar, eventos)) return eventos;
     if (u.robaImpetu && t.impetu > 0) { t.impetu--; eventos.push({ tipo: 'texto', clave: 'roba', quien: t }); }
     return eventos;
   }

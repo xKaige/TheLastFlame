@@ -134,7 +134,19 @@
           }
         }
       ]
-    }
+    },
+    "habilidades": [
+      {
+        "nombre": "clava sus dientes podridos",
+        "prob": 0.35,
+        "estado": {
+          "tipo": "veneno",
+          "por_turno": 2,
+          "min": 2,
+          "max": 3
+        }
+      }
+    ]
   },
   "kobold": {
     "nombre": "Kobold No-Muerto",
@@ -280,7 +292,15 @@
           }
         }
       ]
-    }
+    },
+    "habilidades": [
+      {
+        "nombre": "lanza una ráfaga de golpes",
+        "prob": 0.35,
+        "veces": 2,
+        "mult": 0.7
+      }
+    ]
   },
   "soplo": {
     "nombre": "El Soplo",
@@ -442,7 +462,15 @@
           "capa": -1.6
         }
       ]
-    }
+    },
+    "habilidades": [
+      {
+        "nombre": "sopla sobre la antorcha",
+        "prob": 0.35,
+        "mult": 0,
+        "apaga": 5
+      }
+    ]
   },
   "centinela": {
     "nombre": "Centinela del Osario",
@@ -588,7 +616,21 @@
           }
         }
       ]
-    }
+    },
+    "habilidades": [
+      {
+        "nombre": "alza su escudo",
+        "prob": 0.25,
+        "mult": 0,
+        "propia": "guardia"
+      },
+      {
+        "nombre": "golpea con el escudo",
+        "prob": 0.2,
+        "mult": 0.7,
+        "aturde": true
+      }
+    ]
   },
   "reyOsario": {
     "nombre": "El Rey del Osario",
@@ -925,7 +967,14 @@
           }
         }
       ]
-    }
+    },
+    "habilidades": [
+      {
+        "nombre": "muerde y se alimenta",
+        "prob": 0.35,
+        "roba_vida": 0.6
+      }
+    ]
   },
   "sombra": {
     "nombre": "Sombra Susurrante",
@@ -1038,7 +1087,15 @@
           "capa": -1.6
         }
       ]
-    }
+    },
+    "habilidades": [
+      {
+        "nombre": "susurra un nombre olvidado",
+        "prob": 0.35,
+        "mult": 0,
+        "debilita": 3
+      }
+    ]
   },
   "acechador": {
     "nombre": "El Acechador",
@@ -1144,7 +1201,15 @@
           }
         }
       ]
-    }
+    },
+    "habilidades": [
+      {
+        "nombre": "salta sobre el más débil",
+        "prob": 0.4,
+        "blanco": "herido",
+        "mult": 1.25
+      }
+    ]
   },
   "caballero": {
     "nombre": "Caballero Hueco",
@@ -1298,7 +1363,15 @@
           }
         }
       ]
-    }
+    },
+    "habilidades": [
+      {
+        "nombre": "descarga un tajo que atraviesa la armadura",
+        "prob": 0.3,
+        "ignora_defensa": true,
+        "sangrado": 0.12
+      }
+    ]
   },
   "cebado": {
     "nombre": "El Cebado",
@@ -1456,7 +1529,21 @@
           }
         }
       ]
-    }
+    },
+    "habilidades": [
+      {
+        "nombre": "vomita sobre el grupo",
+        "prob": 0.3,
+        "blanco": "todos",
+        "mult": 0,
+        "estado": {
+          "tipo": "veneno",
+          "por_turno": 2,
+          "min": 2,
+          "max": 3
+        }
+      }
+    ]
   },
   "cazador": {
     "nombre": "El Cazador Gris",
@@ -1807,6 +1894,13 @@
           }
         }
       ]
-    }
+    },
+    "habilidades": [
+      {
+        "nombre": "desgarra con los colmillos",
+        "prob": 0.5,
+        "sangrado": 0.12
+      }
+    ]
   }
 }

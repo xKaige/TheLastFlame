@@ -2,7 +2,7 @@
 
 El camino del juego es la expedición de grupo. El plan del juego anterior está en `juego_viejo/ROADMAP.md`.
 
-**Versión actual: 0.3.23.** Lo próximo: 0.4.0.
+**Versión actual: 0.3.24.** Lo próximo: 0.4.0.
 
 ## Cómo se numeran las versiones
 
@@ -50,11 +50,16 @@ Cada parche sube la versión en `package.json` y en `index.html`, y se anota ac�
 - **Botín:** los objetos raros (✦) salen el 20% de las veces, y el 70% si los suelta un jefe (`botin` en `datos/mazmorra.json`).
 - **Personajes:** no hay protagonistas fijos. Son al azar, se conocen entre sí, y la historia importante está en notas por la mazmorra.
 - **Encuentros:** el enemigo del mapa siempre está en la pelea, en el centro. Los acompañantes salen de los grupos del piso.
+- **Enemigos:** ninguno pelea igual; cada uno tiene al menos una habilidad propia, y cada jefe, una fase de furia distinta.
 - **Primera expedición:** arranca con las 4 clases y no se pueden repetir.
 - **Modelos y clases:** cada retrato tiene su clase fija.
 - **Título:** el logo "The Last Flame" no cambia con el idioma.
 
 ## Historial
+
+### 0.3.24
+
+- Cada enemigo tiene su habilidad propia: veneno, sangrado, ráfagas, robo de vida, debilidad, aturdimiento y más (`habilidades` en `datos/enemigos.json`).
 
 ### 0.3.23
 
