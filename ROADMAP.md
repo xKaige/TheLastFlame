@@ -1,37 +1,94 @@
 # Roadmap
 
 El camino del juego es la expedición de grupo. El plan del juego anterior está en `juego_viejo/ROADMAP.md`.
-Steam sigue en pausa hasta que el juego esté pulido; sus notas están en `juego_viejo/STEAM.md`.
 
-## Orden de trabajo
+**Versión actual: 0.3.2.** Lo próximo: 0.3.3.
 
-Por partes: primero la base y el piso 1 (La Cripta) terminado. Después se remodela el piso 2, y recién entonces el resto.
-Lo próximo son más objetos y más historia para el piso 1.
+## Cómo se numeran las versiones
+
+- **Parche (0.3.x):** cada tanda de cambios que se sube al juego. Arreglos, ajustes y contenido dentro de lo que ya existe.
+- **Versión (0.x.0):** una etapa grande terminada, como un piso remodelado.
+- **1.0.0:** el juego completo, listo para publicar.
+
+Cada parche sube la versión en `package.json` y en `index.html`, y se anota acá: pasa de "Próximas versiones" a "Historial". Lo que surja en el camino se agrega al parche que corresponda.
+
+## Próximas versiones
+
+### 0.3.3: Más objetos
+
+- Sumar objetos para que el botín no se repita (hoy son 7).
+- Revisar las probabilidades del botín con la lista nueva.
+
+### 0.3.4: Más historia del piso 1
+
+- Decidir si hay protagonistas fijos o sólo personajes al azar.
+- Diálogos entre personajes del grupo.
+- Más escenas de Aldemar y La Sombra.
+
+### 0.3.5: Cierre del piso 1
+
+- Decidir cómo se muestran los objetos (F8) y el nivel (F9), y borrar esas dos teclas.
+- Velas sobre la calavera: reemplazar el dibujo viejo.
+- Grillete: subirle el contraste contra el muro.
+- Eventos: mejorar cómo se ven en el mapa y decidir si la sangre del altar va en rojo.
+- Fondo del título.
+- Música de exploración, cuando esté el archivo.
+- Retratos: conseguir los PNG originales sin marco.
+
+### 0.4.0: Piso 2 (Los Salones)
+
+- Remodelar el piso y cambiar los dibujos de sus enemigos.
+- Escenario de batalla propio.
+- Eventos y misiones propios.
+- Animar a su jefe cuando tenga el dibujo definitivo.
+
+### 0.5.0: Piso 3 (El Fondo)
+
+- Remodelar el piso y hacerlo más grande.
+- Cambiar los dibujos de sus enemigos.
+- Escenario de batalla propio.
+- Eventos propios.
+- Animar a su jefe cuando tenga el dibujo definitivo.
+
+### 0.6.0: Idiomas
+
+- Completar el inglés (`node tools/textos_faltantes.js en`).
+- Sumar los demás idiomas que se elijan.
+
+### 0.7.0: Pulido final
+
+- Quitar del motor lo que quedó sin uso (combate, creación de personaje, partidas del juego anterior).
+- Balance de toda la expedición, de punta a punta.
+
+### 1.0.0: Publicación
+
+- Steam sigue en pausa hasta que el juego esté pulido. Sus notas están en `juego_viejo/STEAM.md`.
 
 ## Reglas decididas
 
+- **Orden de trabajo:** primero se termina el piso 1, después se remodela el piso 2 y recién entonces el resto.
 - **Zonas:** cada 3 pisos son una zona, con nivel máximo 10, 20, 30... (`zonas` en `datos/mazmorra.json`). En un piso de una zona ya superada el personaje no gana experiencia.
 - **Continuar:** la expedición se guarda sola explorando, nunca en medio de una pelea. Morir no se deshace cerrando el juego.
+- **Primera expedición:** arranca con las 4 clases y no se pueden repetir.
+- **Modelos y clases:** cada retrato tiene su clase fija.
+- **Título:** el logo "The Last Flame" no cambia con el idioma.
 
-## Pendiente de elegir
+## Historial
 
-- Cómo se muestran los objetos (F8) y el nivel (F9). Al decidir se borran esas dos teclas.
-- Protagonistas fijos o sólo personajes al azar.
+### 0.3.2
 
-## Falta para que sea un juego completo
+- Cinco eventos para el piso 1, con ilustración y opciones según atributos (`datos/eventos.json`).
+- Plantel inicial con las 4 clases.
+- Detalle de las acciones en la pelea.
+- El objetivo elegido se marca en la línea de tiempo.
 
-- **Eventos:** el piso 1 tiene cinco y el peregrino (`datos/eventos.json`); faltan los de los otros pisos y las misiones.
-- **Más variedad:** hoy son 7 objetos, 18 habilidades y 10 enemigos; faltan escenarios de batalla propios para Los Salones y El Fondo.
-- **Más historia:** diálogos entre personajes del grupo, y Aldemar y La Sombra con más escenas.
-- **Traducciones:** el sistema de idiomas está listo; faltan textos en inglés (`node tools/textos_faltantes.js en`).
-- **Música de exploración:** pendiente del archivo.
+### 0.3.1
 
-## Arte
+- Logo en el título.
+- La primera expedición no repite clases.
 
-- Velas sobre la calavera: siguen con el dibujo viejo.
-- Grillete: poco contraste contra el muro.
-- Retratos: faltan los PNG originales sin marco.
+### 0.3.0
 
-## Limpieza
-
-- Quitar del motor lo que quedó sin uso (combate, creación de personaje, partidas del juego anterior).
+- Base de la expedición de grupo y piso 1 jugable.
+- Continuar la expedición y nivel máximo por zona.
+- Cada retrato con su clase, y emboscadas sólo de costado o por la espalda.
