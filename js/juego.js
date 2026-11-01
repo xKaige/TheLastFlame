@@ -438,10 +438,12 @@ function dibujarFuego(c, f, x, y) {
   if (paso !== f.ultimo) {
     f.ultimo = paso; avanzarFuego(f);
     if (!f.pal) f.pal = packRamp(RAMPS.fuegoX);
-    const { w, h, tope, calor, out, pal } = f, n = pal.length - 1;
+    const { w, h, tope, calor, out, pal, base } = f, n = pal.length - 1;
     for (let py = 0; py < h; py++) for (let px = 0; px < w; px++) {
       const t = calor[py * w + px] / (tope * 0.55) * n + (BAYER[((py & 3) << 2) | (px & 3)] - 0.5) * 0.55;
-      out[py * w + px] = t < 0.55 ? 0 : pal[clamp(Math.round(t), 1, n)];
+      // con base redonda, el fuego nace de un punto y no de un corte recto
+      const d = base ? h - py : 0, afuera = d && d < base && Math.abs(px - w / 2) > Math.sqrt(base * base - (base - d) ** 2);
+      out[py * w + px] = t < 0.55 || afuera ? 0 : pal[clamp(Math.round(t), 1, n)];
     }
     f.g.putImageData(f.img, 0, 0);
   }
@@ -911,7 +913,7 @@ window.drawMinimap = (c, R, w, p) => {
 };
 
 // La mano con la antorcha: el dibujo pasa por la paleta del piso y se apaga junto con el combustible;
-// el fuego es la llama animada del juego, que crece o baja con lo que queda.
+// el fuego es la misma simulación de la fogata del Hogar, que crece o baja con lo que queda.
 window.renderTorch = () => {};
 const MANO = { img: Object.assign(new Image(), { src: 'interfaz/hud/mano_antorcha.png' }), x: 326, y: 152, lado: 136, cache: {} };
 RAMPS.fuegoX = ['#3a0d06', '#7c1f0a', '#c9440c', '#ee7d1a', '#fab634', '#ffeeb0'];
@@ -920,16 +922,17 @@ function manoIluminada(nivel) {
   if (!MANO.cache[clave]) MANO.cache[clave] = spriteCanvas(spriteDesdeImagen(MANO.img, MANO.lado), MANO.lado, S.env, 0.5 + nivel * 0.15);
   return MANO.cache[clave];
 }
+const LLAMA_MANO = { atras: Object.assign(crearFuego(76, 96, 96, 26), { base: 27 }), frente: Object.assign(crearFuego(52, 72, 52, 15), { base: 17 }) };
 function dibujarAntorcha(c) {
   if (!MANO.img.complete || !MANO.img.naturalWidth) return;
   const paso = anim && !anim.bump ? Math.sin(clamp(anim.t / anim.dur, 0, 1) * Math.PI) * 3 : 0;
   const x = MANO.x, y = MANO.y + Math.round(Math.sin(T * 1.7) + paso), k = 0.3 + 0.7 * P.fuel / 100;
   c.globalAlpha = S.mode === 'fade' ? 1 - fx.fade : 1;
   // el fuego abraza la cabeza: una llama detrás, los trapos, y lenguas y brasas por delante
-  if (P.fuel > 0) drawFlame(c, x + 31, y + 34, 72, 70, T, k, 'fuegoX');
+  if (P.fuel > 0) { LLAMA_MANO.atras.tope = 34 + 44 * k; dibujarFuego(c, LLAMA_MANO.atras, x + 31, y + 36); }
   c.drawImage(manoIluminada(Math.ceil(P.fuel / 25)), x, y);
   if (P.fuel > 0) {
-    drawFlame(c, x + 31, y + 24, 44, 40, T + 2.7, k, 'fuegoX');
+    LLAMA_MANO.frente.tope = 20 + 20 * k; dibujarFuego(c, LLAMA_MANO.frente, x + 30, y + 28);
     for (let n = 0; n < 9; n++) {
       const u = (T * (0.5 + n * 0.07) + n * 0.37) % 1;
       c.fillStyle = RAMPS.fuegoX[n % 2 ? 4 : 5];
