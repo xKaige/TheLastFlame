@@ -93,6 +93,15 @@ function spriteDesdeImagen(img, size) {
 const COFRES = { chest: D.mazmorra.accesorios.cofres.cerrado, chestOpen: D.mazmorra.accesorios.cofres.abierto };
 for (const k in COFRES) COFRES[k] = Object.assign(new Image(), { src: tr('interfaz/mazmorra/cripta/accesorios/{0}.png', COFRES[k]) });
 
+// Los enemigos de Los Salones existen sólo en esta versión del juego: el motor los necesita para ponerlos en el mapa
+Object.assign(ENEMIES, {
+  armadura: { name: 'Armadura Vacía', idle: 'heavy', hitFx: 'blade', spr: 'armadura', hp: 30, atk: [4, 9], def: 3, xp: 20, ramp: 0, speed: 0.6, scale: 1, flee: 0.5 },
+  retrato: { name: 'Retrato Viviente', idle: 'float', hitFx: 'shadow', spr: 'retrato', hp: 20, atk: [1, 1], def: 0, xp: 14, ramp: 0, speed: 0.4, scale: 0.85, flee: 0.5 },
+  dama: { name: 'Dama de Compañía', idle: 'float', hitFx: 'shadow', spr: 'dama', hp: 20, atk: [3, 6], def: 1, xp: 14, ramp: 0, speed: 0.8, scale: 0.95, flee: 0.5 },
+  copero: { name: 'Copero Hinchado', idle: 'heavy', hitFx: 'smash', spr: 'copero', hp: 25, atk: [3, 6], def: 1, xp: 14, ramp: 0, speed: 0.5, scale: 1, flee: 0.5 },
+});
+POOLS[2].push('armadura', 'armadura', 'retrato', 'retrato', 'dama', 'dama', 'copero', 'copero');
+
 function aplicarEnemigosEnMapa() {
   for (const [k, img] of Object.entries(COFRES)) {
     if (img.enMapa || !img.complete || !img.naturalWidth) continue;
@@ -104,7 +113,7 @@ function aplicarEnemigosEnMapa() {
   for (const [id, d] of Object.entries(D.enemigos)) {
     const img = IMG_ENEMIGOS[d.imagen];
     if (!img || img.enMapa || !img.complete || !img.naturalWidth) continue;
-    if (SPRITES[d.sprite]) SPRITES[d.sprite].w = spriteDesdeImagen(img, 96);      // lo invocado en pelea no está en el mapa
+    (SPRITES[d.sprite] || (SPRITES[d.sprite] = {})).w = spriteDesdeImagen(img, 96);
     if (d.escala_mapa) ENEMIES[id].scale = d.escala_mapa;
     img.enMapa = true;
   }
@@ -1215,7 +1224,7 @@ function siguiente() {
   if (!Bt) return;
   const r = NUCLEO.haTerminado(Bt.b);
   if (r) return terminarPelea(r === 'victoria');
-  const { unidad: u, eventos, pierde } = NUCLEO.proximoTurno(Bt.b);
+  const { unidad: u, eventos, pierde } = NUCLEO.proximoTurno(Bt.b, azarX);
   mostrar(eventos);
   if (pierde) { pintarBatalla(); return later(1000, siguiente); }
   if (u.vida <= 0) return later(500, siguiente);
@@ -1277,6 +1286,7 @@ function mostrarEvento(e) {
   if (e.tipo === 'texto' && e.clave === 'resiste') Bt.msg = tr('{0} ya tiene ese efecto: no se renueva.', q.nombre);
   if (e.tipo === 'texto' && e.clave === 'especial') { Bt.msg = `${q.nombre} ${e.texto}.`; Bt.temblor = 5; Bt.destello = 0.5; }
   // los estados del grupo no llevan texto: se leen en los íconos de cada tarjeta
+  if (e.tipo === 'texto' && e.clave === 'hechizado') Bt.msg = tr('{0} pierde el control y ataca a su propio grupo.', q.nombre);
   if (e.tipo === 'texto' && e.clave === 'roba') Bt.msg = tr('El Soplo le roba Ímpetu a {0}.', q.nombre);
 }
 
@@ -1637,7 +1647,7 @@ function rombo(c, x, y, lleno) {
 // Fila de estados: lo que afecta a cada personaje ahora
 function estadosDe(q) {
   const on = [q.guardia && ['escudo', icon('shield'), 'En guardia'], q.provoca > 0 && ['ira', icon('cross'), 'Provocando'],
-    q.defensaExtra > 0 && ['bonus', iconoEstado('bonus'), `Defensa +${q.defensaExtra}`], q.marcado && ['marca', icon('ash'), 'Marcado'], q.presa > 0 && ['presa', iconoEstado('presa'), 'Presa'], q.enganchado && ['aturdido', iconoEstado('aturdido'), 'Pierde el turno'], q.debil > 0 && ['debil', iconoEstado('debil'), 'Debilitado'],
+    q.defensaExtra > 0 && ['bonus', iconoEstado('bonus'), `Defensa +${q.defensaExtra}`], q.marcado && ['marca', icon('ash'), 'Marcado'], q.presa > 0 && ['presa', iconoEstado('presa'), 'Presa'], q.enganchado && ['aturdido', iconoEstado('aturdido'), 'Pierde el turno'], q.hechizado && ['hechizado', iconoEstado('hechizado'), 'Hechizado'], q.debil > 0 && ['debil', iconoEstado('debil'), 'Debilitado'],
     ...(q.estados || []).map(v => [v.tipo, ICONOS[v.tipo] ? iconoEstado(v.tipo) : '●', v.tipo])].filter(Boolean).slice(-4);
   return Array.from({ length: 4 }, (_, i) => (on[i] ? `<i class="${on[i][0]}" title="${on[i][2]}">${on[i][1]}</i>` : '<i></i>')).join('');
 }
@@ -1735,7 +1745,7 @@ function dibujarMenu(c) {
 }
 
 // ---------- Vida y estados de los enemigos ----------
-const COLOR_ESTADO = { veneno: ['#2f6a2a', '#5fbf4a', '#b6e36a'], quemadura: ['#8a3a10', '#e8761c', '#fbbf5a'], sangrado: ['#6a1518', '#b52a2a', '#e0605a'], aturdido: ['#6a5a10', '#c8a81c', '#ffe14a'], presa: ['', '', '#e0261c'], debil: ['', '', '#5aa0e8'], bonus: ['', '', '#e0261c'] };
+const COLOR_ESTADO = { veneno: ['#2f6a2a', '#5fbf4a', '#b6e36a'], quemadura: ['#8a3a10', '#e8761c', '#fbbf5a'], sangrado: ['#6a1518', '#b52a2a', '#e0605a'], aturdido: ['#6a5a10', '#c8a81c', '#ffe14a'], hechizado: ['', '', '#e060c0'], presa: ['', '', '#e0261c'], debil: ['', '', '#5aa0e8'], bonus: ['', '', '#e0261c'] };
 const ICONOS = {
   veneno: ['.#####.', '#######', '#..#..#', '#######', '.##.##.', '.#####.', '.#.#.#.'],
   quemadura: ['...#...', '..##...', '..###..', '.#####.', '.##.##.', '.#####.', '..###..'],
@@ -1744,6 +1754,7 @@ const ICONOS = {
   presa: ['....#....', '..#####..', '.#..#..#.', '.#.....#.', '###.#.###', '.#.....#.', '.#..#..#.', '..#####..', '....#....'],
   debil: ['..###..', '..###..', '..###..', '#######', '.#####.', '..###..', '...#...'],
   bonus: ['...#...', '..###..', '.#####.', '#######', '..###..', '..###..', '..###..'],
+  hechizado: ['.##.##.', '#######', '#######', '.#####.', '..###..', '...#...', '.......'],
 };
 // El mismo dibujo para las tarjetas del grupo
 const ICONO_URL = {};

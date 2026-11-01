@@ -1902,5 +1902,310 @@
         "sangrado": 0.12
       }
     ]
+  },
+  "armadura": {
+    "nombre": "Armadura Vacía",
+    "sprite": "armadura",
+    "imagen": "armadura",
+    "vida": 62,
+    "ataque": [
+      10,
+      15
+    ],
+    "defensa": 3,
+    "velocidad": 6,
+    "exp": 10,
+    "resiste_fisico": 0.5,
+    "habilidades": [
+      {
+        "nombre": "barre al grupo con su mandoble",
+        "prob": 0.3,
+        "blanco": "todos",
+        "mult": 0.6
+      }
+    ],
+    "animacion": {
+      "base": 124,
+      "cintura": 62,
+      "pies": 110,
+      "partes": [],
+      "reposo": {
+        "pecho": 0.9,
+        "capa": 0.8,
+        "partes": {}
+      },
+      "ataque": [
+        {
+          "pecho": 0.5,
+          "todo": {
+            "x": 1.5
+          }
+        },
+        {
+          "pecho": 1,
+          "todo": {
+            "x": 3
+          }
+        },
+        {
+          "pecho": 1.4,
+          "todo": {
+            "x": 4
+          }
+        },
+        {
+          "pecho": -1,
+          "todo": {
+            "x": -6
+          }
+        },
+        {
+          "pecho": -1.4,
+          "todo": {
+            "x": -8
+          }
+        },
+        {
+          "pecho": -0.5,
+          "todo": {
+            "x": -3
+          }
+        }
+      ]
+    }
+  },
+  "retrato": {
+    "nombre": "Retrato Viviente",
+    "sprite": "retrato",
+    "imagen": "retrato",
+    "vida": 40,
+    "ataque": [
+      1,
+      1
+    ],
+    "defensa": 0,
+    "velocidad": 10,
+    "exp": 8,
+    "habilidades": [
+      {
+        "nombre": "clava la mirada",
+        "prob": 0.5,
+        "mult": 0,
+        "quita_impetu": 2
+      },
+      {
+        "nombre": "ordena a los suyos que resistan",
+        "prob": 1,
+        "mult": 0,
+        "refuerza": 3
+      }
+    ],
+    "animacion": {
+      "base": 104,
+      "cintura": 52,
+      "pies": 104,
+      "partes": [],
+      "reposo": {
+        "pecho": 0.9,
+        "capa": 0.8,
+        "partes": {}
+      },
+      "ataque": [
+        {
+          "pecho": 0.5,
+          "todo": {
+            "x": 1.5
+          }
+        },
+        {
+          "pecho": 1,
+          "todo": {
+            "x": 3
+          }
+        },
+        {
+          "pecho": 1.4,
+          "todo": {
+            "x": 4
+          }
+        },
+        {
+          "pecho": -1,
+          "todo": {
+            "x": -6
+          }
+        },
+        {
+          "pecho": -1.4,
+          "todo": {
+            "x": -8
+          }
+        },
+        {
+          "pecho": -0.5,
+          "todo": {
+            "x": -3
+          }
+        }
+      ]
+    }
+  },
+  "dama": {
+    "nombre": "Dama de Compañía",
+    "sprite": "dama",
+    "imagen": "dama",
+    "vida": 42,
+    "ataque": [
+      8,
+      12
+    ],
+    "defensa": 1,
+    "velocidad": 12,
+    "exp": 9,
+    "habilidades": [
+      {
+        "nombre": "tiende la mano y susurra una orden",
+        "prob": 0.4,
+        "mult": 0,
+        "hechiza": true
+      }
+    ],
+    "animacion": {
+      "base": 118,
+      "cintura": 60,
+      "pies": 118,
+      "partes": [],
+      "reposo": {
+        "pecho": 0.9,
+        "capa": 0.8,
+        "partes": {}
+      },
+      "ataque": [
+        {
+          "pecho": 0.5,
+          "todo": {
+            "x": 1.5
+          }
+        },
+        {
+          "pecho": 1,
+          "todo": {
+            "x": 3
+          }
+        },
+        {
+          "pecho": 1.4,
+          "todo": {
+            "x": 4
+          }
+        },
+        {
+          "pecho": -1,
+          "todo": {
+            "x": -6
+          }
+        },
+        {
+          "pecho": -1.4,
+          "todo": {
+            "x": -8
+          }
+        },
+        {
+          "pecho": -0.5,
+          "todo": {
+            "x": -3
+          }
+        }
+      ]
+    }
+  },
+  "copero": {
+    "nombre": "Copero Hinchado",
+    "sprite": "copero",
+    "imagen": "copero",
+    "vida": 58,
+    "ataque": [
+      7,
+      11
+    ],
+    "defensa": 1,
+    "velocidad": 7,
+    "exp": 9,
+    "habilidades": [
+      {
+        "nombre": "sirve una copa de vino agrio",
+        "prob": 0.5,
+        "mult": 0.7,
+        "estado": {
+          "tipo": "veneno",
+          "por_turno": 2,
+          "min": 2,
+          "max": 3
+        }
+      }
+    ],
+    "al_morir": {
+      "nombre": "revienta y salpica vino sobre el grupo",
+      "dano": [
+        4,
+        7
+      ],
+      "estado": {
+        "tipo": "veneno",
+        "por_turno": 2,
+        "min": 2,
+        "max": 3
+      }
+    },
+    "animacion": {
+      "base": 116,
+      "cintura": 64,
+      "pies": 106,
+      "partes": [],
+      "reposo": {
+        "pecho": 0.9,
+        "capa": 0.8,
+        "partes": {}
+      },
+      "ataque": [
+        {
+          "pecho": 0.5,
+          "todo": {
+            "x": 1.5
+          }
+        },
+        {
+          "pecho": 1,
+          "todo": {
+            "x": 3
+          }
+        },
+        {
+          "pecho": 1.4,
+          "todo": {
+            "x": 4
+          }
+        },
+        {
+          "pecho": -1,
+          "todo": {
+            "x": -6
+          }
+        },
+        {
+          "pecho": -1.4,
+          "todo": {
+            "x": -8
+          }
+        },
+        {
+          "pecho": -0.5,
+          "todo": {
+            "x": -3
+          }
+        }
+      ]
+    }
   }
 }
