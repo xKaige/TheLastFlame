@@ -37,6 +37,8 @@ function armarPose(g, an, mov) {
     if (!pieza) copiar(i, sx, sy);
     // lo que una pieza del cuerpo deja al descubierto sigue siendo cuerpo: se ve el dibujo original
     else if (pieza.tapar) copiar(i, sx, sy);
+    // detrás de un arma no hay dibujo: se completa con lo que se ve a su lado (campo "relleno")
+    else if (an.relleno && dentro(an.relleno.rects, sx, sy)) copiar(i, sx + an.relleno.x, sy + an.relleno.y);
   }
   cerrarUniones(g, a, lum, k, T, m, todo);
   quitarSueltos(a, T);
