@@ -1,0 +1,92 @@
+[
+  {
+    "id": "cocinero",
+    "piso": 1,
+    "titulo": "Una lista de provisiones",
+    "lineas": [
+      "Cuarenta caballeros, dos meses. Carne salada, velas, vino para el rey.",
+      "Al margen, con otra mano: el rey ya no toca la comida. Tampoco duerme. Dice que el sueño es practicar para morirse."
+    ]
+  },
+  {
+    "id": "caballero",
+    "piso": 1,
+    "titulo": "Carta de un caballero",
+    "lineas": [
+      "Madre: bajamos por orden del rey. Dice que vamos a custodiar el fuego. Nadie sabe de qué.",
+      "Hay una mujer con nosotros que no figura en ninguna lista. Baja adelante, con una antorcha igual a las nuestras, y conoce los escalones sin mirar."
+    ]
+  },
+  {
+    "id": "promesa",
+    "piso": 1,
+    "titulo": "Una hoja arrancada",
+    "lineas": [
+      "Se lo dije yo. Le dije que quien tuviera la Llama no conocería la oscuridad, ni la de la tumba.",
+      "Era cierto. Sólo que no le dije qué se siente."
+    ]
+  },
+  {
+    "id": "orden",
+    "piso": 1,
+    "titulo": "Regla de las Guardianas",
+    "lineas": [
+      "La Llama no se toma. Se cuida. Nadie la toca, nadie la mueve, nadie le pide nada.",
+      "Debajo, muy gastado: quien le pida algo va a recibirlo."
+    ]
+  },
+  {
+    "id": "cazador",
+    "piso": 2,
+    "titulo": "Bitácora del Cazador Gris",
+    "lineas": [
+      "El rey paga por adelantado. Rastreé el olor del fuego durante tres días hasta encontrar la entrada.",
+      "No es un olor. Es hambre. Y me está rastreando a mí."
+    ]
+  },
+  {
+    "id": "muro",
+    "piso": 2,
+    "titulo": "Nombres en una pared",
+    "lineas": [
+      "Una lista, tallada con un cuchillo. Cuarenta nombres de caballeros, casi todos tachados.",
+      "El último no está tachado. Sólo dice: no los escuché bajar. Los escuché quedarse."
+    ]
+  },
+  {
+    "id": "aldemar_uno",
+    "piso": 2,
+    "titulo": "Una orden del rey",
+    "lineas": [
+      "Que ningún hombre descanse hasta que yo lo haga.",
+      "La firma es de Aldemar. La tinta está fresca."
+    ]
+  },
+  {
+    "id": "sombra_diario",
+    "piso": 3,
+    "titulo": "Una antorcha gastada",
+    "lineas": [
+      "Tiene un nombre grabado en el mango, raspado a propósito hasta no dejar nada.",
+      "Abajo, con letra chiquita: fui la primera en llegar. Lo vi llorar de miedo. Le ofrecí la Llama. Pensé que era piedad."
+    ]
+  },
+  {
+    "id": "aldemar_dos",
+    "piso": 3,
+    "titulo": "Lo último que escribió el rey",
+    "lineas": [
+      "La toqué y se apagó. Sigo acá. Ella tenía razón: no hay oscuridad para mí, ni siquiera ésa.",
+      "Veo todo lo que hice, sin parar, sin poder cerrar los ojos."
+    ]
+  },
+  {
+    "id": "ultima",
+    "piso": 3,
+    "titulo": "Una nota sin firma",
+    "lineas": [
+      "Si leés esto, sos una lucecita más. Te voy a hablar mal todo el camino.",
+      "No es por vos. Cuando llegues, no le ofrezcas nada. Y no le pidas nada."
+    ]
+  }
+]

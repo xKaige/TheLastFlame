@@ -7,7 +7,7 @@ const raiz = path.join(__dirname, '..'), carpeta = path.join(raiz, 'datos', 'idi
 const leer = f => JSON.parse(fs.readFileSync(path.join(raiz, 'datos', f), 'utf8'));
 
 // En los datos se traduce todo texto con espacios o mayúscula inicial que esté en estos campos
-const CAMPOS = new Set(['nombre', 'titulo', 'rasgo', 'rol', 'descripcion', 'pista', 'lineas', 'texto', 'label', 'sub', 'motivo', 'baja', 'piso', 'fondo', 'muerte', 'q', 'big', 'escenas', 'intro', 'nombres_atr']);
+const CAMPOS = new Set(['nombre', 'titulo', 'rasgo', 'rol', 'descripcion', 'pista', 'lineas', 'texto', 'label', 'sub', 'motivo', 'baja', 'piso', 'fondo', 'muerte', 'q', 'big', 'escenas', 'intro', 'nombres_atr', 't']);
 function recorrer(v, clave, out) {
   if (typeof v === 'string') { if (CAMPOS.has(clave) && /\p{L}/u.test(v)) out.add(v); return; }
   if (Array.isArray(v)) { for (const x of v) recorrer(x, clave, out); return; }
@@ -18,7 +18,7 @@ function recorrer(v, clave, out) {
 const PATRON = /(?:\btr\(|label: |sub: |title: |text: |log\(|banner\(|msg = |confirmMenu\()\s*'((?:[^'\\]|\\.)+)'/g;
 function textos() {
   const out = new Set();
-  for (const f of ['clases', 'habilidades', 'objetos', 'modelos', 'enemigos', 'dialogos', 'historia', 'eventos']) recorrer(leer(`${f}.json`), '', out);
+  for (const f of ['clases', 'habilidades', 'objetos', 'modelos', 'enemigos', 'dialogos', 'historia', 'eventos', 'vinculos', 'notas']) recorrer(leer(`${f}.json`), '', out);
   const m = leer('mazmorra.json');
   for (const p of m.pisos) out.add(p.nombre);
   for (const n of Object.values(m.atributos.nombres)) out.add(n);

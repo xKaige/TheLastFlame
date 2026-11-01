@@ -19,6 +19,9 @@
     ],
     "por_nivel": 2
   },
+  "charlas": {
+    "prob": 0.5
+  },
   "exp_por_nivel": 10,
   "zonas": {
     "pisos": 3,

@@ -6,7 +6,7 @@
 
 // ---------- Datos y estado ----------
 const D = {};
-for (const f of ['clases', 'habilidades', 'objetos', 'modelos', 'enemigos', 'mazmorra', 'dialogos', 'historia', 'eventos']) {
+for (const f of ['clases', 'habilidades', 'objetos', 'modelos', 'enemigos', 'mazmorra', 'dialogos', 'historia', 'eventos', 'vinculos', 'notas']) {
   const x = new XMLHttpRequest();
   x.open('GET', `datos/${f}.json`, false); x.send();
   D[f] = JSON.parse(x.responseText);
@@ -508,6 +508,7 @@ function abrirHogar() {
       { label: 'Reclutar', sub: tr('{0} de {1} en el plantel.', X.plantel.length, REGLAS_HOGAR.plantel_max), fn: () => abrirReclutas(m) },
       { label: 'Los caídos', sub: 'Quienes quedaron en la cripta.', off: !X.caidos.length, fn: () => abrirLista('Los caídos', X.caidos, c => tr('Cayó en el nivel {0}. Puede volver a aparecer entre los reclutas.', c.cayo)) },
       { label: 'Las leyendas', sub: 'Quienes volvieron con la Llama.', off: !X.leyendas.length, fn: () => abrirLista('Las leyendas', X.leyendas, c => tr('Sobrevivió a la expedición {0}.', c.corrida)) },
+      { label: 'Las notas', sub: tr('{0} de {1} encontradas.', notasLeidas().length, D.notas.length), off: !notasLeidas().length, fn: abrirNotas },
       { label: 'Personajes', sub: 'Atributos, equipo y habilidades.', off: !X.plantel.length, fn: () => abrirPersonajes(X.plantel, true) },
       { label: 'Grimorio', sub: tr('{0} habilidades desbloqueadas.', X.grimorio.length), fn: abrirGrimorio },
       { label: 'La historia', sub: 'Lo que pasó con la Llama.', fn: verIntro },
@@ -518,6 +519,14 @@ function abrirHogar() {
   openMenu(m, 'hogar');
 }
 
+// Quien ya estuvo con alguien del grupo lo dice al elegirlo
+const conocidos = p => X.sel.filter(q => q !== p && D.vinculos.some(v => v.modelos.includes(p.modelo) && v.modelos.includes(q.modelo))).map(q => q.nombre);
+function abrirNotas() {
+  const leidas = D.notas.filter(n => notasLeidas().includes(n.id));
+  openMenu({ title: 'Las notas', cls: 'altar hogar', items: leidas.map(n => ({ label: n.titulo, fn: () =>
+    openMenu({ title: n.titulo, cls: 'altar hogar', text: n.lineas.map(l => tr(l)).join('<br><br>'), items: [{ label: 'Volver', fn: closeMenu }] }) })) });
+}
+
 function abrirGrupo(hogar) {
   const m = { title: 'El grupo', cls: 'altar hogar', items: [], onClose: hogar.refresh };
   m.refresh = () => {
@@ -525,7 +534,7 @@ function abrirGrupo(hogar) {
     m.items = X.plantel.map(p => {
       // la primera expedición baja sin clases repetidas
       const on = X.sel.includes(p), repetida = !on && !X.corridas && X.sel.some(q => q.clase === p.clase);
-      return { label: `${fichaDe(p)}${on ? '◆' : '◇'} ${datosDe(p)}`, sub: repetida ? tr('En la primera expedición no se repite la clase.') : detalleDe(p), off: repetida || (!on && X.sel.length >= MAX_GRUPO),
+      return { label: `${fichaDe(p)}${on ? '◆' : '◇'} ${datosDe(p)}`, sub: repetida ? tr('En la primera expedición no se repite la clase.') : conocidos(p).length ? tr('Conoce a {0}.', conocidos(p).join(', ')) : detalleDe(p), off: repetida || (!on && X.sel.length >= MAX_GRUPO),
         fn: () => { if (on) X.sel.splice(X.sel.indexOf(p), 1); else X.sel.push(p); m.refresh(); renderMenu(); } };
     });
     if (!m.items.length) m.items.push({ label: 'No hay nadie en el plantel', sub: 'Reclutá a alguien primero.', off: true, fn: () => {} });
@@ -651,6 +660,7 @@ window.enterLevel = (floor, level) => {
 };
 
 window.openEvent = e => {
+  if (e.ev.startsWith('nota_')) return leerNota(e);
   if (D.eventos[e.ev]) return abrirEvento(e);
   // el portador se va del mapa, se quede o no con el grupo
   W_().ents.splice(W_().ents.indexOf(e), 1);
@@ -664,26 +674,65 @@ for (const [id, ev] of Object.entries(D.eventos)) {
   ev.imgMapa = Object.assign(new Image(), { src: `interfaz/${ev.mapa}.png` });
   EVENTS[id] = { spr: `ev_${id}`, sprDone: `ev_${id}`, scale: ev.escala, glow: 0.4, doneText: '', title: '', text: '', choices: [] };
 }
+for (const n of D.notas) EVENTS[`nota_${n.id}`] = { spr: 'ev_nota', sprDone: 'ev_nota', scale: 0.42, glow: 0.5, doneText: '', title: '', text: '', choices: [] };
+const IMG_NOTA = Object.assign(new Image(), { src: 'interfaz/mazmorra/cripta/accesorios/nota.png' });
 function prepararEventos() {
+  if (!SPRITES.ev_nota && IMG_NOTA.complete && IMG_NOTA.naturalWidth) SPRITES.ev_nota = { w: spriteDesdeImagen(IMG_NOTA, IMG_NOTA.naturalWidth) };
   for (const [id, ev] of Object.entries(D.eventos)) {
     if (!SPRITES[`ev_${id}`] && ev.imgMapa.complete && ev.imgMapa.naturalWidth) SPRITES[`ev_${id}`] = { w: spriteDesdeImagen(ev.imgMapa, ev.imgMapa.naturalWidth) };
   }
 }
 function ponerEventos(w, nivel) {
   const R = D.mazmorra.eventos;
-  if (nivel === 0 || isBossLevel() || !R.pisos.includes(S.floor)) return;
-  const vistos = S.flags.eventos || (S.flags.eventos = []), pendientes = Object.keys(D.eventos).filter(id => !vistos.includes(id) && SPRITES[`ev_${id}`]).sort(() => azarX() - 0.5), libres = [];
+  if (nivel === 0 || isBossLevel()) return;
+  const libres = [];
   for (let y = 1; y < MH - 1; y++) for (let x = 1; x < MW - 1; x++) {
     if (w.map[y * MW + x] === 0 && esquinaDeSala(w, x, y) && !w.solidos?.has(y * MW + x) && !w.ents.some(e => e.x === x && e.y === y) && Math.abs(x - w.start[0]) + Math.abs(y - w.start[1]) >= 6) libres.push([x, y]);
   }
   libres.sort(() => azarX() - 0.5);
-  for (const id of pendientes.slice(0, R.por_nivel)) {
+  const poner = ev => {
     const lugar = libres.pop();
-    if (!lugar) return;
-    const [x, y] = lugar;
-    w.ents.push({ type: 'event', ev: id, done: false, x, y, vx: x + 0.5, vy: y + 0.5 });
-    vistos.push(id);
-  }
+    if (lugar) w.ents.push({ type: 'event', ev, done: false, x: lugar[0], y: lugar[1], vx: lugar[0] + 0.5, vy: lugar[1] + 0.5 });
+    return !!lugar;
+  };
+  // una nota por nivel: la siguiente de este piso que el jugador no haya leído nunca
+  const puestas = S.flags.notas || (S.flags.notas = []), nota = D.notas.find(n => n.piso === S.floor && !notasLeidas().includes(n.id) && !puestas.includes(n.id));
+  if (nota && SPRITES.ev_nota && poner(`nota_${nota.id}`)) puestas.push(nota.id);
+  if (!R.pisos.includes(S.floor)) return;
+  const vistos = S.flags.eventos || (S.flags.eventos = []), pendientes = Object.keys(D.eventos).filter(id => !vistos.includes(id) && SPRITES[`ev_${id}`]).sort(() => azarX() - 0.5);
+  for (const id of pendientes.slice(0, R.por_nivel)) if (poner(id)) vistos.push(id);
+}
+
+// Las notas cuentan la historia de fondo: lo leído queda para siempre y se relee en el Hogar
+const notasLeidas = () => X.memoria.notas || (X.memoria.notas = []);
+function leerNota(e) {
+  const n = D.notas.find(q => `nota_${q.id}` === e.ev), ents = W_().ents;
+  ents.splice(ents.indexOf(e), 1);
+  notasLeidas().push(n.id); guardarX();
+  sfx('pickup');
+  charla({ quien: 'narrador', titulo: n.titulo, lineas: n.lineas }, () => { log('La nota queda en el Hogar.', 'em'); guardarExpedicion(); });
+}
+
+// ---------- Vínculos ----------
+// Quienes se conocen de antes hablan entre peleas. Lo ya conversado no se repite, y sigue donde quedó en otra expedición.
+const unoDe = (modelo, lista) => lista.find(p => p.modelo === modelo);
+function charlaDelGrupo() {
+  const R = D.mazmorra.charlas, vivos = NUCLEO.vivos(X.grupo), dichas = X.memoria.charlas || (X.memoria.charlas = {}), aca = `${S.floor}-${S.level}`;
+  if (S.flags.charlaEn === aca || azarX() >= R.prob) return null;
+  const v = D.vinculos.filter(q => q.modelos.every(m => unoDe(m, vivos)) && (dichas[q.id] || 0) < q.charlas.length).sort(() => azarX() - 0.5)[0];
+  if (!v) return null;
+  S.flags.charlaEn = aca;
+  const nombres = t => v.modelos.reduce((s, m) => s.replaceAll(`{${m}}`, unoDe(m, vivos).nombre), tr(t));
+  const lineas = v.charlas[dichas[v.id] || 0].map(l => ({ quien: 'personaje', p: unoDe(l.quien, vivos), lineas: [nombres(l.t)] }));
+  dichas[v.id] = (dichas[v.id] || 0) + 1;
+  return lineas;
+}
+// Quien pierde a alguien que conocía lo dice
+function dueloPor(caido) {
+  const vivos = NUCLEO.vivos(X.grupo), v = caido && D.vinculos.find(q => q.modelos.includes(caido.modelo) && q.modelos.some(m => m !== caido.modelo && unoDe(m, vivos)));
+  if (!v) return null;
+  const quien = v.modelos.find(m => m !== caido.modelo), l = v.duelo.find(d => d.quien === quien);
+  return { quien: 'personaje', p: unoDe(quien, vivos), lineas: [l.t] };
 }
 
 // La ilustración pasa por la paleta del piso, como todo lo demás
@@ -973,7 +1022,7 @@ window.showDialog = (lineas, quien, cara, listo) => {
   encadenar([`piso_${piso}`, revelar(piso), dichoDeAlguien('piso')], listo);
 };
 function pintarCharla() {
-  const { n, i, sel } = CH, q = n.p ? [0, 0, n.p.nombre] : QUIEN[n.quien], ops = i >= n.lineas.length - 1 && n.opciones ? n.opciones.filter(o => o.requiere !== 'pocion' || P.potions > 0) : null;
+  const { n, i, sel } = CH, q = n.titulo ? [0, 0, n.titulo] : n.p ? [0, 0, n.p.nombre] : QUIEN[n.quien], ops = i >= n.lineas.length - 1 && n.opciones ? n.opciones.filter(o => o.requiere !== 'pocion' || P.potions > 0) : null;
   CH.ops = ops;
   $('xCharla').innerHTML = `<div class="cb">${q[2] ? `<div class="cq">${tr(q[2])}</div>` : ''}<div class="ct">${tr(n.lineas[i])}</div>` +
     (ops ? ops.map((o, k) => `<div class="co${k === sel ? ' sel' : ''}">${tr(o.texto)}</div>`).join('') : '<div class="cs">Enter</div>') + '</div>';
@@ -1396,7 +1445,7 @@ function seguirTrasPelea() {
   X.memoria.ultimoCaido = null;
   if (jefe && piso === LAST_FLOOR) return encadenar([muerte, 'jefe_3_muerto', revelar(4)], elegirPortador);
   guardarExpedicion();
-  encadenar([muerte, caido ? revelar(1) : null, jefe ? tr('jefe_{0}_muerto', piso) : null]);
+  encadenar([muerte, dueloPor(caido), caido ? revelar(1) : null, jefe ? tr('jefe_{0}_muerto', piso) : null, ...(!caido && !jefe && charlaDelGrupo() || [])]);
 }
 
 // ---------- El santuario ----------

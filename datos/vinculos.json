@@ -1,0 +1,169 @@
+[
+  {
+    "id": "muralla",
+    "modelos": ["viuda", "desertor"],
+    "charlas": [
+      [
+        { "quien": "viuda", "t": "{desertor}, ¿vos estabas en la muralla la noche que cayó?" },
+        { "quien": "desertor", "t": "Mucha gente estaba." },
+        { "quien": "viuda", "t": "Mi pareja bajó de esa muralla con la última antorcha. Alguien tuvo que quedarse a cubrirle la salida." },
+        { "quien": "desertor", "t": "Alguien tuvo que quedarse, sí." }
+      ],
+      [
+        { "quien": "desertor", "t": "Fue mi puesto. El que quedó vacío. Tu pareja bajó sola porque yo ya estaba corriendo." },
+        { "quien": "viuda", "t": "Lo sé desde que te vi caminar. Corrés incluso cuando estás parado." },
+        { "quien": "desertor", "t": "¿Y por qué seguís bajando conmigo?" },
+        { "quien": "viuda", "t": "Porque esta vez no te voy a dejar correr." }
+      ]
+    ],
+    "duelo": [
+      { "quien": "viuda", "t": "Se quedó en su puesto. Tarde, pero se quedó." },
+      { "quien": "desertor", "t": "Esta vez no corrí. No sirvió de nada." }
+    ]
+  },
+  {
+    "id": "cirios",
+    "modelos": ["novicia", "penitente"],
+    "charlas": [
+      [
+        { "quien": "novicia", "t": "Reconozco ese rezo, {penitente}. Sólo lo enseñaba mi orden." },
+        { "quien": "penitente", "t": "Lo aprendí de rodillas, en su puerta. Me tuvieron un invierno." },
+        { "quien": "novicia", "t": "¿Qué fuiste a confesar?" },
+        { "quien": "penitente", "t": "Todavía no terminé." }
+      ],
+      [
+        { "quien": "penitente", "t": "La noche del incendio la puerta del claustro estaba trabada. Yo la trabé." },
+        { "quien": "novicia", "t": "Eran cuarenta hermanas." },
+        { "quien": "penitente", "t": "Me dijeron que adentro guardaban una chispa que no era de ellas. No había ninguna chispa." },
+        { "quien": "novicia", "t": "Voy a terminar este voto. Después hablamos vos y yo." }
+      ]
+    ],
+    "duelo": [
+      { "quien": "novicia", "t": "No alcancé a perdonarle nada. Tampoco sé si iba a hacerlo." },
+      { "quien": "penitente", "t": "Era la última. Y yo sigo vivo. Qué mal repartido está todo." }
+    ]
+  },
+  {
+    "id": "raices",
+    "modelos": ["minero", "guardabosque"],
+    "charlas": [
+      [
+        { "quien": "guardabosque", "t": "Estas raíces están cortadas a pico. Cortadas a propósito." },
+        { "quien": "minero", "t": "Abrían paso. Eso hacíamos." },
+        { "quien": "guardabosque", "t": "Cortaron la raíz madre de mi bosque, {minero}. Por eso se muere." },
+        { "quien": "minero", "t": "Yo no sabía que estaba viva. Era piedra con vetas, para nosotros." }
+      ],
+      [
+        { "quien": "minero", "t": "Dame la mano. Si apoyás acá sentís cómo tira hacia abajo." },
+        { "quien": "guardabosque", "t": "Sigue buscando agua. Después de tantos años." },
+        { "quien": "minero", "t": "Se puede empalmar. Lo hacíamos con vigas. Si llegamos, yo lo hago." },
+        { "quien": "guardabosque", "t": "Si llegamos, te dejo." }
+      ]
+    ],
+    "duelo": [
+      { "quien": "minero", "t": "Le prometí un empalme. Lo voy a hacer igual." },
+      { "quien": "guardabosque", "t": "Era la única persona que sabía dónde apoyar la mano." }
+    ]
+  },
+  {
+    "id": "mapa",
+    "modelos": ["ladrona", "buhonero"],
+    "charlas": [
+      [
+        { "quien": "ladrona", "t": "Este mapa me lo vendiste vos, {buhonero}. Falta un piso entero." },
+        { "quien": "buhonero", "t": "Te lo vendí barato." },
+        { "quien": "ladrona", "t": "Me lo vendiste a lo que me quedaba." },
+        { "quien": "buhonero", "t": "Exacto. Es un precio justo." }
+      ],
+      [
+        { "quien": "buhonero", "t": "Cuando encuentres el cuenco, no lo vendas. No hay quien lo pague." },
+        { "quien": "ladrona", "t": "¿Cómo sabés que busco el cuenco?" },
+        { "quien": "buhonero", "t": "Porque te borré el piso de las tumbas para que no llegaras tan rápido. Alguien tenía que seguir viva." },
+        { "quien": "ladrona", "t": "Eso va a tu cuenta, entonces." }
+      ]
+    ],
+    "duelo": [
+      { "quien": "ladrona", "t": "Me debía el piso que faltaba. Ahora quién me lo paga." },
+      { "quien": "buhonero", "t": "Anoto la pérdida. No sé en qué columna." }
+    ]
+  },
+  {
+    "id": "cancion",
+    "modelos": ["cantora", "exiliado"],
+    "charlas": [
+      [
+        { "quien": "cantora", "t": "Esa melodía que silbás no la conoce nadie fuera de Vel’Ombra." },
+        { "quien": "exiliado", "t": "Me la llevé cuando me echaron. Fue lo único que pude sacar." },
+        { "quien": "cantora", "t": "Está incompleta, {exiliado}." },
+        { "quien": "exiliado", "t": "Como todo lo de allá." }
+      ],
+      [
+        { "quien": "exiliado", "t": "Me echaron por cantarla entera. El rey dijo que le quitaba el sueño." },
+        { "quien": "cantora", "t": "¿Cuánto te acordás?" },
+        { "quien": "exiliado", "t": "Hasta la nota donde me taparon la boca." },
+        { "quien": "cantora", "t": "Es la que busco. Cantá. Yo sigo desde ahí." }
+      ]
+    ],
+    "duelo": [
+      { "quien": "cantora", "t": "Me quedé con la mitad de la canción. Otra vez." },
+      { "quien": "exiliado", "t": "Tenía la nota. Se la llevó. Vel’Ombra siempre me quita lo mismo." }
+    ]
+  },
+  {
+    "id": "caliz",
+    "modelos": ["ladrona", "novicia"],
+    "charlas": [
+      [
+        { "quien": "novicia", "t": "Ese cáliz que llevás en el cinto es de plata de mi orden." },
+        { "quien": "ladrona", "t": "Era. Ya no queda orden, y yo tengo sed." },
+        { "quien": "novicia", "t": "Quedo yo, {ladrona}." },
+        { "quien": "ladrona", "t": "Entonces te convido." }
+      ],
+      [
+        { "quien": "ladrona", "t": "Tomá. Antes de que le pase algo." },
+        { "quien": "novicia", "t": "¿Me lo devolvés?" },
+        { "quien": "ladrona", "t": "Te lo presto. No le cuentes a nadie: tengo un nombre que cuidar." }
+      ]
+    ],
+    "duelo": [
+      { "quien": "ladrona", "t": "Le debía un cáliz. Se lo dejo. Es la primera vez que dejo algo." },
+      { "quien": "novicia", "t": "Rezo por quien me robó. Mis hermanas no lo hubieran entendido." }
+    ]
+  },
+  {
+    "id": "deuda",
+    "modelos": ["penitente", "buhonero"],
+    "charlas": [
+      [
+        { "quien": "buhonero", "t": "{penitente}, tengo un pagaré a nombre de una hermana del claustro." },
+        { "quien": "penitente", "t": "¿Por qué me lo mostrás?" },
+        { "quien": "buhonero", "t": "Porque me fiaba comida en el invierno malo. Le debo. Y ella ya no está para cobrar." }
+      ],
+      [
+        { "quien": "buhonero", "t": "Hice las cuentas. Lo que le debía a ella, y quién trabó esa puerta." },
+        { "quien": "penitente", "t": "Entonces ya sabés." },
+        { "quien": "buhonero", "t": "Vamos a pagar los dos, acá abajo. Yo pongo lo mío. Usted pone lo suyo." }
+      ]
+    ],
+    "duelo": [
+      { "quien": "penitente", "t": "Pagó su parte. Me quedó la mía." },
+      { "quien": "buhonero", "t": "Deuda saldada. No esperaba que doliera el recibo." }
+    ]
+  },
+  {
+    "id": "tuneles",
+    "modelos": ["minero", "desertor"],
+    "charlas": [
+      [
+        { "quien": "desertor", "t": "¿Por dónde se sale de acá? Pregunto nada más." },
+        { "quien": "minero", "t": "Hay un ramal al norte que sube. Lo marcó mi abuelo." },
+        { "quien": "desertor", "t": "No voy a usarlo." },
+        { "quien": "minero", "t": "Ya sé. Pero dormís mejor sabiéndolo, {desertor}." }
+      ]
+    ],
+    "duelo": [
+      { "quien": "minero", "t": "Nunca usó el ramal. Quedó abierto." },
+      { "quien": "desertor", "t": "Me dijo por dónde salir y no se fue. Sigo sin entenderlo." }
+    ]
+  }
+]
