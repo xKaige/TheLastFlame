@@ -1477,6 +1477,168 @@
         10,
         14
       ]
+    },
+    "imagen": "cazador",
+    "tam_batalla": 150,
+    "escala_mapa": 1.6,
+    "animacion": {
+      "base": 128,
+      "cintura": 58,
+      "pies": 108,
+      "partes": [
+        {
+          "nombre": "cabeza",
+          "rects": [
+            [
+              62,
+              0,
+              90,
+              42
+            ]
+          ],
+          "pivote": [
+            72,
+            44
+          ]
+        },
+        {
+          "nombre": "lanza",
+          "rects": [
+            [
+              0,
+              0,
+              34,
+              85
+            ],
+            [
+              34,
+              42,
+              46,
+              62
+            ]
+          ],
+          "pivote": [
+            46,
+            44
+          ]
+        },
+        {
+          "nombre": "cadena",
+          "rects": [
+            [
+              96,
+              56,
+              128,
+              118
+            ]
+          ],
+          "pivote": [
+            93,
+            53
+          ]
+        }
+      ],
+      "reposo": {
+        "pecho": 0.9,
+        "capa": 1.8,
+        "partes": {
+          "cabeza": {
+            "y": -0.9
+          },
+          "lanza": {
+            "giro": 0.025
+          },
+          "cadena": {
+            "giro": 0.09
+          }
+        }
+      },
+      "ataque": [
+        {
+          "lanza": {
+            "giro": -0.147
+          },
+          "cadena": {
+            "giro": -0.105
+          },
+          "cabeza": {
+            "y": -0.42
+          },
+          "pecho": 0.42
+        },
+        {
+          "lanza": {
+            "giro": -0.294
+          },
+          "cadena": {
+            "giro": -0.21
+          },
+          "cabeza": {
+            "y": -0.84
+          },
+          "pecho": 0.84
+        },
+        {
+          "lanza": {
+            "giro": -0.42
+          },
+          "cadena": {
+            "giro": -0.3
+          },
+          "cabeza": {
+            "y": -1.2
+          },
+          "pecho": 1.2
+        },
+        {
+          "lanza": {
+            "giro": 0.35
+          },
+          "cadena": {
+            "giro": 0.182
+          },
+          "cabeza": {
+            "y": 0.84
+          },
+          "pecho": -0.84,
+          "capa": -2.1,
+          "todo": {
+            "x": 2.8
+          }
+        },
+        {
+          "lanza": {
+            "giro": 0.5
+          },
+          "cadena": {
+            "giro": 0.26
+          },
+          "cabeza": {
+            "y": 1.2
+          },
+          "pecho": -1.2,
+          "capa": -3,
+          "todo": {
+            "x": 4
+          }
+        },
+        {
+          "lanza": {
+            "giro": 0.2
+          },
+          "cadena": {
+            "giro": 0.104
+          },
+          "cabeza": {
+            "y": 0.48
+          },
+          "pecho": -0.48,
+          "capa": -1.2,
+          "todo": {
+            "x": 1.6
+          }
+        }
+      ]
     }
   },
   "habitante": {

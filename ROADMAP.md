@@ -2,7 +2,7 @@
 
 El camino del juego es la expedición de grupo. El plan del juego anterior está en `juego_viejo/ROADMAP.md`.
 
-**Versión actual: 0.3.14.** Lo próximo: 0.4.0.
+**Versión actual: 0.3.15.** Lo próximo: 0.4.0.
 
 ## Cómo se numeran las versiones
 
@@ -16,10 +16,9 @@ Cada parche sube la versión en `package.json` y en `index.html`, y se anota ac�
 
 ### 0.4.0: Piso 2 (Los Salones)
 
-- Remodelar el piso y cambiar los dibujos de sus enemigos.
-- Escenario de batalla propio.
+- Adornos propios: pared, piso y techo.
 - Eventos y misiones propios.
-- Animar a su jefe cuando tenga el dibujo definitivo.
+- Música de exploración y tema del Cazador Gris.
 
 ### 0.5.0: Piso 3 (El Fondo)
 
@@ -56,6 +55,10 @@ Cada parche sube la versión en `package.json` y en `index.html`, y se anota ac�
 - **Título:** el logo "The Last Flame" no cambia con el idioma.
 
 ## Historial
+
+### 0.3.15
+
+- Piso 2: muros, piso y techo propios, escenario de batalla, y El Cazador Gris con dibujo nuevo y animación.
 
 ### 0.3.14
 
