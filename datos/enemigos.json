@@ -1928,47 +1928,148 @@
       "base": 124,
       "cintura": 62,
       "pies": 110,
-      "partes": [],
+      "partes": [
+        {
+          "nombre": "cabeza",
+          "rects": [
+            [
+              44,
+              2,
+              68,
+              24
+            ]
+          ],
+          "pivote": [
+            56,
+            24
+          ]
+        },
+        {
+          "nombre": "espada",
+          "rects": [
+            [
+              10,
+              48,
+              52,
+              66
+            ],
+            [
+              52,
+              58,
+              72,
+              76
+            ],
+            [
+              72,
+              66,
+              92,
+              86
+            ],
+            [
+              92,
+              76,
+              110,
+              94
+            ],
+            [
+              110,
+              86,
+              124,
+              104
+            ]
+          ],
+          "pivote": [
+            46,
+            62
+          ]
+        }
+      ],
       "reposo": {
-        "pecho": 0.9,
-        "capa": 0.8,
-        "partes": {}
+        "pecho": 0.7,
+        "capa": 0.5,
+        "partes": {
+          "cabeza": {
+            "y": -0.7
+          },
+          "espada": {
+            "giro": 0.02
+          }
+        }
       },
       "ataque": [
         {
-          "pecho": 0.5,
+          "espada": {
+            "giro": -0.262
+          },
+          "cabeza": {
+            "y": -0.35
+          },
+          "pecho": 0.42,
           "todo": {
-            "x": 1.5
+            "x": 0.7
           }
         },
         {
-          "pecho": 1,
+          "espada": {
+            "giro": -0.525
+          },
+          "cabeza": {
+            "y": -0.7
+          },
+          "pecho": 0.84,
           "todo": {
-            "x": 3
+            "x": 1.4
           }
         },
         {
-          "pecho": 1.4,
+          "espada": {
+            "giro": -0.75
+          },
+          "cabeza": {
+            "y": -1
+          },
+          "pecho": 1.2,
           "todo": {
-            "x": 4
+            "x": 2
           }
         },
         {
-          "pecho": -1,
+          "espada": {
+            "giro": 0.28
+          },
+          "cabeza": {
+            "y": 0.7
+          },
+          "pecho": -0.84,
+          "capa": -2.1,
           "todo": {
-            "x": -6
+            "x": -4.9
           }
         },
         {
-          "pecho": -1.4,
+          "espada": {
+            "giro": 0.4
+          },
+          "cabeza": {
+            "y": 1
+          },
+          "pecho": -1.2,
+          "capa": -3,
           "todo": {
-            "x": -8
+            "x": -7
           }
         },
         {
-          "pecho": -0.5,
+          "espada": {
+            "giro": 0.16
+          },
+          "cabeza": {
+            "y": 0.4
+          },
+          "pecho": -0.48,
+          "capa": -1.2,
           "todo": {
-            "x": -3
+            "x": -2.8
           }
         }
       ]
@@ -2004,47 +2105,72 @@
       "base": 104,
       "cintura": 52,
       "pies": 104,
-      "partes": [],
+      "partes": [
+        {
+          "nombre": "marco",
+          "rects": [
+            [
+              0,
+              0,
+              104,
+              104
+            ]
+          ],
+          "pivote": [
+            52,
+            52
+          ]
+        }
+      ],
       "reposo": {
-        "pecho": 0.9,
-        "capa": 0.8,
-        "partes": {}
+        "partes": {
+          "marco": {
+            "giro": 0.025,
+            "y": -1.5
+          }
+        }
       },
       "ataque": [
         {
-          "pecho": 0.5,
-          "todo": {
-            "x": 1.5
+          "marco": {
+            "giro": -0.056,
+            "y": -1.75,
+            "x": 1.4
           }
         },
         {
-          "pecho": 1,
-          "todo": {
-            "x": 3
+          "marco": {
+            "giro": -0.112,
+            "y": -3.5,
+            "x": 2.8
           }
         },
         {
-          "pecho": 1.4,
-          "todo": {
+          "marco": {
+            "giro": -0.16,
+            "y": -5,
             "x": 4
           }
         },
         {
-          "pecho": -1,
-          "todo": {
-            "x": -6
+          "marco": {
+            "giro": 0.07,
+            "y": 1.4,
+            "x": -7.0
           }
         },
         {
-          "pecho": -1.4,
-          "todo": {
-            "x": -8
+          "marco": {
+            "giro": 0.1,
+            "y": 2,
+            "x": -10
           }
         },
         {
-          "pecho": -0.5,
-          "todo": {
-            "x": -3
+          "marco": {
+            "giro": 0.04,
+            "y": 0.8,
+            "x": -4.0
           }
         }
       ]
@@ -2074,47 +2200,133 @@
       "base": 118,
       "cintura": 60,
       "pies": 118,
-      "partes": [],
+      "partes": [
+        {
+          "nombre": "abanico",
+          "rects": [
+            [
+              10,
+              12,
+              46,
+              50
+            ]
+          ],
+          "pivote": [
+            46,
+            44
+          ]
+        },
+        {
+          "nombre": "mano",
+          "rects": [
+            [
+              70,
+              26,
+              92,
+              48
+            ]
+          ],
+          "pivote": [
+            70,
+            34
+          ]
+        }
+      ],
       "reposo": {
-        "pecho": 0.9,
-        "capa": 0.8,
-        "partes": {}
+        "pecho": 0.7,
+        "capa": 1.4,
+        "partes": {
+          "abanico": {
+            "giro": 0.05
+          },
+          "mano": {
+            "giro": -0.05
+          }
+        }
       },
       "ataque": [
         {
-          "pecho": 0.5,
+          "abanico": {
+            "giro": 0.14
+          },
+          "mano": {
+            "giro": -0.105
+          },
+          "pecho": 0.35,
+          "capa": 0.7,
           "todo": {
-            "x": 1.5
+            "y": -1.05
           }
         },
         {
+          "abanico": {
+            "giro": 0.28
+          },
+          "mano": {
+            "giro": -0.21
+          },
+          "pecho": 0.7,
+          "capa": 1.4,
+          "todo": {
+            "y": -2.1
+          }
+        },
+        {
+          "abanico": {
+            "giro": 0.4
+          },
+          "mano": {
+            "giro": -0.3
+          },
           "pecho": 1,
+          "capa": 2,
           "todo": {
+            "y": -3
+          }
+        },
+        {
+          "abanico": {
+            "giro": -0.315
+          },
+          "mano": {
+            "giro": 0.245,
+            "x": 2.1
+          },
+          "pecho": -0.7,
+          "capa": -2.8,
+          "todo": {
+            "x": -4.2,
+            "y": 0.7
+          }
+        },
+        {
+          "abanico": {
+            "giro": -0.45
+          },
+          "mano": {
+            "giro": 0.35,
             "x": 3
-          }
-        },
-        {
-          "pecho": 1.4,
-          "todo": {
-            "x": 4
-          }
-        },
-        {
+          },
           "pecho": -1,
+          "capa": -4,
           "todo": {
-            "x": -6
+            "x": -6,
+            "y": 1
           }
         },
         {
-          "pecho": -1.4,
+          "abanico": {
+            "giro": -0.18
+          },
+          "mano": {
+            "giro": 0.14,
+            "x": 1.2
+          },
+          "pecho": -0.4,
+          "capa": -1.6,
           "todo": {
-            "x": -8
-          }
-        },
-        {
-          "pecho": -0.5,
-          "todo": {
-            "x": -3
+            "x": -2.4,
+            "y": 0.4
           }
         }
       ]
@@ -2162,47 +2374,126 @@
       "base": 116,
       "cintura": 64,
       "pies": 106,
-      "partes": [],
+      "partes": [
+        {
+          "nombre": "cabeza",
+          "rects": [
+            [
+              36,
+              0,
+              62,
+              20
+            ]
+          ],
+          "pivote": [
+            48,
+            20
+          ]
+        },
+        {
+          "nombre": "bandeja",
+          "rects": [
+            [
+              84,
+              4,
+              116,
+              40
+            ]
+          ],
+          "pivote": [
+            86,
+            36
+          ]
+        }
+      ],
       "reposo": {
-        "pecho": 0.9,
-        "capa": 0.8,
-        "partes": {}
+        "pecho": 1.2,
+        "partes": {
+          "cabeza": {
+            "y": -1.2
+          },
+          "bandeja": {
+            "giro": 0.03
+          }
+        }
       },
       "ataque": [
         {
-          "pecho": 0.5,
+          "bandeja": {
+            "giro": -0.105,
+            "y": -0.7
+          },
+          "cabeza": {
+            "y": -0.7
+          },
+          "pecho": 0.7,
           "todo": {
-            "x": 1.5
+            "x": 0.7
           }
         },
         {
-          "pecho": 1,
-          "todo": {
-            "x": 3
-          }
-        },
-        {
+          "bandeja": {
+            "giro": -0.21,
+            "y": -1.4
+          },
+          "cabeza": {
+            "y": -1.4
+          },
           "pecho": 1.4,
           "todo": {
-            "x": 4
+            "x": 1.4
           }
         },
         {
-          "pecho": -1,
+          "bandeja": {
+            "giro": -0.3,
+            "y": -2
+          },
+          "cabeza": {
+            "y": -2
+          },
+          "pecho": 2,
           "todo": {
-            "x": -6
+            "x": 2
           }
         },
         {
+          "bandeja": {
+            "giro": 0.42,
+            "x": -2.1
+          },
+          "cabeza": {
+            "y": 1.4
+          },
           "pecho": -1.4,
           "todo": {
-            "x": -8
+            "x": -4.9
           }
         },
         {
-          "pecho": -0.5,
-          "todo": {
+          "bandeja": {
+            "giro": 0.6,
             "x": -3
+          },
+          "cabeza": {
+            "y": 2
+          },
+          "pecho": -2,
+          "todo": {
+            "x": -7
+          }
+        },
+        {
+          "bandeja": {
+            "giro": 0.24,
+            "x": -1.2
+          },
+          "cabeza": {
+            "y": 0.8
+          },
+          "pecho": -0.8,
+          "todo": {
+            "x": -2.8
           }
         }
       ]
