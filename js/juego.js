@@ -1276,11 +1276,7 @@ function mostrarEvento(e) {
   if (e.tipo === 'texto' && e.clave === 'jefe_resiste') Bt.msg = tr('{0} ni se inmuta.', q.nombre);
   if (e.tipo === 'texto' && e.clave === 'resiste') Bt.msg = tr('{0} ya tiene ese efecto: no se renueva.', q.nombre);
   if (e.tipo === 'texto' && e.clave === 'especial') { Bt.msg = `${q.nombre} ${e.texto}.`; Bt.temblor = 5; Bt.destello = 0.5; }
-  if (e.tipo === 'texto' && e.clave === 'estado' && !q.enemigo) Bt.msg = tr('{0} sufre {1}.', q.nombre, tr(e.estado));
-  if (e.tipo === 'texto' && e.clave === 'debilitado') Bt.msg = tr('{0} queda debilitado: pega menos fuerte.', q.nombre);
-  if (e.tipo === 'texto' && e.clave === 'aturdido_grupo') Bt.msg = tr('{0} queda aturdido y pierde su próximo turno.', q.nombre);
-  if (e.tipo === 'texto' && e.clave === 'enganchado') Bt.msg = tr('{0} queda enganchado y pierde su próximo turno.', q.nombre);
-  if (e.tipo === 'texto' && e.clave === 'presa') Bt.msg = tr('{0} es la presa: lo persiguen y le pegan más fuerte.', q.nombre);
+  // los estados del grupo no llevan texto: se leen en los íconos de cada tarjeta
   if (e.tipo === 'texto' && e.clave === 'roba') Bt.msg = tr('El Soplo le roba Ímpetu a {0}.', q.nombre);
 }
 
