@@ -1,0 +1,8 @@
+juego_viejo
+tools
+.claude
+*.md
+main.js
+preload.js
+ipc.js
+package-lock.json
