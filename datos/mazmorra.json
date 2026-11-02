@@ -23,7 +23,7 @@
     "prob": 0.5
   },
   "dificultad": {
-    "vida": 1.2,
+    "vida": 1.25,
     "dano": 1.2
   },
   "exp_por_nivel": 10,
