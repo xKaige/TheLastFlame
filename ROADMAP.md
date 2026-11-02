@@ -2,7 +2,7 @@
 
 El camino del juego es la expedición de grupo. El plan del juego anterior está en `juego_viejo/ROADMAP.md`.
 
-**Versión actual: 0.4.0.** Lo próximo: 0.5.0.
+**Versión actual: 0.4.1.** Lo próximo: 0.5.0.
 
 ## Cómo se numeran las versiones
 
@@ -18,7 +18,6 @@ Cada parche sube la versión en `package.json` y en `index.html`, y se anota ac�
 
 - Remodelar la zona y hacerla más grande.
 - Cambiar los dibujos de sus enemigos.
-- Escenario de batalla propio.
 - Eventos propios.
 - Animar a su jefe cuando tenga el dibujo definitivo.
 - Reescribir el final: Aldemar pasa a ser el jefe del acto I, y al vencerlo se abre el suelo hacia la zona 4.
@@ -93,6 +92,10 @@ La idea que une todo es una regla de las Guardianas: "quien le pida algo va a re
 - **Título:** el logo "The Last Flame" no cambia con el idioma.
 
 ## Historial
+
+### 0.4.1
+
+- Zona 3: muros, piso y techo propios, y escenario de batalla.
 
 ### 0.4.0
 
