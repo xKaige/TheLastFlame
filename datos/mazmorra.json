@@ -280,6 +280,32 @@
       [
         "cebado",
         "necrofago"
+      ],
+      [
+        "portadora",
+        "caballero"
+      ],
+      [
+        "tachado",
+        "apagado"
+      ],
+      [
+        "apagado",
+        "portadora",
+        "apagado"
+      ],
+      [
+        "perdido",
+        "necrofago"
+      ],
+      [
+        "tachado",
+        "portadora"
+      ],
+      [
+        "perdido",
+        "apagado",
+        "perdido"
       ]
     ]
   },
@@ -295,7 +321,9 @@
       "sombra"
     ],
     "3": [
-      "habitante"
+      "apagado",
+      "habitante",
+      "apagado"
     ]
   },
   "grupo": {

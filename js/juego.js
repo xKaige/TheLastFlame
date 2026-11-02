@@ -96,14 +96,19 @@ function spriteDesdeImagen(img, size) {
 const COFRES = { chest: D.mazmorra.accesorios.cofres.cerrado, chestOpen: D.mazmorra.accesorios.cofres.abierto };
 for (const k in COFRES) COFRES[k] = Object.assign(new Image(), { src: tr('interfaz/mazmorra/cripta/accesorios/{0}.png', COFRES[k]) });
 
-// Los enemigos de Los Salones existen sólo en esta versión del juego: el motor los necesita para ponerlos en el mapa
+// Los enemigos de Los Salones y El Fondo existen sólo en esta versión del juego: el motor los necesita para ponerlos en el mapa
 Object.assign(ENEMIES, {
+  portadora: { name: 'Portadora Velada', idle: 'float', hitFx: 'shadow', spr: 'portadora', hp: 26, atk: [4, 8], def: 2, xp: 20, ramp: 0, speed: 0.7, scale: 1, flee: 0.5 },
+  tachado: { name: 'El Tachado', idle: 'heavy', hitFx: 'blade', spr: 'tachado', hp: 32, atk: [5, 9], def: 4, xp: 24, ramp: 0, speed: 0.5, scale: 1, flee: 0.5 },
+  apagado: { name: 'El Apagado', idle: 'heavy', hitFx: 'smash', spr: 'apagado', hp: 22, atk: [4, 7], def: 1, xp: 18, ramp: 0, speed: 0.8, scale: 0.95, flee: 0.5 },
+  perdido: { name: 'Portador Perdido', idle: 'float', hitFx: 'claw', spr: 'perdido', hp: 18, atk: [3, 6], def: 0, xp: 14, ramp: 0, speed: 1, scale: 0.8, flee: 0.5 },
   armadura: { name: 'Armadura Vacía', idle: 'heavy', hitFx: 'blade', spr: 'armadura', hp: 30, atk: [4, 9], def: 3, xp: 20, ramp: 0, speed: 0.6, scale: 1, flee: 0.5 },
   retrato: { name: 'Retrato Viviente', idle: 'float', hitFx: 'shadow', spr: 'retrato', hp: 20, atk: [1, 1], def: 0, xp: 14, ramp: 0, speed: 0.4, scale: 0.85, flee: 0.5 },
   dama: { name: 'Dama de Compañía', idle: 'float', hitFx: 'shadow', spr: 'dama', hp: 20, atk: [3, 6], def: 1, xp: 14, ramp: 0, speed: 0.8, scale: 0.95, flee: 0.5 },
   copero: { name: 'Copero Hinchado', idle: 'heavy', hitFx: 'smash', spr: 'copero', hp: 25, atk: [3, 6], def: 1, xp: 14, ramp: 0, speed: 0.5, scale: 1, flee: 0.5 },
 });
 POOLS[2].push('armadura', 'armadura', 'retrato', 'retrato', 'dama', 'dama', 'copero', 'copero');
+POOLS[3].push('portadora', 'portadora', 'tachado', 'tachado', 'apagado', 'apagado', 'perdido', 'perdido');
 
 function aplicarEnemigosEnMapa() {
   for (const [k, img] of Object.entries(COFRES)) {

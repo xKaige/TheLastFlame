@@ -1788,6 +1788,178 @@
         12,
         17
       ]
+    },
+    "imagen": "aldemar",
+    "tam_batalla": 150,
+    "ojos": [
+      [
+        73,
+        16
+      ],
+      [
+        78,
+        16
+      ]
+    ],
+    "fase": {
+      "umbral": 0.5,
+      "escudos": 0,
+      "velocidad": 1.15,
+      "dano": 1.1,
+      "mensaje": "{0} abre los ojos que nunca pudo cerrar.",
+      "ciclo": [
+        "jauria",
+        "gancho",
+        "presa",
+        "especial",
+        "golpe"
+      ],
+      "jauria": {
+        "nombre": "alza el cuenco y los suyos acuden",
+        "enemigo": "apagado",
+        "cantidad": 2
+      },
+      "gancho": {
+        "nombre": "te mira y no podés moverte",
+        "dano": [
+          10,
+          14
+        ]
+      },
+      "presa": {
+        "nombre": "elige a quien va a acompañarlo",
+        "turnos": 2,
+        "dano": 1.5
+      }
+    },
+    "animacion": {
+      "base": 150,
+      "cintura": 70,
+      "pies": 150,
+      "partes": [
+        {
+          "nombre": "cabeza",
+          "rects": [
+            [
+              64,
+              0,
+              86,
+              36
+            ]
+          ],
+          "pivote": [
+            75,
+            36
+          ]
+        },
+        {
+          "nombre": "cuenco",
+          "rects": [
+            [
+              46,
+              46,
+              104,
+              72
+            ]
+          ],
+          "pivote": [
+            75,
+            60
+          ]
+        }
+      ],
+      "reposo": {
+        "pecho": 0.9,
+        "capa": 1.6,
+        "partes": {
+          "cabeza": {
+            "y": -0.8
+          },
+          "cuenco": {
+            "y": 0.8
+          }
+        }
+      },
+      "ataque": [
+        {
+          "cabeza": {
+            "y": -0.7
+          },
+          "cuenco": {
+            "y": -0.7
+          },
+          "pecho": 0.49,
+          "capa": 0.7,
+          "todo": {
+            "x": 0.7
+          }
+        },
+        {
+          "cabeza": {
+            "y": -1.4
+          },
+          "cuenco": {
+            "y": -1.4
+          },
+          "pecho": 0.98,
+          "capa": 1.4,
+          "todo": {
+            "x": 1.4
+          }
+        },
+        {
+          "cabeza": {
+            "y": -2
+          },
+          "cuenco": {
+            "y": -2
+          },
+          "pecho": 1.4,
+          "capa": 2,
+          "todo": {
+            "x": 2
+          }
+        },
+        {
+          "cabeza": {
+            "y": 1.4
+          },
+          "cuenco": {
+            "y": 1.4
+          },
+          "pecho": -0.98,
+          "capa": -2.8,
+          "todo": {
+            "x": -4.9
+          }
+        },
+        {
+          "cabeza": {
+            "y": 2
+          },
+          "cuenco": {
+            "y": 2
+          },
+          "pecho": -1.4,
+          "capa": -4,
+          "todo": {
+            "x": -7
+          }
+        },
+        {
+          "cabeza": {
+            "y": 0.8
+          },
+          "cuenco": {
+            "y": 0.8
+          },
+          "pecho": -0.56,
+          "capa": -1.6,
+          "todo": {
+            "x": -2.8
+          }
+        }
+      ]
     }
   },
   "perro": {
@@ -2530,6 +2702,485 @@
           "pecho": -0.8,
           "todo": {
             "x": -2.8
+          }
+        }
+      ]
+    }
+  },
+  "portadora": {
+    "nombre": "Portadora Velada",
+    "sprite": "portadora",
+    "imagen": "portadora",
+    "vida": 60,
+    "ataque": [
+      9,
+      13
+    ],
+    "defensa": 2,
+    "velocidad": 9,
+    "exp": 12,
+    "habilidades": [
+      {
+        "nombre": "alza su antorcha muerta y las llamas tiemblan",
+        "prob": 0.4,
+        "blanco": "todos",
+        "mult": 0.5,
+        "apaga": 8
+      },
+      {
+        "nombre": "reza por los que siguen de pie",
+        "prob": 0.3,
+        "mult": 0,
+        "refuerza": 3
+      }
+    ],
+    "animacion": {
+      "base": 124,
+      "cintura": 58,
+      "pies": 124,
+      "partes": [
+        {
+          "nombre": "cabeza",
+          "rects": [
+            [
+              54,
+              0,
+              74,
+              28
+            ]
+          ],
+          "pivote": [
+            64,
+            28
+          ]
+        }
+      ],
+      "reposo": {
+        "pecho": 0.9,
+        "capa": 1.6,
+        "partes": {
+          "cabeza": {
+            "y": -0.8
+          }
+        }
+      },
+      "ataque": [
+        {
+          "cabeza": {
+            "y": -0.7
+          },
+          "pecho": 0.49,
+          "capa": 0.7,
+          "todo": {
+            "x": 1.05
+          }
+        },
+        {
+          "cabeza": {
+            "y": -1.4
+          },
+          "pecho": 0.98,
+          "capa": 1.4,
+          "todo": {
+            "x": 2.1
+          }
+        },
+        {
+          "cabeza": {
+            "y": -2
+          },
+          "pecho": 1.4,
+          "capa": 2,
+          "todo": {
+            "x": 3
+          }
+        },
+        {
+          "cabeza": {
+            "y": 1.4
+          },
+          "pecho": -0.98,
+          "capa": -2.1,
+          "todo": {
+            "x": -5.6
+          }
+        },
+        {
+          "cabeza": {
+            "y": 2
+          },
+          "pecho": -1.4,
+          "capa": -3,
+          "todo": {
+            "x": -8
+          }
+        },
+        {
+          "cabeza": {
+            "y": 0.8
+          },
+          "pecho": -0.56,
+          "capa": -1.2,
+          "todo": {
+            "x": -3.2
+          }
+        }
+      ]
+    }
+  },
+  "tachado": {
+    "nombre": "El Tachado",
+    "sprite": "tachado",
+    "imagen": "tachado",
+    "vida": 84,
+    "ataque": [
+      12,
+      18
+    ],
+    "defensa": 5,
+    "velocidad": 6,
+    "exp": 12,
+    "resiste_fisico": 0.3,
+    "habilidades": [
+      {
+        "nombre": "raya tu nombre con la espada rota",
+        "prob": 0.4,
+        "mult": 0.8,
+        "debilita": 2
+      }
+    ],
+    "animacion": {
+      "base": 128,
+      "cintura": 62,
+      "pies": 128,
+      "partes": [
+        {
+          "nombre": "cabeza",
+          "rects": [
+            [
+              55,
+              0,
+              69,
+              20
+            ]
+          ],
+          "pivote": [
+            62,
+            20
+          ]
+        }
+      ],
+      "reposo": {
+        "pecho": 0.9,
+        "capa": 0.6,
+        "partes": {
+          "cabeza": {
+            "y": -0.8
+          }
+        }
+      },
+      "ataque": [
+        {
+          "cabeza": {
+            "y": -0.7
+          },
+          "pecho": 0.49,
+          "capa": 0.7,
+          "todo": {
+            "x": 1.05
+          }
+        },
+        {
+          "cabeza": {
+            "y": -1.4
+          },
+          "pecho": 0.98,
+          "capa": 1.4,
+          "todo": {
+            "x": 2.1
+          }
+        },
+        {
+          "cabeza": {
+            "y": -2
+          },
+          "pecho": 1.4,
+          "capa": 2,
+          "todo": {
+            "x": 3
+          }
+        },
+        {
+          "cabeza": {
+            "y": 1.4
+          },
+          "pecho": -0.98,
+          "capa": -2.1,
+          "todo": {
+            "x": -5.6
+          }
+        },
+        {
+          "cabeza": {
+            "y": 2
+          },
+          "pecho": -1.4,
+          "capa": -3,
+          "todo": {
+            "x": -8
+          }
+        },
+        {
+          "cabeza": {
+            "y": 0.8
+          },
+          "pecho": -0.56,
+          "capa": -1.2,
+          "todo": {
+            "x": -3.2
+          }
+        }
+      ]
+    }
+  },
+  "apagado": {
+    "nombre": "El Apagado",
+    "sprite": "apagado",
+    "imagen": "apagado",
+    "vida": 46,
+    "ataque": [
+      9,
+      14
+    ],
+    "defensa": 1,
+    "velocidad": 10,
+    "exp": 10,
+    "habilidades": [
+      {
+        "nombre": "te arroja ceniza a los ojos",
+        "prob": 0.4,
+        "mult": 0.5,
+        "aturde": true
+      }
+    ],
+    "al_morir": {
+      "nombre": "se deshace en una nube de ceniza caliente",
+      "dano": [
+        4,
+        7
+      ],
+      "estado": {
+        "tipo": "quemadura",
+        "por_turno": 2,
+        "min": 2,
+        "max": 3
+      }
+    },
+    "animacion": {
+      "base": 122,
+      "cintura": 60,
+      "pies": 122,
+      "partes": [
+        {
+          "nombre": "cabeza",
+          "rects": [
+            [
+              52,
+              0,
+              70,
+              22
+            ]
+          ],
+          "pivote": [
+            60,
+            22
+          ]
+        }
+      ],
+      "reposo": {
+        "pecho": 0.9,
+        "capa": 1.8,
+        "partes": {
+          "cabeza": {
+            "y": -0.8
+          }
+        }
+      },
+      "ataque": [
+        {
+          "cabeza": {
+            "y": -0.7
+          },
+          "pecho": 0.49,
+          "capa": 0.7,
+          "todo": {
+            "x": 1.05
+          }
+        },
+        {
+          "cabeza": {
+            "y": -1.4
+          },
+          "pecho": 0.98,
+          "capa": 1.4,
+          "todo": {
+            "x": 2.1
+          }
+        },
+        {
+          "cabeza": {
+            "y": -2
+          },
+          "pecho": 1.4,
+          "capa": 2,
+          "todo": {
+            "x": 3
+          }
+        },
+        {
+          "cabeza": {
+            "y": 1.4
+          },
+          "pecho": -0.98,
+          "capa": -2.1,
+          "todo": {
+            "x": -5.6
+          }
+        },
+        {
+          "cabeza": {
+            "y": 2
+          },
+          "pecho": -1.4,
+          "capa": -3,
+          "todo": {
+            "x": -8
+          }
+        },
+        {
+          "cabeza": {
+            "y": 0.8
+          },
+          "pecho": -0.56,
+          "capa": -1.2,
+          "todo": {
+            "x": -3.2
+          }
+        }
+      ]
+    }
+  },
+  "perdido": {
+    "nombre": "Portador Perdido",
+    "sprite": "perdido",
+    "imagen": "perdido",
+    "vida": 38,
+    "ataque": [
+      8,
+      12
+    ],
+    "defensa": 0,
+    "velocidad": 14,
+    "exp": 9,
+    "roba_impetu": true,
+    "habilidades": [
+      {
+        "nombre": "se te prende y te pide fuego",
+        "prob": 0.5,
+        "mult": 0.7,
+        "roba_vida": 0.5,
+        "apaga": 6
+      }
+    ],
+    "animacion": {
+      "base": 112,
+      "cintura": 84,
+      "pies": 112,
+      "partes": [
+        {
+          "nombre": "cabeza",
+          "rects": [
+            [
+              18,
+              62,
+              46,
+              94
+            ]
+          ],
+          "pivote": [
+            44,
+            80
+          ]
+        }
+      ],
+      "reposo": {
+        "pecho": 0.9,
+        "capa": 0.8,
+        "partes": {
+          "cabeza": {
+            "y": -0.8
+          }
+        }
+      },
+      "ataque": [
+        {
+          "cabeza": {
+            "y": -0.7
+          },
+          "pecho": 0.49,
+          "capa": 0.7,
+          "todo": {
+            "x": 1.05
+          }
+        },
+        {
+          "cabeza": {
+            "y": -1.4
+          },
+          "pecho": 0.98,
+          "capa": 1.4,
+          "todo": {
+            "x": 2.1
+          }
+        },
+        {
+          "cabeza": {
+            "y": -2
+          },
+          "pecho": 1.4,
+          "capa": 2,
+          "todo": {
+            "x": 3
+          }
+        },
+        {
+          "cabeza": {
+            "y": 1.4
+          },
+          "pecho": -0.98,
+          "capa": -2.1,
+          "todo": {
+            "x": -5.6
+          }
+        },
+        {
+          "cabeza": {
+            "y": 2
+          },
+          "pecho": -1.4,
+          "capa": -3,
+          "todo": {
+            "x": -8
+          }
+        },
+        {
+          "cabeza": {
+            "y": 0.8
+          },
+          "pecho": -0.56,
+          "capa": -1.2,
+          "todo": {
+            "x": -3.2
           }
         }
       ]
