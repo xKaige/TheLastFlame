@@ -74,6 +74,7 @@
   "Nv": "Lv",
   "Atacar": "Attack",
   "Defender": "Defend",
+  "Cuanto más alto, menos rinde cada punto.": "The higher it is, the less each point gives.",
   "ver qué hace": "details",
   "Cada punto suma 1 de Ataque. Las armas pesadas la piden.": "Each point adds 1 Attack. Heavy weapons require it.",
   "Cada punto suma 0,5 de Velocidad y 1% de Esquiva. Las armas livianas la piden.": "Each point adds 0.5 Speed and 1% Dodge. Light weapons require it.",

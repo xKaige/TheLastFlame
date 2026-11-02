@@ -2,7 +2,7 @@
 
 El camino del juego es la expedición de grupo. El plan del juego anterior está en `juego_viejo/ROADMAP.md`.
 
-**Versión actual: 0.4.11.** Lo próximo: 0.5.0.
+**Versión actual: 0.4.12.** Lo próximo: 0.5.0.
 
 ## Cómo se numeran las versiones
 
@@ -88,10 +88,16 @@ La idea que une todo es una regla de las Guardianas: "quien le pida algo va a re
 - **Ímpetu:** Sanador y Mago arrancan cada pelea con 2, y en lugar de Defender tienen Concentrar: la misma protección, con +2 de Ímpetu (`impetu_inicial` y `concentra` en `datos/clases.json`).
 - **Atributos mágicos:** Intelecto sube toda la magia, Fe sube las curas y habilita las más fuertes, y Arcano hace lo mismo con el fuego.
 - **Armas:** cada arma es de una clase y pide atributos. Las de Mago y Sanador suman al ataque básico un porcentaje del Intelecto (`magico` en `datos/objetos.json`).
+- **Crecimiento:** cada nivel da 1 punto para repartir, y cada 3 niveles los atributos propios de la clase suben solos. Cuanto más alto el atributo, menos rinde cada punto: vale entero hasta +20, la mitad hasta +50 y un cuarto después.
 - **Modelos y clases:** cada retrato tiene su clase fija.
 - **Título:** el logo "The Last Flame" no cambia con el idioma.
 
 ## Historial
+
+### 0.4.12
+
+- Crecimiento más lento: los atributos de clase suben solos cada 3 niveles.
+- Los atributos muy altos rinden menos, para llegar sanos a nivel 90.
 
 ### 0.4.11
 

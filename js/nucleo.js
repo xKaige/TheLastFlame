@@ -52,10 +52,18 @@ const NUCLEO = (() => {
     return t;
   }
 
+  // Cuanto más alto el atributo, menos rinde cada punto: tramos de "atributos" en mazmorra.json
+  function puntosQueValen(D, d) {
+    if (d <= 0) return d;
+    let n = 0, ini = 0;
+    for (const { hasta = Infinity, vale } of D.mazmorra.atributos.tramos) { n += Math.max(0, Math.min(d, hasta) - ini) * vale; ini = hasta; }
+    return n;
+  }
+
   // Los números de pelea salen de la base más lo que suman los atributos por encima de los de su clase
   function recalcular(D, p) {
     const total = atributosDe(D, p), inicial = D.clases[p.clase].atributos, suma = { vida: 0, ataque: 0, defensa: 0, velocidad: 0, critico: 0, esquiva: 0, magia: 0, cura: 0, fuego: 0 };
-    for (const [a, efectos] of Object.entries(D.mazmorra.atributos.por_punto)) for (const [k, v] of Object.entries(efectos)) suma[k] += v * (total[a] - inicial[a]);
+    for (const [a, efectos] of Object.entries(D.mazmorra.atributos.por_punto)) for (const [k, v] of Object.entries(efectos)) suma[k] += v * puntosQueValen(D, total[a] - inicial[a]);
     for (const id of Object.values(p.equipo)) if (id) for (const [k, v] of Object.entries(D.objetos[id].bonos)) if (k in suma) suma[k] += v;
     const b = p.base, antes = p.vidaMax;
     p.vidaMax = Math.round(b.vida + suma.vida); p.ataque = Math.round(b.ataque + suma.ataque); p.defensa = Math.round(b.defensa + suma.defensa);
@@ -129,7 +137,7 @@ const NUCLEO = (() => {
     while (p.nivel < tope && p.exp >= p.nivel * D.mazmorra.exp_por_nivel) {
       p.exp -= p.nivel * D.mazmorra.exp_por_nivel; p.nivel++; subio = true; p.puntos++;
       p.base.vida += D.mazmorra.mejora_nivel.vida; p.base.ataque += D.mazmorra.mejora_nivel.ataque;
-      for (const [a, v] of Object.entries(D.clases[p.clase].crecimiento)) p.atributos[a] = atributosBase(D, p, a) + v;   // lo que crece solo, según la clase
+      if (p.nivel % D.mazmorra.atributos.crece_cada === 0) for (const [a, v] of Object.entries(D.clases[p.clase].crecimiento)) p.atributos[a] = atributosBase(D, p, a) + v;   // lo que crece solo, según la clase
       recalcular(D, p);
     }
     if (p.nivel >= tope) p.exp = 0;

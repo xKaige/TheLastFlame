@@ -487,7 +487,21 @@
       "fe": "Cada punto suma 5% a las curas. Hace falta para aprender las curas más fuertes.",
       "ard": "Cada punto suma 5% al daño de fuego y a las quemaduras. Hace falta para aprender el fuego más fuerte.",
       "per": "Cada punto suma 1,5% de Crítico. Algunos eventos la piden."
-    }
+    },
+    "crece_cada": 3,
+    "tramos": [
+      {
+        "hasta": 20,
+        "vale": 1
+      },
+      {
+        "hasta": 50,
+        "vale": 0.5
+      },
+      {
+        "vale": 0.25
+      }
+    ]
   },
   "botin": {
     "objeto": 0.45,

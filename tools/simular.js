@@ -3,6 +3,13 @@
 const fs = require('fs'), path = require('path');
 const N = require('../js/nucleo.js');
 const D = {};
+// Como un jugador: gasta cada punto en lo propio de su clase
+function subir(u, exp, piso) {
+  N.ganarExp(D, u, exp, N.topeNivel(D, piso));
+  const propios = Object.keys(D.clases[u.clase].crecimiento);
+  for (let i = u.nivel; u.puntos; i++) N.subirAtributo(D, u, propios[i % propios.length]);
+}
+
 for (const f of ['clases', 'habilidades', 'objetos', 'modelos', 'enemigos', 'mazmorra', 'dialogos']) D[f] = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'datos', f + '.json'), 'utf8'));
 const azar = Math.random, MEZCLA = ['guerrero', 'picaro', 'mago', 'sanador'];
 
@@ -41,7 +48,7 @@ for (const tam of [4, 3, 2, 1]) {
         tot.peleas++; tot.turnos += turnos; vivo = r === 'victoria';
         if (piso === 1) { tot.peleas1++; tot.turnos1 += turnos; }
         const exp = 8;
-        for (const u of N.vivos(grupo)) N.ganarExp(D, u, exp, N.topeNivel(D, piso));
+        for (const u of N.vivos(grupo)) subir(u, exp, piso);
         descanso(G.descanso);
         if (k % 2 === 1) descanso(0.25);          // pociones del grupo
       }
@@ -49,7 +56,7 @@ for (const tam of [4, 3, 2, 1]) {
         descanso(0.3);
         const { r } = pelear(grupo, G.jefes[piso]);
         vivo = r === 'victoria';
-        if (vivo) { tot.jefes[piso - 1]++; for (const u of N.vivos(grupo)) N.ganarExp(D, u, D.enemigos[G.jefes[piso].find(i => D.enemigos[i].jefe)].exp, N.topeNivel(D, piso)); descanso(G.santuario.cura); }
+        if (vivo) { tot.jefes[piso - 1]++; for (const u of N.vivos(grupo)) subir(u, D.enemigos[G.jefes[piso].find(i => D.enemigos[i].jefe)].exp, piso); descanso(G.santuario.cura); }
       }
     }
     if (vivo) tot.gana++;

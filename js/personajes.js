@@ -91,7 +91,7 @@ function pintarPj() {
     const combate = panel('Combate', '', `<div class="pstats">${dato('Ataque', p.ataque + (p.ataqueMagico || 0))}${dato('Defensa', p.defensa)}${dato('Vel', p.velocidad)}${dato('Crítico', `${Math.round(p.critico * 100)}%`)}${dato('Esquiva', `${Math.round(p.esquiva * 100)}%`, 'ancho')}</div>`);
     const equipo = panel('Equipo', '', LUGARES_EQUIPO.map(filaEquipo).join(''));
     const a = filas[PJ.sel] && filas[PJ.sel].atr;
-    const info = PJ.info && a ? panel(REGLAS_ATR.nombres[a], '', `<div class="pdesc">${tr(REGLAS_ATR.descripciones[a])}</div>`, 'plleno') : `${combate}${equipo}`;
+    const info = PJ.info && a ? panel(REGLAS_ATR.nombres[a], '', `<div class="pdesc">${tr(REGLAS_ATR.descripciones[a])}</div><div class="pdesc nota">${tr('Cuanto más alto, menos rinde cada punto.')}</div>`, 'plleno') : `${combate}${equipo}`;
     centro = `${atributos}<div class="pcol">${info}</div>`;
   } else if (PJ.tab === 1) {
     const h = filas[PJ.sel] && D.habilidades[filas[PJ.sel].hab];
