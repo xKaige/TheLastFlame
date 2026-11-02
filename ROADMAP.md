@@ -2,7 +2,7 @@
 
 El camino del juego es la expedición de grupo. El plan del juego anterior está en `juego_viejo/ROADMAP.md`.
 
-**Versión actual: 0.3.41.** Lo próximo: 0.4.0.
+**Versión actual: 0.4.0.** Lo próximo: 0.5.0.
 
 ## Cómo se numeran las versiones
 
@@ -13,10 +13,6 @@ El camino del juego es la expedición de grupo. El plan del juego anterior está
 Cada parche sube la versión en `package.json` y en `index.html`, y se anota acá: pasa de "Próximas versiones" a "Historial". Lo que surja en el camino se agrega al parche que corresponda.
 
 ## Próximas versiones
-
-### 0.4.0: Zona 2 (Los Salones)
-
-- Música de exploración.
 
 ### 0.5.0: Zona 3 (El Fondo)
 
@@ -97,6 +93,11 @@ La idea que une todo es una regla de las Guardianas: "quien le pida algo va a re
 - **Título:** el logo "The Last Flame" no cambia con el idioma.
 
 ## Historial
+
+### 0.4.0
+
+- Zona 2 (Los Salones) terminada.
+- Música de exploración de la zona 2: The Unfinished Banquet.
 
 ### 0.3.41
 

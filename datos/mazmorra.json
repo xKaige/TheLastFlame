@@ -330,6 +330,14 @@
       ],
       "volumen": 0.13
     },
+    "castle": {
+      "archivo": "assets/musica/exploracion_salones.ogg",
+      "bucle": [
+        36.071,
+        148.112
+      ],
+      "volumen": 0.13
+    },
     "pelea": {
       "archivo": "assets/musica/pelea_comun.ogg",
       "bucle": [
