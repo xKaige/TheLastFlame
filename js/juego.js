@@ -1220,7 +1220,7 @@ function iniciarPelea(ent, ids, entrada = 0.95, emboscada = false) {
   const fx = ids.length === 1 ? [240] : ids.length === 2 ? [190, 290] : ids.some(id => D.enemigos[id].tam_batalla) ? [92, 240, 388] : FX3;   // un jefe grande necesita lugar
   for (const e of b.enemigos) { e.x = fx[e.i]; prepararEnemigo(e); }
   for (const u of b.aliados) u.golpeado = 0;
-  Bt = { b, lugares: fx, ent, fase: 'espera', sel: 0, tsel: 0, ops: [], msg: 'Te cierran el paso.', t: 0, gris: fondoBatalla(), fx: [], fxHab: [], fxPixel: [], congelado: 0, part: [], temblor: 0, destello: 0, golpe: 'tajo', ini: 0, entrada };
+  Bt = { b, lugares: fx, ent, fase: 'espera', sel: 0, tsel: 0, ops: [], msg: 'Te cierran el paso.', t: 0, gris: fondoBatalla(), fx: [], fxHab: [], fxPixel: [], congelado: 0, oscuro: 0, part: [], temblor: 0, destello: 0, golpe: 'tajo', ini: 0, entrada };
   S.mode = 'xbat';
   $('battle').classList.remove('hidden');
   $('bMenu').classList.add('hidden');
@@ -1240,6 +1240,7 @@ function siguiente() {
   if (u.vida <= 0) return later(500, siguiente);
   if (u.enemigo) {
     Bt.fase = 'espera'; Bt.msg = ''; pintarBatalla();
+    if (NUCLEO.haraEspecial(u) && cuadrosEspeciales(u)) return golpeImponente(u);
     iniciarAtaqueAnimado(u);
     later(600, () => { if (Bt) { mostrar(NUCLEO.turnoEnemigo(D, Bt.b, u, azarX)); later(450, () => { if (Bt) Bt.fase = 'cambio'; }); later(800, siguiente); } });
   } else {
@@ -1262,6 +1263,20 @@ function mostrar(eventos) {
   }
   pintarBatalla();
   return espera;
+}
+
+// El golpe a todo el grupo se anuncia: la sala se apaga, el jefe se prepara y recién ahí pega
+function golpeImponente(u) {
+  u.especialDesde = Bt.t; sfx('encounter');
+  later(D.enemigos[u.tipo].golpe_especial.impacto * 1000, () => {
+    if (!Bt) return;
+    mostrar(NUCLEO.turnoEnemigo(D, Bt.b, u, azarX));
+    golpePixel('barrido', u);
+    for (let x = 50; x <= 430; x += 38) chispas(x, FBASE, 4, coloresFx(), -46, 60);
+    Bt.temblor = 13; Bt.destello = 0.9; Bt.congelado = 0.16; sfx('slash');
+    later(850, () => { if (Bt) Bt.fase = 'cambio'; });
+    later(1300, siguiente);
+  });
 }
 
 function mostrarEvento(e) {
@@ -1350,6 +1365,8 @@ function dibujarFx(c) {
 
 function actualizarFx(dt) {
   Bt.temblor = Math.max(0, Bt.temblor - dt * 22);
+  const prepara = Bt.b.enemigos.some(e => e.especialDesde !== undefined && Bt.t - e.especialDesde < D.enemigos[e.tipo].golpe_especial.impacto);
+  Bt.oscuro = clamp(Bt.oscuro + (prepara ? dt * 1.5 : -dt * 3), 0, 1);
   Bt.destello = Math.max(0, Bt.destello - dt * 2.2);
   for (const f of Bt.fx) f.t += dt;
   Bt.fx = Bt.fx.filter(f => f.t < f.dur);
@@ -1714,7 +1731,7 @@ function dibujarEscena(c, ex, ey) {
   for (let y = 0, i = 0; y < h; y++) for (let x = 0; x < w; x++, i++) {
     let l = ambiente + Bt.destello + Math.max(0, 1 - dc[i] / alcance) * 0.8 + Math.max(0, 1 - dl[i] / lat) * 0.95;
     for (const d of focos) { const q = 1 - d[i] / 52; if (q > 0) l += q * 0.5; }
-    const b = lum[i] * l * entra, v = (b > 1 ? 1 : b) * n;
+    const b = lum[i] * l * entra * (1 - Bt.oscuro * 0.6), v = (b > 1 ? 1 : b) * n;
     let k = v | 0;
     if (v - k > BAYER[((y & 3) << 2) | (x & 3)]) k++;
     px[i] = pal[k];
@@ -1794,7 +1811,7 @@ function dibujarEscudo(c, x, y) {
 // Los ojos encendidos del enemigo furioso, sobre el dibujo
 function dibujarOjos(c, e) {
   const an = D.enemigos[e.tipo].animacion, ojos = D.enemigos[e.tipo].ojos;
-  if (!e.enfurecido || !ojos || e.vida <= 0) return;
+  if (!e.enfurecido || !ojos || e.vida <= 0 || e.especialDesde !== undefined) return;
   const k = e.tam / an.base, x0 = e.x - e.tam / 2, y0 = FBASE - e.tam, f = 0.75 + Math.sin(Bt.t * 9) * 0.25;
   for (const [ox, oy] of ojos) {
     const x = Math.round(x0 + ox * k), y = Math.round(y0 + oy * k);

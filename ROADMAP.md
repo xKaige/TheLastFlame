@@ -2,7 +2,7 @@
 
 El camino del juego es la expedición de grupo. El plan del juego anterior está en `juego_viejo/ROADMAP.md`.
 
-**Versión actual: 0.4.7.** Lo próximo: 0.5.0.
+**Versión actual: 0.4.8.** Lo próximo: 0.5.0.
 
 ## Cómo se numeran las versiones
 
@@ -92,6 +92,10 @@ La idea que une todo es una regla de las Guardianas: "quien le pida algo va a re
 - **Título:** el logo "The Last Flame" no cambia con el idioma.
 
 ## Historial
+
+### 0.4.8
+
+- El Rey del Osario: golpe a todo el grupo dibujado cuadro por cuadro, con la sala que se apaga antes del impacto (`golpe_especial` en `datos/enemigos.json`).
 
 ### 0.4.7
 

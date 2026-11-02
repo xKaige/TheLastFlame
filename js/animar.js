@@ -119,12 +119,38 @@ function prepararPoses(e) {
   e.poses = POSES_LISTAS[clave];
 }
 
+// El golpe especial dibujado cuadro por cuadro (campo "golpe_especial" de enemigos.json): una hoja con un cuadro al lado del otro
+const HOJAS_ESPECIAL = {}, CUADROS_ESPECIAL = {};
+for (const d of Object.values(D.enemigos)) if (d.golpe_especial) HOJAS_ESPECIAL[d.golpe_especial.imagen] = Object.assign(new Image(), { src: `interfaz/enemigos/${d.golpe_especial.imagen}.png` });
+
+function cuadrosEspeciales(e) {
+  const r = D.enemigos[e.tipo].golpe_especial, hoja = r && HOJAS_ESPECIAL[r.imagen];
+  if (!hoja || !hoja.complete || !hoja.naturalWidth) return null;
+  if (!CUADROS_ESPECIAL[r.imagen]) CUADROS_ESPECIAL[r.imagen] = Array.from({ length: r.cuadros }, (_, i) => {
+    const c = document.createElement('canvas'), t = r.lado; c.width = c.height = t;
+    c.getContext('2d').drawImage(hoja, i * t, 0, t, t, 0, 0, t, t);
+    const q = spriteDesdeImagen(c, t), borde = new Uint8Array(t * t);
+    for (let n = 0; n < q.lum.length; n++) q.lum[n] = Math.min(1, q.lum[n] * 1.15 + 0.12);
+    for (let y = 1; y < t - 1; y++) for (let x = 1; x < t - 1; x++) {
+      const n = y * t + x;
+      if (!q.a[n] && (q.a[n - 1] || q.a[n + 1] || q.a[n - t] || q.a[n + t])) borde[n] = 1;
+    }
+    return { ...q, margen: r.margen, borde };
+  });
+  return CUADROS_ESPECIAL[r.imagen];
+}
+
 function iniciarAtaqueAnimado(e) {
   if (e.poses) e.atacaDesde = Bt.t;
 }
 
 // Elige la pose de este momento: mientras ataca sigue la secuencia y después vuelve a respirar
 function posar(e) {
+  if (e.especialDesde !== undefined) {
+    const i = D.enemigos[e.tipo].golpe_especial.tiempos.findIndex(v => Bt.t - e.especialDesde < v);
+    if (i >= 0) { e.gris = cuadrosEspeciales(e)[i]; return; }
+    e.especialDesde = undefined;
+  }
   if (!e.poses) return;
   const n = e.poses.ataque.length, t = e.atacaDesde === undefined ? -1 : Bt.t - e.atacaDesde, mitad = Math.floor(n / 2);
   if (t >= POSES.fin) e.atacaDesde = undefined;

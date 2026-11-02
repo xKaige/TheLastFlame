@@ -832,7 +832,22 @@
         62,
         14
       ]
-    ]
+    ],
+    "golpe_especial": {
+      "imagen": "rey_osario_especial",
+      "lado": 240,
+      "margen": 45,
+      "cuadros": 6,
+      "tiempos": [
+        0.3,
+        0.6,
+        1,
+        1.18,
+        1.5,
+        1.85
+      ],
+      "impacto": 1
+    }
   },
   "necrofago": {
     "nombre": "Necrófago",

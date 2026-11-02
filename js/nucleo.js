@@ -411,6 +411,9 @@ const NUCLEO = (() => {
     }
   }
 
+  // Si en este turno le toca el golpe a todo el grupo: la pantalla lo anuncia antes de que pase
+  const haraEspecial = u => !!u.especial && !u.aturdido && !(u.enfurecido && u.fase.ciclo) && (u.turnos + 1) % u.especial.cada === 0;
+
   function turnoEnemigo(D, b, u, azar) {
     const eventos = [], grupo = vivos(b.aliados);
     if (u.aturdido) { u.aturdido = false; eventos.push({ tipo: 'texto', clave: 'pierde_turno', quien: u }); return eventos; }
@@ -427,7 +430,7 @@ const NUCLEO = (() => {
     return eventos;
   }
 
-  return { IMP_TOPE, vivos, crearPersonaje, asegurarPersonaje, ajustarModelo, atributosDe, recalcular, subirAtributo, cumpleRequisito, sirveAClase, cumpleObjeto, sortearCandidatos, elegirObjeto, sortearCaidos, aplicarCondicion, topeNivel, ganarExp, iniciarBatalla, haTerminado, vistaPrevia, proximoTurno, opciones, atacar, defender, usarHabilidad, turnoEnemigo };
+  return { IMP_TOPE, vivos, crearPersonaje, asegurarPersonaje, ajustarModelo, atributosDe, recalcular, subirAtributo, cumpleRequisito, sirveAClase, cumpleObjeto, sortearCandidatos, elegirObjeto, sortearCaidos, aplicarCondicion, topeNivel, ganarExp, iniciarBatalla, haTerminado, vistaPrevia, proximoTurno, opciones, atacar, defender, usarHabilidad, haraEspecial, turnoEnemigo };
 })();
 
 if (typeof module !== 'undefined') module.exports = NUCLEO;

@@ -149,12 +149,13 @@ const LUGAR_PIXEL = {
   golpe: (x, m) => ({ x, y: m + 22 }),
   chispa: (x, m) => ({ x, y: m + 20 }),
   critico: (x, m) => ({ x, y: m + 26 }),
+  barrido: () => ({ x: 240, y: FBASE - 30, radius: 175 }),
 };
 let capaPixel = null;
 
 function golpePixel(id, q) {
   const R = RAMPS[S.env], palette = id === 'critico' ? ['#2a0510', '#5c0a1c', '#a3142a', '#e0302c', R[4], R[5], '#fff09a', '#ffffff'] : [...R, '#ffffff'];
-  const f = PIXELFX.createFx(PIXELFX.EFECTOS[id], { ...LUGAR_PIXEL[id](q.x, FBASE - q.tam * 0.5, q), flip: q.dir < 0, seed: 1 + Math.floor(azarX() * 9999), palette, sparks: [R[5], R[4], R[3], '#ffffff'], warm: R[4], dust: R[3], clod: R[2] });
+  const f = PIXELFX.createFx(PIXELFX.EFECTOS[id === 'barrido' ? 'tajo' : id], { ...LUGAR_PIXEL[id](q.x, FBASE - q.tam * 0.5, q), flip: id !== 'barrido' && q.dir < 0, seed: 1 + Math.floor(azarX() * 9999), palette, sparks: [R[5], R[4], R[3], '#ffffff'], warm: R[4], dust: R[3], clod: R[2] });
   f.update(0.07);   // arranca ya en el impacto: es el cuadro que queda congelado
   Bt.fxPixel.push(f);
 }
