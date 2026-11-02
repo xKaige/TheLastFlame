@@ -326,11 +326,22 @@ function abrirPisosDePrueba() {
   openMenu({ title: 'Explorar de prueba', cls: 'altar', items });
 }
 
+// Un grupo nuevo, una de cada clase, en el nivel máximo de la zona y con los puntos repartidos en lo propio de su clase
+function grupoDePrueba(piso) {
+  const tope = NUCLEO.topeNivel(D, piso);
+  X.plantel = NUCLEO.sortearCandidatos(D, azarX).filter((p, i, l) => l.findIndex(q => q.clase === p.clase) === i).slice(0, MAX_GRUPO);
+  for (const p of X.plantel) {
+    while (p.nivel < tope) { p.exp = 0; NUCLEO.ganarExp(D, p, p.nivel * D.mazmorra.exp_por_nivel, tope); }
+    const propios = Object.keys(D.clases[p.clase].crecimiento);
+    for (let i = 0; p.puntos; i++) NUCLEO.subirAtributo(D, p, propios[i % propios.length]);
+    p.vida = p.vidaMax;
+  }
+  X.sel = X.plantel.slice();
+}
+
 function explorarDePrueba(piso, nivel) {
   X.corridas = Math.max(X.corridas, 2);
-  X.plantel = NUCLEO.sortearCandidatos(D, azarX).filter((p, i, l) => l.findIndex(q => q.clase === p.clase) === i).slice(0, MAX_GRUPO);
-  for (const p of X.plantel) while (p.nivel < 1 + (piso - 1) * 3) { p.exp = 0; NUCLEO.ganarExp(D, p, p.nivel * D.mazmorra.exp_por_nivel); }
-  X.sel = X.plantel.slice();
+  grupoDePrueba(piso);
   partir();
   $('xCharla').classList.add('hidden'); CH = null;      // sin los diálogos de la bajada
   S.mode = 'explore';
@@ -353,8 +364,7 @@ function abrirPeleasDePrueba() {
 
 function pelearDePrueba(ids, piso, jefe) {
   prepararHogar();
-  while (X.plantel.length < MAX_GRUPO) X.plantel.push(...NUCLEO.sortearCandidatos(D, azarX).slice(0, MAX_GRUPO - X.plantel.length));
-  X.sel = X.plantel.slice(0, MAX_GRUPO);
+  grupoDePrueba(piso);
   partir();
   $('xCharla').classList.add('hidden'); CH = null;      // sin los diálogos de la bajada
   S.mode = 'explore';
