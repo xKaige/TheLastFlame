@@ -42,7 +42,7 @@ function cerrarPersonajes() {
   if (MENU.stack.length) renderMenu();
 }
 
-const textoBonos = o => Object.entries(o.bonos).map(([k, v]) => `${v > 0 ? '+' : '−'}${Math.abs(v)} ${(REGLAS_ATR.nombres[k] || k).toUpperCase().slice(0, 3)}`).join(' · ');
+const textoBonos = o => [...Object.entries(o.bonos).map(([k, v]) => `${v > 0 ? '+' : '−'}${Math.abs(v)} ${(REGLAS_ATR.nombres[k] || k).toUpperCase().slice(0, 3)}`), ...(o.magico ? [tr('ATQ +{0}% INT', Math.round(o.magico * 100))] : [])].join(' · ');
 const nombreObjeto = o => `${o.rareza === 'rara' ? '✦ ' : ''}${o.nombre}`;
 const textoRequisito = h => Object.entries(h.requisito || {}).map(([k, v]) => `${REGLAS_ATR.nombres[k]} ${v}`).join(' · ');
 const habilidadesConocidas = p => [...D.clases[p.clase].habilidades, ...X.grimorio.filter(id => !D.clases[p.clase].habilidades.includes(id))];
@@ -88,7 +88,7 @@ function pintarPj() {
     };
     const dato = (n, v, cls = '') => `<div class="pstat ${cls}"><span>${tr(n)}</span><em>${v}</em></div>`;
     const atributos = panel('Atributos', p.puntos ? tr('{0} pts libres', p.puntos) : '', `${p.puntos ? `<div class="paviso">✦ ${p.puntos} punto${p.puntos > 1 ? 's' : ''} para repartir</div>` : ''}${REGLAS_ATR.lista.map(filaAtr).join('')}`, 'patrs');
-    const combate = panel('Combate', '', `<div class="pstats">${dato('Ataque', p.ataque)}${dato('Defensa', p.defensa)}${dato('Vel', p.velocidad)}${dato('Crítico', `${Math.round(p.critico * 100)}%`)}${dato('Esquiva', `${Math.round(p.esquiva * 100)}%`, 'ancho')}</div>`);
+    const combate = panel('Combate', '', `<div class="pstats">${dato('Ataque', p.ataque + (p.ataqueMagico || 0))}${dato('Defensa', p.defensa)}${dato('Vel', p.velocidad)}${dato('Crítico', `${Math.round(p.critico * 100)}%`)}${dato('Esquiva', `${Math.round(p.esquiva * 100)}%`, 'ancho')}</div>`);
     const equipo = panel('Equipo', '', LUGARES_EQUIPO.map(filaEquipo).join(''));
     centro = `${atributos}<div class="pcol">${combate}${equipo}</div>`;
   } else if (PJ.tab === 1) {
@@ -102,12 +102,13 @@ function pintarPj() {
   } else {
     const o = filas[PJ.sel] && D.objetos[filas[PJ.sel].obj];
     const lista = filas.length ? filas.map(f => `<div class="pitem${elegida(f) ? ' sel' : ''}"><span>${nombreObjeto(D.objetos[f.obj])}</span><em>${textoBonos(D.objetos[f.obj])}</em></div>`).join('') : `<div class="pdesc">${tr('Está vacía.')}</div>`;
-    const detalle = `${o ? `<div class="pnom2">${nombreObjeto(o)}</div><div class="pdesc">${o.descripcion}</div><div class="pdesc">${tr('Se equipa desde Estado.')}</div>` : ''}<div class="pdesc nota">${P ? `${P.potions || 0} pociones · ${P.oil || 0} de aceite` : ''}</div>`;
+    const detalle = `${o ? `<div class="pnom2">${nombreObjeto(o)}</div><div class="pdesc">${o.descripcion}</div>${o.clases ? `<div class="pdesc">${tr('Para: {0}', o.clases.map(k => D.clases[k].nombre).join(', '))}</div>` : ''}${o.requisito ? `<div class="pdesc ${NUCLEO.cumpleObjeto(D, p, filas[PJ.sel].obj) ? '' : 'no'}">${tr('Requiere {0}', textoRequisito(o))}</div>` : ''}<div class="pdesc">${tr('Se equipa desde Estado.')}</div>` : ''}<div class="pdesc nota">${P ? `${P.potions || 0} pociones · ${P.oil || 0} de aceite` : ''}</div>`;
     centro = `${panel('Mochila', `${filas.length} objetos`, `<div class="plista">${lista}</div>`, 'patrs')}<div class="pcol">${panel('Detalle', '', detalle, 'plleno')}</div>`;
   }
   const sub = PJ.sub ? `<div class="psubm"><h4>${tr(LUGARES_EQUIPO.find(x => x[0] === PJ.sub.slot)[1])}</h4>${PJ.sub.opciones.map((id, i) => {
     const o = id && D.objetos[id];
-    return `<div class="pitem${i === PJ.sel ? ' sel' : ''}"><span>${o ? nombreObjeto(o) : tr('Dejar vacío')}</span><em>${o ? textoBonos(o) : ''}</em></div>`;
+    const puede = !o || NUCLEO.cumpleObjeto(D, p, id);
+    return `<div class="pitem${i === PJ.sel ? ' sel' : ''}${puede ? '' : ' no'}"><span>${o ? nombreObjeto(o) : tr('Dejar vacío')}</span><em>${o ? (puede ? textoBonos(o) : tr('Requiere {0}', textoRequisito(o))) : ''}</em></div>`;
   }).join('')}</div>` : '';
   $('personajes').innerHTML = `<div class="ptop"><div class="ptabs">${tecla('Q', 'strafeL')}${pestanas}${tecla('E', 'strafeR')}</div><div class="pgrupo">${uno ? '' : tecla('Z', 'lt')}<span>Grupo</span>${grupo}${uno ? '' : tecla('X', 'rt')}</div></div>
     <div class="pcuerpo">${ficha}<div class="pder">${centro}</div></div>${sub}
@@ -123,7 +124,7 @@ function accionPj(f) {
     if (p.puntos) { NUCLEO.subirAtributo(D, p, f.atr); sfx('level'); } else { PJ.msg = 'No hay puntos para repartir.'; sfx('bump'); }
   }
   else if (f.slot) {
-    const propios = [...new Set(X.mochila.filter(id => D.objetos[id].tipo === f.slot))];
+    const propios = [...new Set(X.mochila.filter(id => D.objetos[id].tipo === f.slot && NUCLEO.sirveAClase(D, p, id)))];
     if (!propios.length && !p.equipo[f.slot]) { PJ.msg = 'No hay nada para equipar acá.'; sfx('bump'); }
     else { PJ.sub = { slot: f.slot, opciones: [null, ...propios], volver: PJ.sel }; PJ.sel = 0; sfx('select'); }
   } else if (f.hab) {
@@ -138,6 +139,7 @@ function accionPj(f) {
 
 function equiparElegido() {
   const p = PJ.lista[PJ.i], { slot, opciones } = PJ.sub, id = opciones[PJ.sel], viejo = p.equipo[slot];
+  if (id && !NUCLEO.cumpleObjeto(D, p, id)) { PJ.msg = tr('{0} no cumple el requisito.', p.nombre); sfx('bump'); return pintarPj(); }
   if (id) X.mochila.splice(X.mochila.indexOf(id), 1);
   if (viejo) X.mochila.push(viejo);
   p.equipo[slot] = id;

@@ -18,7 +18,9 @@
       "des": 9,
       "vit": 14,
       "int": 6,
-      "per": 8
+      "per": 8,
+      "fe": 8,
+      "ard": 6
     },
     "crecimiento": {
       "fue": 1,
@@ -45,7 +47,9 @@
       "des": 15,
       "vit": 8,
       "int": 8,
-      "per": 13
+      "per": 13,
+      "fe": 7,
+      "ard": 7
     },
     "crecimiento": {
       "fue": 1,
@@ -73,10 +77,13 @@
       "des": 10,
       "vit": 7,
       "int": 15,
-      "per": 11
+      "per": 11,
+      "fe": 6,
+      "ard": 14
     },
     "crecimiento": {
-      "int": 2
+      "int": 1,
+      "ard": 1
     }
   },
   "sanador": {
@@ -100,10 +107,12 @@
       "des": 9,
       "vit": 10,
       "int": 14,
-      "per": 12
+      "per": 12,
+      "fe": 14,
+      "ard": 6
     },
     "crecimiento": {
-      "int": 1,
+      "fe": 1,
       "vit": 1
     }
   }

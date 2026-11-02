@@ -250,7 +250,7 @@
     ],
     "descripcion": "Enciende al enemigo. Si ya ardía, recuperás 1 de Ímpetu.",
     "requisito": {
-      "int": 12
+      "ard": 12
     },
     "fuente": "compra",
     "precio": 8
@@ -267,7 +267,7 @@
     ],
     "descripcion": "Los próximos 4 ataques enemigos dejan a quien los hace ardiendo.",
     "requisito": {
-      "int": 14
+      "ard": 14
     },
     "fuente": "cofre",
     "pista": "Dicen que hay un pergamino en un cofre de la cripta."
@@ -284,7 +284,7 @@
     ],
     "descripcion": "Devuelve el 15% de la vida a un aliado.",
     "requisito": {
-      "int": 9
+      "fe": 9
     },
     "fuente": "compra",
     "precio": 6
@@ -306,5 +306,87 @@
     "fuente": "jefe",
     "jefe": "cazador",
     "pista": "Quien guió al rey hasta el fuego sabe cómo prestarlo."
+  },
+  "gracia": {
+    "nombre": "Gracia",
+    "costo": 2,
+    "objetivo": "aliado",
+    "efectos": [
+      {
+        "tipo": "cura",
+        "porcentaje": 0.5
+      }
+    ],
+    "descripcion": "Devuelve el 50% de la vida a un aliado.",
+    "requisito": {
+      "fe": 16
+    },
+    "fuente": "compra",
+    "precio": 16
+  },
+  "milagro": {
+    "nombre": "Milagro",
+    "costo": 3,
+    "objetivo": "aliados",
+    "efectos": [
+      {
+        "tipo": "cura",
+        "porcentaje": 0.35
+      }
+    ],
+    "descripcion": "Devuelve el 35% de la vida a todo el grupo.",
+    "requisito": {
+      "fe": 20
+    },
+    "fuente": "compra",
+    "precio": 24
+  },
+  "lanza_ignea": {
+    "nombre": "Lanza Ígnea",
+    "costo": 2,
+    "objetivo": "enemigo",
+    "efectos": [
+      {
+        "tipo": "dano_fijo",
+        "min": 24,
+        "max": 32
+      },
+      {
+        "tipo": "quemadura",
+        "por_turno": 4,
+        "min": 2,
+        "max": 4
+      }
+    ],
+    "descripcion": "Mucho fuego contra un solo enemigo.",
+    "requisito": {
+      "ard": 16
+    },
+    "fuente": "compra",
+    "precio": 16
+  },
+  "incendio": {
+    "nombre": "Incendio",
+    "costo": 3,
+    "objetivo": "enemigos",
+    "efectos": [
+      {
+        "tipo": "dano_fijo",
+        "min": 16,
+        "max": 22
+      },
+      {
+        "tipo": "quemadura",
+        "por_turno": 3,
+        "min": 2,
+        "max": 3
+      }
+    ],
+    "descripcion": "Mucho fuego sobre todos los enemigos.",
+    "requisito": {
+      "ard": 20
+    },
+    "fuente": "compra",
+    "precio": 24
   }
 }

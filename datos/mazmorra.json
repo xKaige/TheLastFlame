@@ -439,6 +439,8 @@
       "des",
       "vit",
       "int",
+      "fe",
+      "ard",
       "per"
     ],
     "nombres": {
@@ -448,7 +450,9 @@
       "int": "Intelecto",
       "per": "Perspicacia",
       "ataque": "Ataque",
-      "defensa": "Defensa"
+      "defensa": "Defensa",
+      "fe": "Fe",
+      "ard": "Ardor"
     },
     "por_punto": {
       "fue": {
@@ -467,6 +471,12 @@
       },
       "per": {
         "critico": 0.015
+      },
+      "fe": {
+        "cura": 0.05
+      },
+      "ard": {
+        "fuego": 0.05
       }
     }
   },

@@ -47,32 +47,43 @@ const NUCLEO = (() => {
 
   // Atributos con los bonos del equipo: son los que cuentan para los requisitos
   function atributosDe(D, p) {
-    const t = { ...p.atributos };
+    const t = { ...D.clases[p.clase].atributos, ...p.atributos };   // un personaje viejo arranca los atributos nuevos con los de su clase
     for (const id of Object.values(p.equipo)) if (id) for (const [k, v] of Object.entries(D.objetos[id].bonos)) if (k in t) t[k] += v;
     return t;
   }
 
   // Los números de pelea salen de la base más lo que suman los atributos por encima de los de su clase
   function recalcular(D, p) {
-    const total = atributosDe(D, p), inicial = D.clases[p.clase].atributos, suma = { vida: 0, ataque: 0, defensa: 0, velocidad: 0, critico: 0, esquiva: 0, magia: 0 };
+    const total = atributosDe(D, p), inicial = D.clases[p.clase].atributos, suma = { vida: 0, ataque: 0, defensa: 0, velocidad: 0, critico: 0, esquiva: 0, magia: 0, cura: 0, fuego: 0 };
     for (const [a, efectos] of Object.entries(D.mazmorra.atributos.por_punto)) for (const [k, v] of Object.entries(efectos)) suma[k] += v * (total[a] - inicial[a]);
     for (const id of Object.values(p.equipo)) if (id) for (const [k, v] of Object.entries(D.objetos[id].bonos)) if (k in suma) suma[k] += v;
     const b = p.base, antes = p.vidaMax;
     p.vidaMax = Math.round(b.vida + suma.vida); p.ataque = Math.round(b.ataque + suma.ataque); p.defensa = Math.round(b.defensa + suma.defensa);
-    p.velocidad = Math.round((b.velocidad + suma.velocidad) * 10) / 10; p.critico = b.critico + suma.critico; p.esquiva = Math.max(0, b.esquiva + suma.esquiva); p.magia = suma.magia;
+    p.velocidad = Math.round((b.velocidad + suma.velocidad) * 10) / 10; p.critico = b.critico + suma.critico; p.esquiva = Math.max(0, b.esquiva + suma.esquiva); p.magia = suma.magia; p.cura = suma.cura; p.fuego = suma.fuego;
+    // el arma mágica suma al ataque básico un porcentaje del Intelecto
+    p.ataqueMagico = Math.round(Object.values(p.equipo).reduce((n, id) => n + (id && D.objetos[id].magico || 0), 0) * total.int);
     if (p.vida > 0) p.vida = clampN(p.vida + p.vidaMax - antes, 1, p.vidaMax);
     // lo que ya no cumple el requisito queda fuera de la pelea hasta volver a cumplirlo
   }
 
+  const atributosBase = (D, p, a) => p.atributos[a] ?? D.clases[p.clase].atributos[a];
+
   function subirAtributo(D, p, a) {
     if (!p.puntos) return;
-    p.puntos--; p.atributos[a]++;
+    p.puntos--; p.atributos[a] = atributosBase(D, p, a) + 1;
     recalcular(D, p);
   }
 
   const cumpleRequisito = (D, p, id) => {
     const t = atributosDe(D, p);
     return Object.entries(D.habilidades[id].requisito || {}).every(([k, v]) => t[k] >= v);
+  };
+
+  // Cada arma es de una clase y pide atributos; lo que hay en ese lugar no cuenta porque se va a sacar
+  const sirveAClase = (D, p, id) => !D.objetos[id].clases || D.objetos[id].clases.includes(p.clase);
+  const cumpleObjeto = (D, p, id) => {
+    const o = D.objetos[id], t = atributosDe(D, { ...p, equipo: { ...p.equipo, [o.tipo]: null } });
+    return Object.entries(o.requisito || {}).every(([k, v]) => t[k] >= v);
   };
 
   // Candidatos de la reunión: al menos uno de cada clase, sin repetir modelo si alcanza
@@ -118,7 +129,7 @@ const NUCLEO = (() => {
     while (p.nivel < tope && p.exp >= p.nivel * D.mazmorra.exp_por_nivel) {
       p.exp -= p.nivel * D.mazmorra.exp_por_nivel; p.nivel++; subio = true; p.puntos++;
       p.base.vida += D.mazmorra.mejora_nivel.vida; p.base.ataque += D.mazmorra.mejora_nivel.ataque;
-      for (const [a, v] of Object.entries(D.clases[p.clase].crecimiento)) p.atributos[a] += v;   // lo que crece solo, según la clase
+      for (const [a, v] of Object.entries(D.clases[p.clase].crecimiento)) p.atributos[a] = atributosBase(D, p, a) + v;   // lo que crece solo, según la clase
       recalcular(D, p);
     }
     if (p.nivel >= tope) p.exp = 0;
@@ -208,7 +219,7 @@ const NUCLEO = (() => {
       if (!t.enemigo) t.impetu = Math.min(IMP_TOPE, t.impetu + 1);
       return;
     }
-    let dano = Math.max(1, Math.round((entre(azar, 1, 6) + u.ataque) * mult) - (ignoraDefensa ? 0 : t.defensa + (t.defensaExtra || 0)));
+    let dano = Math.max(1, Math.round((entre(azar, 1, 6) + u.ataque + (u.ataqueMagico || 0)) * mult) - (ignoraDefensa ? 0 : t.defensa + (t.defensaExtra || 0)));
     const critico = criticoSeguro || azar() < u.critico;
     if (critico) dano *= 2;
     if (t.resisteFisico) dano = Math.max(1, Math.round(dano * t.resisteFisico));     // un golpe apenas abolla lo que no tiene cuerpo
@@ -271,10 +282,11 @@ const NUCLEO = (() => {
     for (const t of blancos) for (const e of h.efectos) {
       if (t.vida <= 0 && e.tipo !== 'cura') continue;
       if (e.tipo === 'dano') golpear(azar, u, t, eventos, { mult: e.mult + (e.por_herida || 0) * (1 - u.vida / u.vidaMax), criticoSeguro: e.critico_seguro, ignoraDefensa: e.ignora_defensa });
-      else if (e.tipo === 'dano_fijo') herir(t, Math.round(entre(azar, e.min, e.max) * (1 + (u.magia || 0))), eventos);
-      else if (e.tipo === 'veneno' || e.tipo === 'quemadura') aplicarEstado(t, e, azar, eventos);
+      else if (e.tipo === 'dano_fijo') herir(t, Math.round(entre(azar, e.min, e.max) * (1 + (u.magia || 0) + (u.fuego || 0))), eventos);
+      else if (e.tipo === 'quemadura') aplicarEstado(t, { ...e, por_turno: Math.round(e.por_turno * (1 + (u.magia || 0) + (u.fuego || 0))) }, azar, eventos);
+      else if (e.tipo === 'veneno') aplicarEstado(t, e, azar, eventos);
       else if (e.tipo === 'sangrado') sangrar(t, e, azar, eventos);
-      else if (e.tipo === 'cura') { const v = Math.round(t.vidaMax * e.porcentaje * (1 + (u.magia || 0))); t.vida = clampN(t.vida + v, 0, t.vidaMax); eventos.push({ tipo: 'cura', quien: t, valor: v }); }
+      else if (e.tipo === 'cura') { const v = Math.round(t.vidaMax * e.porcentaje * (1 + (u.magia || 0) + (u.cura || 0))); t.vida = clampN(t.vida + v, 0, t.vidaMax); eventos.push({ tipo: 'cura', quien: t, valor: v }); }
       else if (e.tipo === 'defensa') t.defensaExtra = Math.max(t.defensaExtra, e.valor);
       else if (e.tipo === 'provocar') { t.provoca = e.turnos; eventos.push({ tipo: 'texto', clave: 'provoca', quien: t }); }
       else if (e.tipo === 'esquiva_segura') t.esquivaSegura = true;
@@ -415,7 +427,7 @@ const NUCLEO = (() => {
     return eventos;
   }
 
-  return { IMP_TOPE, vivos, crearPersonaje, asegurarPersonaje, ajustarModelo, atributosDe, recalcular, subirAtributo, cumpleRequisito, sortearCandidatos, elegirObjeto, sortearCaidos, aplicarCondicion, topeNivel, ganarExp, iniciarBatalla, haTerminado, vistaPrevia, proximoTurno, opciones, atacar, defender, usarHabilidad, turnoEnemigo };
+  return { IMP_TOPE, vivos, crearPersonaje, asegurarPersonaje, ajustarModelo, atributosDe, recalcular, subirAtributo, cumpleRequisito, sirveAClase, cumpleObjeto, sortearCandidatos, elegirObjeto, sortearCaidos, aplicarCondicion, topeNivel, ganarExp, iniciarBatalla, haTerminado, vistaPrevia, proximoTurno, opciones, atacar, defender, usarHabilidad, turnoEnemigo };
 })();
 
 if (typeof module !== 'undefined') module.exports = NUCLEO;

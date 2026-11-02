@@ -5,7 +5,14 @@
     "bonos": {
       "fue": 2
     },
-    "descripcion": "Pesada y mellada, todavía corta."
+    "descripcion": "Pesada y mellada, todavía corta.",
+    "clases": [
+      "guerrero"
+    ],
+    "requisito": {
+      "fue": 12,
+      "vit": 10
+    }
   },
   "daga_fina": {
     "nombre": "Daga Fina",
@@ -13,15 +20,30 @@
     "bonos": {
       "des": 2
     },
-    "descripcion": "Rápida en la mano."
+    "descripcion": "Rápida en la mano.",
+    "clases": [
+      "picaro"
+    ],
+    "requisito": {
+      "des": 12
+    }
   },
   "baston_brasa": {
     "nombre": "Bastón de Brasa",
     "tipo": "arma",
     "bonos": {
-      "int": 2
+      "int": 1,
+      "ard": 1
     },
-    "descripcion": "La punta nunca se enfría del todo."
+    "descripcion": "La punta nunca se enfría del todo.",
+    "clases": [
+      "mago"
+    ],
+    "requisito": {
+      "int": 14,
+      "ard": 13
+    },
+    "magico": 0.5
   },
   "cota_malla": {
     "nombre": "Cota de Malla",
@@ -64,7 +86,14 @@
       "fue": 1,
       "vit": 1
     },
-    "descripcion": "Le quedó un diente clavado."
+    "descripcion": "Le quedó un diente clavado.",
+    "clases": [
+      "guerrero"
+    ],
+    "requisito": {
+      "fue": 14,
+      "vit": 14
+    }
   },
   "cuchillo_caza": {
     "nombre": "Cuchillo de Caza",
@@ -73,16 +102,31 @@
       "des": 1,
       "per": 1
     },
-    "descripcion": "Sirve para todo lo que respira."
+    "descripcion": "Sirve para todo lo que respira.",
+    "clases": [
+      "picaro"
+    ],
+    "requisito": {
+      "des": 14,
+      "per": 12
+    }
   },
   "vara_fresno": {
     "nombre": "Vara de Fresno",
     "tipo": "arma",
     "bonos": {
       "int": 1,
-      "per": 1
+      "fe": 1
     },
-    "descripcion": "Viene de un bosque que ya no existe."
+    "descripcion": "Viene de un bosque que ya no existe.",
+    "clases": [
+      "sanador"
+    ],
+    "requisito": {
+      "int": 12,
+      "fe": 13
+    },
+    "magico": 0.4
   },
   "hacha_verdugo": {
     "nombre": "Hacha del Verdugo",
@@ -92,7 +136,14 @@
       "des": -1
     },
     "descripcion": "Hecha para un solo golpe. Pesa como una condena.",
-    "rareza": "rara"
+    "rareza": "rara",
+    "clases": [
+      "guerrero"
+    ],
+    "requisito": {
+      "fue": 18,
+      "vit": 16
+    }
   },
   "estoque_negro": {
     "nombre": "Estoque Negro",
@@ -102,7 +153,14 @@
       "per": 1
     },
     "descripcion": "No refleja la luz de la antorcha.",
-    "rareza": "rara"
+    "rareza": "rara",
+    "clases": [
+      "picaro"
+    ],
+    "requisito": {
+      "des": 18,
+      "per": 15
+    }
   },
   "cetro_agrietado": {
     "nombre": "Cetro Agrietado",
@@ -112,7 +170,15 @@
       "vit": -1
     },
     "descripcion": "Por la grieta se le escapa algo de quien lo sostiene.",
-    "rareza": "rara"
+    "rareza": "rara",
+    "clases": [
+      "mago"
+    ],
+    "requisito": {
+      "int": 18,
+      "ard": 16
+    },
+    "magico": 0.8
   },
   "jubon_cuero": {
     "nombre": "Jubón de Cuero",
@@ -127,7 +193,7 @@
     "nombre": "Hábito Gris",
     "tipo": "armadura",
     "bonos": {
-      "int": 1,
+      "fe": 1,
       "vit": 1
     },
     "descripcion": "Huele a incienso y a encierro."
@@ -147,7 +213,7 @@
     "tipo": "armadura",
     "bonos": {
       "int": 2,
-      "per": 2
+      "ard": 2
     },
     "descripcion": "Se deshace un poco con cada paso, y nunca se termina.",
     "rareza": "rara"
@@ -187,5 +253,23 @@
     },
     "descripcion": "No hay pájaros acá abajo.",
     "rareza": "rara"
+  },
+  "baculo_guardiana": {
+    "nombre": "Báculo de la Guardiana",
+    "tipo": "arma",
+    "bonos": {
+      "fe": 4,
+      "vit": -1
+    },
+    "descripcion": "Nadie lo pidió. Estaba acá, esperando.",
+    "rareza": "rara",
+    "clases": [
+      "sanador"
+    ],
+    "requisito": {
+      "int": 16,
+      "fe": 18
+    },
+    "magico": 0.65
   }
 }

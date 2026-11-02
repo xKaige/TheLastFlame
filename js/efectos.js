@@ -64,6 +64,11 @@ const FX_HABILIDAD = {
     const a = Math.min(1, k * 3); c.globalAlpha = 1 - k * k; c.strokeStyle = COL_FX.hueso; c.lineWidth = 2;
     c.beginPath(); c.moveTo(-22 * a, -22); c.lineTo(22 * a, -22); c.lineTo(22 * a, 4); c.lineTo(0, 26 * a); c.lineTo(-22 * a, 4); c.closePath(); c.stroke();
   } },
+  // las curas y el fuego más fuertes usan el dibujo de los comunes
+  get gracia() { return this.sanar; },
+  get milagro() { return this.bendicion; },
+  get lanza_ignea() { return this.llama_arcana; },
+  get incendio() { return this.tormenta; },
   // una cruz de sangre que crece y estalla
   ultimo_aliento: { dur: 0.5, dibujar(c, k, m) {
     const r = 12 + 38 * k * m; c.strokeStyle = COL_FX.sangre; c.lineWidth = (1 - k) * 9 + 1;

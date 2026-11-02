@@ -2,7 +2,7 @@
 
 El camino del juego es la expedición de grupo. El plan del juego anterior está en `juego_viejo/ROADMAP.md`.
 
-**Versión actual: 0.4.5.** Lo próximo: 0.5.0.
+**Versión actual: 0.4.6.** Lo próximo: 0.5.0.
 
 ## Cómo se numeran las versiones
 
@@ -86,10 +86,19 @@ La idea que une todo es una regla de las Guardianas: "quien le pida algo va a re
 - **Enemigos:** ninguno pelea igual; cada uno tiene al menos una habilidad propia, y cada jefe, una fase de furia distinta.
 - **Primera expedición:** arranca con las 4 clases y no se pueden repetir.
 - **Ímpetu:** Sanador y Mago arrancan cada pelea con 2, y en lugar de Defender tienen Concentrar: la misma protección, con +2 de Ímpetu (`impetu_inicial` y `concentra` en `datos/clases.json`).
+- **Atributos mágicos:** Intelecto sube toda la magia, Fe sube las curas y habilita las más fuertes, y Ardor hace lo mismo con el fuego.
+- **Armas:** cada arma es de una clase y pide atributos. Las de Mago y Sanador suman al ataque básico un porcentaje del Intelecto (`magico` en `datos/objetos.json`).
 - **Modelos y clases:** cada retrato tiene su clase fija.
 - **Título:** el logo "The Last Flame" no cambia con el idioma.
 
 ## Historial
+
+### 0.4.6
+
+- Atributos nuevos: Fe para las curas y Ardor para el fuego.
+- Cuatro habilidades nuevas: Gracia, Milagro, Lanza Ígnea e Incendio.
+- Las armas son por clase y tienen requisitos. Nueva arma de Sanador: Báculo de la Guardiana.
+- Las armas de Mago y Sanador suman parte del Intelecto al ataque básico.
 
 ### 0.4.5
 
