@@ -544,5 +544,296 @@
         }
       }
     ]
+  },
+  "cuenco_tibio": {
+    "titulo": "El cuenco tibio",
+    "texto": "Un cuenco de piedra lleno de ceniza. Es lo único tibio en todo El Fondo, y la superficie sube y baja muy despacio.",
+    "piso": 3,
+    "mapa": "mazmorra/fondo/accesorios/cuenco_frio",
+    "escala": 0.6,
+    "opciones": [
+      {
+        "texto": "Hundir las manos",
+        "sub": "Puede salir bien.",
+        "prob": 0.5,
+        "exito": {
+          "texto": "Tocás algo duro y lo sacás entero. La ceniza vuelve a quedarse quieta.",
+          "efectos": [
+            {
+              "tipo": "objeto"
+            }
+          ]
+        },
+        "fallo": {
+          "texto": "Algo te toma de las muñecas, te huele y te suelta. Ninguno quiere hablar de eso.",
+          "efectos": [
+            {
+              "tipo": "dolor",
+              "valor": 0.15
+            }
+          ]
+        }
+      },
+      {
+        "texto": "Llenar las bolsas",
+        "exito": {
+          "texto": "La ceniza vale lo que vale. Tu llama se encoge cuando la tocás.",
+          "efectos": [
+            {
+              "tipo": "ceniza",
+              "valor": 14
+            },
+            {
+              "tipo": "antorcha",
+              "valor": -12
+            }
+          ]
+        }
+      },
+      {
+        "texto": "No tocar nada",
+        "exito": {
+          "texto": "Cuando te alejás, deja de respirar. Como si esperara.",
+          "efectos": []
+        }
+      }
+    ]
+  },
+  "la_que_espera": {
+    "titulo": "La que espera",
+    "texto": "Una Guardiana de piedra, con el rostro gastado y la mano abierta. La palma está pulida por todos los que la tocaron antes que vos.",
+    "piso": 3,
+    "mapa": "mazmorra/fondo/accesorios/estatua_velada",
+    "escala": 0.95,
+    "opciones": [
+      {
+        "texto": "Pedirle algo",
+        "sub": "Quien pide, recibe.",
+        "exito": {
+          "texto": "Lo decís en voz baja. Cuando abrís los ojos, ya lo tenés en la mano. La regla decía que ibas a recibirlo.",
+          "efectos": [
+            {
+              "tipo": "objeto"
+            },
+            {
+              "tipo": "ceniza",
+              "valor": 10
+            },
+            {
+              "tipo": "trato"
+            }
+          ]
+        }
+      },
+      {
+        "texto": "Leer el pedestal",
+        "requisito": {
+          "int": 14
+        },
+        "exito": {
+          "texto": "Una sola línea, repetida hasta borrarse: no se toma, se cuida. Decirla en voz alta le hace bien al grupo.",
+          "efectos": [
+            {
+              "tipo": "cura",
+              "valor": 0.25
+            },
+            {
+              "tipo": "impetu",
+              "valor": 1
+            }
+          ]
+        }
+      },
+      {
+        "texto": "Cerrarle la mano",
+        "exito": {
+          "texto": "La piedra cede como si hubiera estado esperando que alguien lo hiciera.",
+          "efectos": []
+        }
+      }
+    ]
+  },
+  "corona_ceniza": {
+    "titulo": "La corona en la ceniza",
+    "texto": "Una pila de ceniza más alta que vos. De la punta salen una corona y la empuñadura de una espada. Los cuarenta bajaron con él.",
+    "piso": 3,
+    "mapa": "mazmorra/fondo/accesorios/montura_ceniza",
+    "escala": 0.65,
+    "opciones": [
+      {
+        "texto": "Arrancar la espada",
+        "requisito": {
+          "fue": 14
+        },
+        "exito": {
+          "texto": "Sale limpia, sin una mancha de óxido. Abajo, algo se acomoda para seguir durmiendo.",
+          "efectos": [
+            {
+              "tipo": "objeto"
+            }
+          ]
+        }
+      },
+      {
+        "texto": "Cavar con cuidado",
+        "requisito": {
+          "per": 13
+        },
+        "exito": {
+          "texto": "Debajo de la ceniza hay un cofre sellado, con cuarenta marcas de uñas en la tapa.",
+          "efectos": [
+            {
+              "tipo": "cofre"
+            }
+          ]
+        }
+      },
+      {
+        "texto": "Tomar la corona",
+        "exito": {
+          "texto": "Pesa más de lo que debería, y está caliente. Por un instante, nadie del grupo te mira a los ojos.",
+          "efectos": [
+            {
+              "tipo": "ceniza",
+              "valor": 16
+            },
+            {
+              "tipo": "sangre",
+              "valor": 0.2
+            }
+          ]
+        }
+      },
+      {
+        "texto": "Seguir de largo",
+        "exito": {
+          "texto": "La ceniza se desliza un poco y tapa la corona. Mejor así.",
+          "efectos": []
+        }
+      }
+    ]
+  },
+  "antorchas_gastadas": {
+    "titulo": "Las antorchas gastadas",
+    "texto": "Un nicho con antorchas consumidas, cada una con un nombre raspado en el mango. Son de los que llegaron hasta acá. Queda un lugar libre.",
+    "piso": 3,
+    "mapa": "mazmorra/fondo/accesorios/nicho_antorchas",
+    "escala": 0.8,
+    "opciones": [
+      {
+        "texto": "Darles un poco de fuego",
+        "exito": {
+          "texto": "Las tres arden un momento con tu llama. Es poco, pero alguien, en alguna parte, deja de tener frío.",
+          "efectos": [
+            {
+              "tipo": "antorcha",
+              "valor": -10
+            },
+            {
+              "tipo": "cura",
+              "valor": 0.3
+            }
+          ]
+        }
+      },
+      {
+        "texto": "Llevarte una",
+        "sub": "Son de alguien.",
+        "prob": 0.6,
+        "exito": {
+          "texto": "Todavía guarda algo de calor. Ya no le sirve a nadie.",
+          "efectos": [
+            {
+              "tipo": "antorcha",
+              "valor": 30
+            }
+          ]
+        },
+        "fallo": {
+          "texto": "Su dueño no se había ido del todo.",
+          "efectos": [
+            {
+              "tipo": "antorcha",
+              "valor": 15
+            },
+            {
+              "tipo": "emboscada"
+            }
+          ]
+        }
+      },
+      {
+        "texto": "Leer lo que quedó",
+        "requisito": {
+          "per": 13
+        },
+        "exito": {
+          "texto": "Bajo los nombres raspados, una letra chiquita: fui la primera en llegar. Reconocés la mano. Alguien dejó un poco de Ceniza.",
+          "efectos": [
+            {
+              "tipo": "ceniza",
+              "valor": 8
+            },
+            {
+              "tipo": "impetu",
+              "valor": 1
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "llama_partida": {
+    "titulo": "La llama partida",
+    "texto": "Una llama tallada en la roca, rajada de arriba abajo. Sale aire de la grieta. No debería haber nada debajo de El Fondo.",
+    "piso": 3,
+    "mapa": "mazmorra/fondo/accesorios/llama_tallada",
+    "escala": 0.8,
+    "opciones": [
+      {
+        "texto": "Escuchar",
+        "requisito": {
+          "int": 14
+        },
+        "exito": {
+          "texto": "Muy lejos, abajo, algo mastica despacio. Lo que encontrás al pie de la grieta lo dejó alguien que escuchó demasiado.",
+          "efectos": [
+            {
+              "tipo": "objeto"
+            }
+          ]
+        }
+      },
+      {
+        "texto": "Acercar la antorcha",
+        "sub": "Puede salir bien.",
+        "prob": 0.5,
+        "exito": {
+          "texto": "La grieta aspira y tu llama crece hasta quemarte los dedos.",
+          "efectos": [
+            {
+              "tipo": "antorcha",
+              "valor": 40
+            }
+          ]
+        },
+        "fallo": {
+          "texto": "La grieta aspira y se lleva media llama. Parece que le gustó.",
+          "efectos": [
+            {
+              "tipo": "antorcha",
+              "valor": -25
+            }
+          ]
+        }
+      },
+      {
+        "texto": "Alejarse",
+        "exito": {
+          "texto": "El aire deja de salir. Empieza a entrar.",
+          "efectos": []
+        }
+      }
+    ]
   }
 }

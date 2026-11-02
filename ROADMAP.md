@@ -2,7 +2,7 @@
 
 El camino del juego es la expedición de grupo. El plan del juego anterior está en `juego_viejo/ROADMAP.md`.
 
-**Versión actual: 0.4.3.** Lo próximo: 0.5.0.
+**Versión actual: 0.4.4.** Lo próximo: 0.5.0.
 
 ## Cómo se numeran las versiones
 
@@ -17,7 +17,8 @@ Cada parche sube la versión en `package.json` y en `index.html`, y se anota ac�
 ### 0.5.0: Zona 3 (El Fondo)
 
 - Remodelar la zona y hacerla más grande.
-- Eventos propios.
+- Ilustraciones de sus 5 eventos.
+- Música de exploración.
 - Reescribir el final: Aldemar pasa a ser el jefe del acto I, y al vencerlo se abre el suelo hacia la zona 4.
 
 ### 0.6.0: Runas
@@ -90,6 +91,10 @@ La idea que une todo es una regla de las Guardianas: "quien le pida algo va a re
 - **Título:** el logo "The Last Flame" no cambia con el idioma.
 
 ## Historial
+
+### 0.4.4
+
+- Cinco eventos para la zona 3: el cuenco tibio, la que espera, la corona en la ceniza, las antorchas gastadas y la llama partida.
 
 ### 0.4.3
 
