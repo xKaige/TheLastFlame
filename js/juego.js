@@ -145,7 +145,7 @@ function aplicarTexturas() {
 // Accesorios de pared: cada uno es una variante del muro, así reciben la perspectiva y la luz del motor.
 // Se eligen por posición, para que un nivel quede siempre igual.
 // Cada piso con arte propio tiene sus adornos; los demás usan los de la cripta.
-const ACC_BASE = 10, DECORADO = { crypt: { ...D.mazmorra.accesorios, carpeta: 'cripta' }, castle: { ...D.mazmorra.accesorios_salones, carpeta: 'salones' } };
+const ACC_BASE = 10, DECORADO = { crypt: { ...D.mazmorra.accesorios, carpeta: 'cripta' }, castle: { ...D.mazmorra.accesorios_salones, carpeta: 'salones' }, abyss: { ...D.mazmorra.accesorios_fondo, carpeta: 'fondo' } };
 const imagenAdorno = (dec, n) => Object.assign(new Image(), { src: `interfaz/mazmorra/${dec.carpeta}/accesorios/${n}.png` });
 for (const dec of Object.values(DECORADO)) {
   for (const a of [...dec.lista, ...dec.piso.lista]) a.img = imagenAdorno(dec, a.imagen);

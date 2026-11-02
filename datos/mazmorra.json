@@ -182,6 +182,47 @@
       ]
     }
   },
+  "accesorios_fondo": {
+    "densidad": 0.12,
+    "separacion": 3,
+    "lista": [
+      {
+        "id": "llama_tallada",
+        "imagen": "llama_tallada",
+        "y": 4,
+        "alto": 52
+      },
+      {
+        "id": "nicho_antorchas",
+        "imagen": "nicho_antorchas",
+        "y": 2,
+        "alto": 54
+      }
+    ],
+    "piso": {
+      "densidad": 0.3,
+      "separacion": 3,
+      "lista": [
+        {
+          "imagen": "cuenco_frio",
+          "escala": 0.6
+        },
+        {
+          "imagen": "estatua_velada",
+          "escala": 0.95
+        },
+        {
+          "imagen": "montura_ceniza",
+          "escala": 0.65
+        }
+      ]
+    },
+    "techo": {
+      "densidad": 0,
+      "separacion": 5,
+      "lista": []
+    }
+  },
   "pisos": [
     {
       "nombre": "La Cripta"
