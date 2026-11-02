@@ -750,8 +750,7 @@ function ponerEventos(w, nivel) {
   // una nota por nivel: la siguiente de este piso que el jugador no haya leído nunca
   const puestas = S.flags.notas || (S.flags.notas = []), nota = D.notas.find(n => n.piso === S.floor && !notasLeidas().includes(n.id) && !puestas.includes(n.id));
   if (nota && SPRITES.ev_nota && poner(`nota_${nota.id}`)) puestas.push(nota.id);
-  if (!R.pisos.includes(S.floor)) return;
-  const vistos = S.flags.eventos || (S.flags.eventos = []), pendientes = Object.keys(D.eventos).filter(id => !vistos.includes(id) && SPRITES[`ev_${id}`]).sort(() => azarX() - 0.5);
+  const vistos = S.flags.eventos || (S.flags.eventos = []), pendientes = Object.keys(D.eventos).filter(id => D.eventos[id].piso === S.floor && !vistos.includes(id) && SPRITES[`ev_${id}`]).sort(() => azarX() - 0.5);
   for (const id of pendientes.slice(0, R.por_nivel)) if (poner(id)) vistos.push(id);
 }
 
@@ -791,7 +790,9 @@ function dueloPor(caido) {
 function ilustracion(ev) {
   if (ev.fondo && ev.fondo.env === S.env) return ev.fondo.url;
   const lado = document.createElement('canvas'); lado.width = lado.height = 480;
-  lado.getContext('2d').drawImage(ev.img, 0, 0, 480, 270);
+  // mientras un evento no tiene ilustración, muestra su objeto del mapa
+  if (ev.img.naturalWidth) lado.getContext('2d').drawImage(ev.img, 0, 0, 480, 270);
+  else lado.getContext('2d').drawImage(ev.imgMapa, 135, 30, 210, 210);
   const c = document.createElement('canvas'); c.width = 480; c.height = 270;
   const g = c.getContext('2d');
   g.drawImage(spriteCanvas(spriteDesdeImagen(lado, 480), 480, S.env, 1.1), 0, 0);
@@ -858,7 +859,8 @@ function cerrarEvento() {
   S.mode = 'explore';
   if (res.efectos.some(f => f.tipo === 'emboscada')) {
     // lo que estaba ahí pasa a ser el enemigo: al ganar se lo saca del mapa como a cualquier otro
-    Object.assign(e, { type: 'enemy', kind: 'rata', def: ENEMIES.rata, hp: 1, maxhp: 1, aware: true, stun: 0, sorpresa: true });
+    const kind = pick(POOLS[S.floor]);
+    Object.assign(e, { type: 'enemy', kind, def: ENEMIES[kind], hp: 1, maxhp: 1, aware: true, stun: 0, sorpresa: true });
     return startCombat(e, true);
   }
   ents.splice(ents.indexOf(e), 1);

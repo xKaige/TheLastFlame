@@ -9,7 +9,15 @@
         "texto": "Ofrecer sangre",
         "exito": {
           "texto": "El cuchillo corta sin dolor. Algo sube desde el fondo del cuenco.",
-          "efectos": [{ "tipo": "sangre", "valor": 0.3 }, { "tipo": "objeto" }]
+          "efectos": [
+            {
+              "tipo": "sangre",
+              "valor": 0.3
+            },
+            {
+              "tipo": "objeto"
+            }
+          ]
         }
       },
       {
@@ -18,18 +26,32 @@
         "prob": 0.5,
         "exito": {
           "texto": "Es tibia. El cansancio se va como si nunca hubiera estado.",
-          "efectos": [{ "tipo": "cura", "valor": 0.35 }]
+          "efectos": [
+            {
+              "tipo": "cura",
+              "valor": 0.35
+            }
+          ]
         },
         "fallo": {
           "texto": "Quema al bajar. La cripta se ríe por lo bajo.",
-          "efectos": [{ "tipo": "dolor", "valor": 0.15 }]
+          "efectos": [
+            {
+              "tipo": "dolor",
+              "valor": 0.15
+            }
+          ]
         }
       },
       {
         "texto": "Seguir de largo",
-        "exito": { "texto": "El cuchillo sigue ahí. Va a seguir ahí.", "efectos": [] }
+        "exito": {
+          "texto": "El cuchillo sigue ahí. Va a seguir ahí.",
+          "efectos": []
+        }
       }
-    ]
+    ],
+    "piso": 1
   },
   "muerto_mochila": {
     "titulo": "El muerto con mochila",
@@ -39,10 +61,20 @@
     "opciones": [
       {
         "texto": "Revisar con cuidado",
-        "requisito": { "per": 12 },
+        "requisito": {
+          "per": 12
+        },
         "exito": {
           "texto": "Soltás los dedos uno por uno. Nada se mueve en la oscuridad.",
-          "efectos": [{ "tipo": "objeto" }, { "tipo": "ceniza", "valor": 3 }]
+          "efectos": [
+            {
+              "tipo": "objeto"
+            },
+            {
+              "tipo": "ceniza",
+              "valor": 3
+            }
+          ]
         }
       },
       {
@@ -51,18 +83,30 @@
         "prob": 0.5,
         "exito": {
           "texto": "El cuerpo se desarma. La mochila es tuya.",
-          "efectos": [{ "tipo": "objeto" }]
+          "efectos": [
+            {
+              "tipo": "objeto"
+            }
+          ]
         },
         "fallo": {
           "texto": "Los huesos caen con estrépito. Algo contesta desde el pasillo.",
-          "efectos": [{ "tipo": "emboscada" }]
+          "efectos": [
+            {
+              "tipo": "emboscada"
+            }
+          ]
         }
       },
       {
         "texto": "Dejarlo descansar",
-        "exito": { "texto": "Alguien le cierra la capucha. Seguís.", "efectos": [] }
+        "exito": {
+          "texto": "Alguien le cierra la capucha. Seguís.",
+          "efectos": []
+        }
       }
-    ]
+    ],
+    "piso": 1
   },
   "inscripcion_muro": {
     "titulo": "La inscripción en el muro",
@@ -72,25 +116,45 @@
     "opciones": [
       {
         "texto": "Descifrar las runas",
-        "requisito": { "int": 14 },
+        "requisito": {
+          "int": 14
+        },
         "exito": {
           "texto": "Leés en voz baja. El muro se abre solo y deja ver un cofre.",
-          "efectos": [{ "tipo": "cofre" }]
+          "efectos": [
+            {
+              "tipo": "cofre"
+            }
+          ]
         }
       },
       {
         "texto": "Forzar las piedras",
-        "requisito": { "fue": 14 },
+        "requisito": {
+          "fue": 14
+        },
         "exito": {
           "texto": "La piedra cede y aplasta un brazo antes de abrirse. Atrás hay un cofre.",
-          "efectos": [{ "tipo": "sangre", "valor": 0.15 }, { "tipo": "cofre" }]
+          "efectos": [
+            {
+              "tipo": "sangre",
+              "valor": 0.15
+            },
+            {
+              "tipo": "cofre"
+            }
+          ]
         }
       },
       {
         "texto": "Seguir de largo",
-        "exito": { "texto": "La luz se apaga cuando le das la espalda.", "efectos": [] }
+        "exito": {
+          "texto": "La luz se apaga cuando le das la espalda.",
+          "efectos": []
+        }
       }
-    ]
+    ],
+    "piso": 1
   },
   "antorcha_ajena": {
     "titulo": "La antorcha ajena",
@@ -103,7 +167,15 @@
         "sub": "La luz es luz.",
         "exito": {
           "texto": "Tu llama crece. Los ojos dejan de parpadear y empiezan a acercarse.",
-          "efectos": [{ "tipo": "antorcha", "valor": 40 }, { "tipo": "emboscada" }]
+          "efectos": [
+            {
+              "tipo": "antorcha",
+              "valor": 40
+            },
+            {
+              "tipo": "emboscada"
+            }
+          ]
         }
       },
       {
@@ -112,18 +184,35 @@
         "prob": 0.6,
         "exito": {
           "texto": "Monedas viejas y Ceniza. Nadie se mueve.",
-          "efectos": [{ "tipo": "ceniza", "valor": 6 }]
+          "efectos": [
+            {
+              "tipo": "ceniza",
+              "valor": 6
+            }
+          ]
         },
         "fallo": {
           "texto": "Una moneda rueda demasiado lejos.",
-          "efectos": [{ "tipo": "ceniza", "valor": 6 }, { "tipo": "emboscada" }]
+          "efectos": [
+            {
+              "tipo": "ceniza",
+              "valor": 6
+            },
+            {
+              "tipo": "emboscada"
+            }
+          ]
         }
       },
       {
         "texto": "Alejarse despacio",
-        "exito": { "texto": "Nadie te sigue. Eso es lo peor.", "efectos": [] }
+        "exito": {
+          "texto": "Nadie te sigue. Eso es lo peor.",
+          "efectos": []
+        }
       }
-    ]
+    ],
+    "piso": 1
   },
   "voz_sombra": {
     "titulo": "La voz de La Sombra",
@@ -136,19 +225,323 @@
         "sub": "Te lo va a cobrar.",
         "exito": {
           "texto": "«Qué fácil.» En tu mano aparece algo frío. Cuando menos lo esperes, va a cobrar.",
-          "efectos": [{ "tipo": "objeto" }, { "tipo": "ceniza", "valor": 8 }, { "tipo": "trato" }]
+          "efectos": [
+            {
+              "tipo": "objeto"
+            },
+            {
+              "tipo": "ceniza",
+              "valor": 8
+            },
+            {
+              "tipo": "trato"
+            }
+          ]
         }
       },
       {
         "texto": "Alzar la antorcha contra ella",
         "exito": {
           "texto": "La sombra retrocede, y la llama paga el precio. El grupo se endereza.",
-          "efectos": [{ "tipo": "antorcha", "valor": -15 }, { "tipo": "impetu", "valor": 2 }]
+          "efectos": [
+            {
+              "tipo": "antorcha",
+              "valor": -15
+            },
+            {
+              "tipo": "impetu",
+              "valor": 2
+            }
+          ]
         }
       },
       {
         "texto": "No contestar",
-        "exito": { "texto": "«Ya vas a hablar.» La mano baja despacio.", "efectos": [] }
+        "exito": {
+          "texto": "«Ya vas a hablar.» La mano baja despacio.",
+          "efectos": []
+        }
+      }
+    ],
+    "piso": 1
+  },
+  "banquete_servido": {
+    "titulo": "El banquete servido",
+    "texto": "La mesa está puesta para cuarenta. La carne todavía humea. El polvo sobre los platos tiene más años que vos.",
+    "piso": 2,
+    "mapa": "mazmorra/salones/accesorios/mesa_banquete",
+    "escala": 0.7,
+    "opciones": [
+      {
+        "texto": "Comer",
+        "sub": "Puede salir bien.",
+        "prob": 0.5,
+        "exito": {
+          "texto": "Está tibia y sabe a casa. Ninguno pregunta de quién.",
+          "efectos": [
+            {
+              "tipo": "cura",
+              "valor": 0.3
+            }
+          ]
+        },
+        "fallo": {
+          "texto": "Sabe a tierra. Lo que tragaste se mueve un rato más.",
+          "efectos": [
+            {
+              "tipo": "dolor",
+              "valor": 0.15
+            }
+          ]
+        }
+      },
+      {
+        "texto": "Revisar los puestos",
+        "requisito": {
+          "per": 12
+        },
+        "exito": {
+          "texto": "Cada plato tiene un nombre rayado. Debajo del último, alguien escondió lo que no pudo llevarse.",
+          "efectos": [
+            {
+              "tipo": "objeto"
+            },
+            {
+              "tipo": "ceniza",
+              "valor": 5
+            }
+          ]
+        }
+      },
+      {
+        "texto": "Seguir de largo",
+        "exito": {
+          "texto": "Cuando pasás, una silla se corre sola para dejarte lugar.",
+          "efectos": []
+        }
+      }
+    ]
+  },
+  "retrato_sin_ojos": {
+    "titulo": "El retrato sin ojos",
+    "texto": "Aldemar, con corona y joven. Alguien le cortó los ojos del lienzo con mucho cuidado. Por los agujeros entra aire frío.",
+    "piso": 2,
+    "mapa": "mazmorra/salones/accesorios/retrato_rajado",
+    "escala": 0.7,
+    "opciones": [
+      {
+        "texto": "Descolgar el marco",
+        "requisito": {
+          "fue": 13
+        },
+        "exito": {
+          "texto": "Pesa como una puerta, porque lo es. Atrás hay un hueco en el muro, y un cofre.",
+          "efectos": [
+            {
+              "tipo": "cofre"
+            }
+          ]
+        }
+      },
+      {
+        "texto": "Mirar por los agujeros",
+        "sub": "Puede salir bien.",
+        "prob": 0.5,
+        "exito": {
+          "texto": "Del otro lado hay un salón igual a éste, sin nadie. Alguien olvidó ahí una bolsa de Ceniza.",
+          "efectos": [
+            {
+              "tipo": "ceniza",
+              "valor": 10
+            }
+          ]
+        },
+        "fallo": {
+          "texto": "Del otro lado, dos ojos ya estaban mirando. Tu llama se encoge.",
+          "efectos": [
+            {
+              "tipo": "antorcha",
+              "valor": -15
+            }
+          ]
+        }
+      },
+      {
+        "texto": "Bajar la vista",
+        "exito": {
+          "texto": "Sentís que igual te sigue. Sin ojos, y te sigue.",
+          "efectos": []
+        }
+      }
+    ]
+  },
+  "guardia_eterna": {
+    "titulo": "La guardia eterna",
+    "texto": "Una armadura de rodillas frente a una puerta tapiada. Adentro no hay nadie, pero respira. Sigue cumpliendo la orden: que ningún hombre descanse.",
+    "piso": 2,
+    "mapa": "mazmorra/salones/accesorios/armadura_vacia",
+    "escala": 0.8,
+    "opciones": [
+      {
+        "texto": "Darle el relevo",
+        "requisito": {
+          "int": 13
+        },
+        "exito": {
+          "texto": "«Yo sigo desde acá.» La armadura suelta el aire y se desarma, pieza por pieza, en silencio. Te dejó lo que cuidaba.",
+          "efectos": [
+            {
+              "tipo": "objeto"
+            },
+            {
+              "tipo": "impetu",
+              "valor": 1
+            }
+          ]
+        }
+      },
+      {
+        "texto": "Sacarle la espada",
+        "sub": "Rápido y con ruido.",
+        "prob": 0.4,
+        "exito": {
+          "texto": "La mano no ofrece resistencia. Ya no sabe de qué defenderse.",
+          "efectos": [
+            {
+              "tipo": "objeto"
+            }
+          ]
+        },
+        "fallo": {
+          "texto": "El casco se levanta. Algo más, en el salón, se levanta con él.",
+          "efectos": [
+            {
+              "tipo": "emboscada"
+            }
+          ]
+        }
+      },
+      {
+        "texto": "Pasar en silencio",
+        "exito": {
+          "texto": "Ya lejos, todavía oís cómo respira.",
+          "efectos": []
+        }
+      }
+    ]
+  },
+  "trampa_gris": {
+    "titulo": "La trampa gris",
+    "texto": "Un gancho colgado de una cadena, y debajo un farol encendido como cebo. Es trabajo de cazador. Las marcas en el piso son recientes y no van hacia afuera.",
+    "piso": 2,
+    "mapa": "mazmorra/cripta/accesorios/cadena_gancho",
+    "escala": 0.7,
+    "opciones": [
+      {
+        "texto": "Desarmar la trampa",
+        "requisito": {
+          "des": 13
+        },
+        "exito": {
+          "texto": "Los dedos encuentran el seguro. La cadena cae sin ruido, y el morral del cazador queda a tu alcance.",
+          "efectos": [
+            {
+              "tipo": "objeto"
+            },
+            {
+              "tipo": "antorcha",
+              "valor": 15
+            }
+          ]
+        }
+      },
+      {
+        "texto": "Robar el farol",
+        "sub": "Puede salir bien.",
+        "prob": 0.5,
+        "exito": {
+          "texto": "Lo sacás de un tirón y el gancho te pasa cerca. La luz es tuya.",
+          "efectos": [
+            {
+              "tipo": "antorcha",
+              "valor": 35
+            }
+          ]
+        },
+        "fallo": {
+          "texto": "El gancho no te pasa cerca.",
+          "efectos": [
+            {
+              "tipo": "sangre",
+              "valor": 0.25
+            },
+            {
+              "tipo": "antorcha",
+              "valor": 15
+            }
+          ]
+        }
+      },
+      {
+        "texto": "Rodearla",
+        "exito": {
+          "texto": "Un perro gris te mira desde lejos, y no ladra. Le alcanza con saber por dónde vas.",
+          "efectos": []
+        }
+      }
+    ]
+  },
+  "silla_del_rey": {
+    "titulo": "La silla del rey",
+    "texto": "A la cabecera de un salón vacío, una silla alta. Tu sombra se sienta antes que vos. «Dale. Todos se sentaron alguna vez. Desde acá se ve todo».",
+    "piso": 2,
+    "mapa": "mazmorra/salones/accesorios/silla_rota",
+    "escala": 0.65,
+    "opciones": [
+      {
+        "texto": "Sentarse",
+        "sub": "Te lo va a cobrar.",
+        "exito": {
+          "texto": "«Eso.» Por un momento el salón está lleno, y todos te obedecen. Al pararte, tenés algo en la mano. Lo va a cobrar.",
+          "efectos": [
+            {
+              "tipo": "objeto"
+            },
+            {
+              "tipo": "ceniza",
+              "valor": 10
+            },
+            {
+              "tipo": "trato"
+            }
+          ]
+        }
+      },
+      {
+        "texto": "Romperla a golpes",
+        "requisito": {
+          "fue": 13
+        },
+        "exito": {
+          "texto": "La madera grita como no debería. Tu sombra vuelve a tus pies, y se queda quieta un buen rato.",
+          "efectos": [
+            {
+              "tipo": "impetu",
+              "valor": 2
+            },
+            {
+              "tipo": "sangre",
+              "valor": 0.1
+            }
+          ]
+        }
+      },
+      {
+        "texto": "Quedarse de pie",
+        "exito": {
+          "texto": "«Aldemar dijo lo mismo. Duró más que vos, seguro.»",
+          "efectos": []
+        }
       }
     ]
   }
