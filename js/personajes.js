@@ -152,7 +152,7 @@ const cambiarPestana = d => { PJ.tab = (PJ.tab + d + 3) % 3; PJ.sel = 0; sfx('se
 const cambiarPersonaje = d => { PJ.i = (PJ.i + d + PJ.lista.length) % PJ.lista.length; sfx('select'); };
 
 // En Estado hay dos columnas: arriba y abajo se mueven dentro de una, izquierda y derecha pasan a la otra
-const COLUMNAS_ESTADO = 5;
+const COLUMNAS_ESTADO = REGLAS_ATR.lista.length;
 function moverVertical(d) {
   const n = filasPj().length;
   if (!n) return;
