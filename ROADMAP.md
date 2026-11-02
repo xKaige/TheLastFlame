@@ -2,7 +2,7 @@
 
 El camino del juego es la expedición de grupo. El plan del juego anterior está en `juego_viejo/ROADMAP.md`.
 
-**Versión actual: 0.3.40.** Lo próximo: 0.4.0.
+**Versión actual: 0.3.41.** Lo próximo: 0.4.0.
 
 ## Cómo se numeran las versiones
 
@@ -16,8 +16,6 @@ Cada parche sube la versión en `package.json` y en `index.html`, y se anota ac�
 
 ### 0.4.0: Zona 2 (Los Salones)
 
-- Falta un adorno de pared: el candelabro (`candelabro_pared.png`).
-- Ilustraciones de sus 5 eventos.
 - Música de exploración.
 
 ### 0.5.0: Zona 3 (El Fondo)
@@ -99,6 +97,11 @@ La idea que une todo es una regla de las Guardianas: "quien le pida algo va a re
 - **Título:** el logo "The Last Flame" no cambia con el idioma.
 
 ## Historial
+
+### 0.3.41
+
+- Ilustraciones de los cinco eventos de la zona 2.
+- Zona 2: candelabro de pared.
 
 ### 0.3.40
 
