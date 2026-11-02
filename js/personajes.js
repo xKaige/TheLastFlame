@@ -9,7 +9,7 @@ const PJ = { lista: [], i: 0, tab: 0, sel: 0, sub: null, prev: 'explore', edita:
 
 function abrirPersonajes(lista, edita) {
   if (!lista.length) return;
-  Object.assign(PJ, { lista, i: 0, tab: 0, sel: 0, sub: null, prev: S.mode, edita });
+  Object.assign(PJ, { lista, i: 0, tab: 0, sel: 0, sub: null, info: false, prev: S.mode, edita });
   S.mode = 'xpj';
   $('personajes').classList.remove('hidden');
   pintarPj();
@@ -90,7 +90,9 @@ function pintarPj() {
     const atributos = panel('Atributos', p.puntos ? tr('{0} pts libres', p.puntos) : '', `${p.puntos ? `<div class="paviso">✦ ${p.puntos} punto${p.puntos > 1 ? 's' : ''} para repartir</div>` : ''}${REGLAS_ATR.lista.map(filaAtr).join('')}`, 'patrs');
     const combate = panel('Combate', '', `<div class="pstats">${dato('Ataque', p.ataque + (p.ataqueMagico || 0))}${dato('Defensa', p.defensa)}${dato('Vel', p.velocidad)}${dato('Crítico', `${Math.round(p.critico * 100)}%`)}${dato('Esquiva', `${Math.round(p.esquiva * 100)}%`, 'ancho')}</div>`);
     const equipo = panel('Equipo', '', LUGARES_EQUIPO.map(filaEquipo).join(''));
-    centro = `${atributos}<div class="pcol">${combate}${equipo}</div>`;
+    const a = filas[PJ.sel] && filas[PJ.sel].atr;
+    const info = PJ.info && a ? panel(REGLAS_ATR.nombres[a], '', `<div class="pdesc">${tr(REGLAS_ATR.descripciones[a])}</div>`, 'plleno') : `${combate}${equipo}`;
+    centro = `${atributos}<div class="pcol">${info}</div>`;
   } else if (PJ.tab === 1) {
     const h = filas[PJ.sel] && D.habilidades[filas[PJ.sel].hab];
     const lista = filas.map(f => {
@@ -112,7 +114,7 @@ function pintarPj() {
   }).join('')}</div>` : '';
   $('personajes').innerHTML = `<div class="ptop"><div class="ptabs">${tecla('Q', 'strafeL')}${pestanas}${tecla('E', 'strafeR')}</div><div class="pgrupo">${uno ? '' : tecla('Z', 'lt')}<span>Grupo</span>${grupo}${uno ? '' : tecla('X', 'rt')}</div></div>
     <div class="pcuerpo">${ficha}<div class="pder">${centro}</div></div>${sub}
-    <div class="pinfo">${tr(PJ.msg || '')}</div><div class="payuda">${glyph('ok')} ${tr('aceptar')} · ${glyph('cancel')} ${tr('volver')}</div>`;
+    <div class="pinfo">${tr(PJ.msg || '')}</div><div class="payuda">${glyph('ok')} ${tr('aceptar')} · ${glyph('cancel')} ${tr('volver')}${PJ.tab === 0 && !PJ.sub && filas[PJ.sel] && filas[PJ.sel].atr ? ` · ${tecla('I', 'inv')} ${tr('ver qué hace')}` : ''}</div>`;
   PJ.msg = '';
   const sel = $('personajes').querySelector('.pitem.sel');
   if (sel) sel.scrollIntoView({ block: 'nearest' });
@@ -178,6 +180,8 @@ function pjAction(act, pad) {
   else if (act === 'turnL' || act === 'turnR') moverHorizontal();
   else if (act === 'strafeL' || act === 'strafeR') { if (pad) cambiarPestana(act === 'strafeL' ? -1 : 1); else moverHorizontal(); }
   else if (act === 'ok') { const f = filasPj()[PJ.sel]; if (f) return accionPj(f); }
+  else if (act === 'inv' && (filasPj()[PJ.sel] || {}).atr) PJ.info = !PJ.info;
+  else if (act === 'cancel' && PJ.info && (filasPj()[PJ.sel] || {}).atr) PJ.info = false;
   else if (act === 'cancel' || act === 'inv') return cerrarPersonajes();
   pintarPj();
 }
