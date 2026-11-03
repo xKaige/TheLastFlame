@@ -378,7 +378,7 @@ const NUCLEO = (() => {
   }
   function usarGancho(u, grupo, azar, eventos) {
     const f = u.fase, t = blancoEnemigo(grupo, azar);
-    eventos.push({ tipo: 'texto', clave: 'especial', quien: u, texto: f.gancho.nombre });
+    eventos.push({ tipo: 'texto', clave: 'especial', quien: u, texto: f.gancho.nombre }, { tipo: 'gancho', quien: t, desde: u });
     if (t.esquivaSegura || azar() < t.esquiva) { t.esquivaSegura = false; eventos.push({ tipo: 'esquiva', quien: t }); return true; }
     herir(t, entre(azar, ...f.gancho.dano), eventos);
     if (t.vida > 0) { t.enganchado = true; eventos.push({ tipo: 'texto', clave: 'enganchado', quien: t }); }
@@ -424,6 +424,7 @@ const NUCLEO = (() => {
     }
   }
 
+  const pasoDeFase = u => (u.enfurecido && u.fase.ciclo && !u.aturdido ? u.fase.ciclo[u.pasoFase % u.fase.ciclo.length] : null);
   const enSuTrono = u => !!(u.enfurecido && u.fase.trono && u.escudos > 0);
 
   // Si en este turno le toca el golpe a todo el grupo: la pantalla lo anuncia antes de que pase
@@ -455,7 +456,7 @@ const NUCLEO = (() => {
     return eventos;
   }
 
-  return { IMP_TOPE, vivos, crearPersonaje, asegurarPersonaje, ajustarModelo, atributosDe, recalcular, subirAtributo, cumpleRequisito, sirveAClase, cumpleObjeto, sortearCandidatos, elegirObjeto, sortearCaidos, aplicarCondicion, topeNivel, ganarExp, iniciarBatalla, haTerminado, vistaPrevia, proximoTurno, opciones, atacar, defender, usarHabilidad, haraEspecial, turnoEnemigo };
+  return { IMP_TOPE, vivos, crearPersonaje, asegurarPersonaje, ajustarModelo, atributosDe, recalcular, subirAtributo, cumpleRequisito, sirveAClase, cumpleObjeto, sortearCandidatos, elegirObjeto, sortearCaidos, aplicarCondicion, topeNivel, ganarExp, iniciarBatalla, haTerminado, vistaPrevia, proximoTurno, opciones, atacar, defender, usarHabilidad, haraEspecial, pasoDeFase, turnoEnemigo };
 })();
 
 if (typeof module !== 'undefined') module.exports = NUCLEO;

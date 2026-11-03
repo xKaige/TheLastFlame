@@ -1250,7 +1250,8 @@ function siguiente() {
   if (u.vida <= 0) return later(500, siguiente);
   if (u.enemigo) {
     Bt.fase = 'espera'; Bt.msg = ''; pintarBatalla();
-    if (NUCLEO.haraEspecial(u) && cuadrosEspeciales(u)) return golpeImponente(u);
+    const hoja = NUCLEO.haraEspecial(u) ? D.enemigos[u.tipo].golpe_especial : NUCLEO.pasoDeFase(u) === 'gancho' ? u.fase.gancho.hoja : null;
+    if (hoja && cuadrosEspeciales(u, hoja)) return golpeImponente(u, hoja);
     iniciarAtaqueAnimado(u);
     later(600, () => { if (Bt) { mostrar(NUCLEO.turnoEnemigo(D, Bt.b, u, azarX)); later(450, () => { if (Bt) Bt.fase = 'cambio'; }); later(800, siguiente); } });
   } else {
@@ -1276,14 +1277,17 @@ function mostrar(eventos) {
 }
 
 // El golpe a todo el grupo se anuncia: la sala se apaga, el jefe se prepara y recién ahí pega
-function golpeImponente(u) {
-  u.especialDesde = Bt.t; sfx('encounter');
-  later(D.enemigos[u.tipo].golpe_especial.impacto * 1000, () => {
+function golpeImponente(u, r) {
+  u.especialDesde = Bt.t; u.hojaActiva = r; sfx('encounter');
+  later(r.impacto * 1000, () => {
     if (!Bt) return;
     mostrar(NUCLEO.turnoEnemigo(D, Bt.b, u, azarX));
-    if (D.enemigos[u.tipo].golpe_especial.efecto === 'caida') { golpePixel('golpe', u); golpePixel('critico', u); } else golpePixel('barrido', u);
-    for (let x = 50; x <= 430; x += 38) chispas(x, FBASE, 4, coloresFx(), -46, 60);
-    Bt.temblor = 13; Bt.destello = 0.9; Bt.congelado = 0.16; sfx('slash');
+    if (r.efecto === 'gancho') { Bt.temblor = 6; Bt.destello = 0.4; Bt.congelado = 0.1; sfx('slash'); }
+    else {
+      if (r.efecto === 'caida') { golpePixel('golpe', u); golpePixel('critico', u); } else golpePixel('barrido', u);
+      for (let x = 50; x <= 430; x += 38) chispas(x, FBASE, 4, coloresFx(), -46, 60);
+      Bt.temblor = 13; Bt.destello = 0.9; Bt.congelado = 0.16; sfx('slash');
+    }
     later(850, () => { if (Bt) Bt.fase = 'cambio'; });
     later(1300, siguiente);
   });
@@ -1309,6 +1313,10 @@ function mostrarEvento(e) {
   if (e.tipo === 'antorcha') { P.fuel = Math.max(0, P.fuel - e.valor); updateHUD(); }
   if (e.tipo === 'invoca') { for (const n of e.nuevos) { n.x = Bt.lugares[n.i]; prepararEnemigo(n); chispas(n.x, FBASE - 24, 18, MARCO.vida, -24); } sfx('encounter'); Bt.temblor = 4; }
   if (e.tipo === 'fase' && q.fase.trono) q.tronoDesde = Bt.t;
+  if (e.tipo === 'gancho') {
+    const r = e.desde.hojaActiva;
+    if (r) Bt.fx.push({ tipo: 'cadena', x: e.desde.x - e.desde.tam / 2 - r.margen + r.cadena[0], y: FBASE - e.desde.tam - r.margen + r.cadena[1], hx: CX[q.i] + 23, hy: CY + 10, t: 0, dur: 0.6, m: 1 });
+  }
   if (e.tipo === 'huesos') { Bt.fx.push({ tipo: 'huesos', x: CX[q.i] + 23, y: CY, t: 0, dur: 0.5, m: 1 }); sfx('hurt'); }
   if (e.tipo === 'fase') { Bt.msg = tr(q.fase.mensaje || '{0} se enfurece y se cubre de escudos.', q.nombre); Bt.temblor = 6; Bt.destello = 0.5; sfx('encounter'); chispas(q.x, FBASE - q.tam * 0.5, 30, VIDA_ESCUDO, -24); }
   if (e.tipo === 'escudo') {
@@ -1369,7 +1377,16 @@ function dibujarFx(c) {
   for (const f of Bt.fx) {
     const k = clamp(f.t / f.dur, 0, 1), cols = coloresFx(f.tipo);
     c.save(); c.translate(f.x, f.y); c.rotate(f.giro || 0); c.lineCap = 'butt';
-    if (f.tipo === 'huesos') {
+    if (f.tipo === 'cadena') {
+      // sale de la mano del Cazador y se clava en la tarjeta del elegido
+      c.rotate(-(f.giro || 0));
+      const dx = f.hx - f.x, dy = f.hy - f.y, q = clamp(k * 5, 0, 1), n = Math.ceil(Math.hypot(dx, dy) / 4);
+      for (let i = 0; i < n * q; i++) {
+        const a = i / n, l = i % 2;
+        c.fillStyle = l ? RAMPS[S.env][3] : RAMPS[S.env][5];
+        c.fillRect(Math.round(dx * a + Math.sin(a * Math.PI) * 6 * (1 - k)) - 2, Math.round(dy * a) - 1, l ? 3 : 5, l ? 3 : 4);
+      }
+    } else if (f.tipo === 'huesos') {
       // caen sobre la tarjeta del elegido
       c.rotate(-(f.giro || 0)); c.fillStyle = RAMPS[S.env][5];
       for (let n = 0; n < 9; n++) { const q = clamp(k * 1.7 - n * 0.08, 0, 1); if (q < 1) c.fillRect((n * 17 % 52) - 26, -150 + q * 165, 2, 7); }
@@ -1386,7 +1403,7 @@ function dibujarFx(c) {
 
 function actualizarFx(dt) {
   Bt.temblor = Math.max(0, Bt.temblor - dt * 22);
-  const prepara = Bt.b.enemigos.some(e => e.especialDesde !== undefined && Bt.t - e.especialDesde < D.enemigos[e.tipo].golpe_especial.impacto);
+  const prepara = Bt.b.enemigos.some(e => e.especialDesde !== undefined && e.hojaActiva.efecto !== 'gancho' && Bt.t - e.especialDesde < e.hojaActiva.impacto);
   Bt.oscuro = clamp(Bt.oscuro + (prepara ? dt * 1.5 : -dt * 3), 0, 1);
   Bt.destello = Math.max(0, Bt.destello - dt * 2.2);
   for (const f of Bt.fx) f.t += dt;

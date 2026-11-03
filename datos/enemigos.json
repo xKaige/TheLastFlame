@@ -1797,7 +1797,27 @@
         "dano": [
           8,
           12
-        ]
+        ],
+        "hoja": {
+          "imagen": "cazador_gancho",
+          "lado": 240,
+          "margen": 55,
+          "cuadros": 6,
+          "efecto": "gancho",
+          "tiempos": [
+            0.2,
+            0.4,
+            0.8,
+            1,
+            1.6,
+            1.9
+          ],
+          "impacto": 1,
+          "cadena": [
+            203,
+            139
+          ]
+        }
       },
       "presa": {
         "nombre": "elige a su presa",

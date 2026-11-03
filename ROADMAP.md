@@ -2,7 +2,7 @@
 
 El camino del juego es la expedición de grupo. El plan del juego anterior está en `juego_viejo/ROADMAP.md`.
 
-**Versión actual: 0.4.16.** Lo próximo: 0.5.0.
+**Versión actual: 0.4.17.** Lo próximo: 0.5.0.
 
 ## Cómo se numeran las versiones
 
@@ -53,7 +53,6 @@ Ideas aprobadas, para hacer con sprites propios (hojas de 6 cuadros, `golpe_espe
 
 **El Cazador Gris**
 
-- Cadena y gancho: gira la cadena, la lanza a la pantalla y agarra a un personaje, que pierde el turno.
 - Marcar a la presa: olfatea, señala con la lanza y aparece la mira roja en el retrato.
 - Silbido a la jauría: silba, la sala se oscurece y los perros entran corriendo desde los costados.
 - Lanzazo de frente: clava la lanza hacia la pantalla, con el arma creciendo en primer plano.
@@ -117,6 +116,10 @@ La idea que une todo es una regla de las Guardianas: "quien le pida algo va a re
 - **Título:** el logo "The Last Flame" no cambia con el idioma.
 
 ## Historial
+
+### 0.4.17
+
+- El Cazador Gris: cadena y gancho dibujados cuadro por cuadro en su furia, con la cadena que llega hasta el enganchado.
 
 ### 0.4.16
 

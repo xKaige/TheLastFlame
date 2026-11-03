@@ -121,7 +121,7 @@ function prepararPoses(e) {
 
 // El golpe especial dibujado cuadro por cuadro (campo "golpe_especial" de enemigos.json): una hoja con un cuadro al lado del otro
 const HOJAS_ESPECIAL = {}, CUADROS_ESPECIAL = {};
-for (const d of Object.values(D.enemigos)) for (const r of [d.golpe_especial, d.fase && d.fase.trono]) if (r) HOJAS_ESPECIAL[r.imagen] = Object.assign(new Image(), { src: `interfaz/enemigos/${r.imagen}.png` });
+for (const d of Object.values(D.enemigos)) for (const r of [d.golpe_especial, d.fase && d.fase.trono, d.fase && d.fase.gancho && d.fase.gancho.hoja]) if (r) HOJAS_ESPECIAL[r.imagen] = Object.assign(new Image(), { src: `interfaz/enemigos/${r.imagen}.png` });
 
 function cuadrosEspeciales(e, r = D.enemigos[e.tipo].golpe_especial) {
   const hoja = r && HOJAS_ESPECIAL[r.imagen];
@@ -153,11 +153,11 @@ function posar(e) {
   }
   if (e.especialDesde !== undefined) {
     // cada tramo muestra un cuadro ("orden"; null es fuera de la pantalla) y puede subir o bajar al enemigo ("vuelo")
-    const r = D.enemigos[e.tipo].golpe_especial, t = Bt.t - e.especialDesde, i = r.tiempos.findIndex(v => t < v);
+    const r = e.hojaActiva, t = Bt.t - e.especialDesde, i = r.tiempos.findIndex(v => t < v);
     if (i >= 0) {
       const c = r.orden ? r.orden[i] : i, v = r.vuelo && r.vuelo[i], ini = i ? r.tiempos[i - 1] : 0;
       e.oculto = c === null;
-      if (c !== null) e.gris = cuadrosEspeciales(e)[c];
+      if (c !== null) e.gris = cuadrosEspeciales(e, r)[c];
       e.vuelo = v ? v[0] + (v[1] - v[0]) * (t - ini) / (r.tiempos[i] - ini) : 0;
       return;
     }
