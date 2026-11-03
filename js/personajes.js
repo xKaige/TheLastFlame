@@ -57,6 +57,24 @@ const CONSUMIBLES = {
   potions: { nombre: 'Poción', descripcion: 'Cura un 40% al aliado más herido.', accion: 'potion' },
   oil: { nombre: 'Aceite', descripcion: 'Aviva la antorcha.', accion: 'oil' },
 };
+// Lo que cambia en un personaje si se pone o se saca un objeto, escrito con todas las letras
+const TIPOS_OBJETO = { arma: 'Armas', armadura: 'Armaduras', accesorio: 'Accesorios' };
+const bonosLargos = o => [...Object.entries(o.bonos).map(([k, v]) => `<div class="pbono ${v > 0 ? 'sube' : 'baja'}">${v > 0 ? '+' : '−'}${Math.abs(v)} ${REGLAS_ATR.nombres[k] || k}</div>`), ...(o.magico ? [`<div class="pbono sube">${tr('+{0}% del Intelecto al ataque', Math.round(o.magico * 100))}</div>`] : [])].join('');
+function valoresDe(p) { return { Vida: p.vidaMax, Ataque: p.ataque + (p.ataqueMagico || 0), Defensa: p.defensa, Velocidad: p.velocidad, Crítico: Math.round(p.critico * 100), Esquiva: Math.round(p.esquiva * 100) }; }
+function comparar(p, slot, id) {
+  const antes = valoresDe(p), copia = { ...p, equipo: { ...p.equipo, [slot]: id } };
+  NUCLEO.recalcular(D, copia);
+  const luego = valoresDe(copia), filas = Object.keys(antes).filter(k => antes[k] !== luego[k]).map(k => `<div class="pbono ${luego[k] > antes[k] ? 'sube' : 'baja'}">${tr(k)} ${antes[k]} → ${luego[k]}</div>`);
+  return filas.length ? filas.join('') : `<div class="pdesc">${tr('No cambia nada.')}</div>`;
+}
+function detalleObjeto(p, id) {
+  const o = D.objetos[id], puesto = p.equipo[o.tipo], sirve = NUCLEO.sirveAClase(D, p, id), puede = sirve && NUCLEO.cumpleObjeto(D, p, id);
+  return `<div class="pnom2">${nombreObjeto(o)}</div><div class="pdesc">${o.descripcion}</div>${bonosLargos(o)}
+    ${o.clases ? `<div class="pdesc ${sirve ? '' : 'no'}">${tr('Para: {0}', o.clases.map(k => D.clases[k].nombre).join(', '))}</div>` : ''}
+    ${o.requisito ? `<div class="pdesc ${puede || !sirve ? '' : 'no'}">${tr('Requiere {0}', textoRequisito(o))}</div>` : ''}
+    ${sirve ? `<div class="psub">${tr(puesto ? 'Comparado con {0}' : 'Si lo equipa', puesto && D.objetos[puesto].nombre)}</div>${comparar(p, o.tipo, id)}` : ''}`;
+}
+
 const habilidadesConocidas = p => [...D.clases[p.clase].habilidades, ...X.grimorio.filter(id => D.habilidades[id].clase === p.clase && !D.clases[p.clase].habilidades.includes(id))];
 
 // Lo que se puede elegir en la pestaña abierta
@@ -64,7 +82,8 @@ function filasTab() {
   const p = PJ.lista[PJ.i];
   if (PJ.tab === 0) return [...REGLAS_ATR.lista.map(a => ({ atr: a })), ...LUGARES_EQUIPO.map(s => ({ slot: s[0] }))];
   if (PJ.tab === 1) return habilidadesConocidas(p).map(id => ({ hab: id }));
-  return [...Object.keys(CONSUMIBLES).filter(k => P && P[k] > 0).map(k => ({ cons: k })), ...X.mochila.map(id => ({ obj: id }))];
+  const orden = Object.keys(TIPOS_OBJETO);
+  return [...Object.keys(CONSUMIBLES).filter(k => P && P[k] > 0).map(k => ({ cons: k })), ...X.mochila.slice().sort((a, b) => orden.indexOf(D.objetos[a].tipo) - orden.indexOf(D.objetos[b].tipo)).map(id => ({ obj: id }))];
 }
 
 const filasPj = () => (PJ.sub ? PJ.sub.opciones : filasTab());
@@ -96,7 +115,7 @@ function pintarPj() {
     };
     const filaEquipo = ([s, n]) => {
       const id = p.equipo[s], o = id && D.objetos[id];
-      return `<div class="pequipo${elegida(filas.find(x => x.slot === s)) ? ' sel' : ''}${o ? '' : ' vacio'}"><small>${tr(n)}</small><span>${o ? o.nombre : tr('Vacío')}</span>${o ? `<em>${textoBonos(o)}</em>` : ''}</div>`;
+      return `<div class="pequipo${elegida(filas.find(x => x.slot === s)) ? ' sel' : ''}${o ? '' : ' vacio'}"><small>${tr(n)}</small><span>${o ? o.nombre : tr('Vacío')}</span></div>`;
     };
     const dato = (n, v, cls = '') => `<div class="pstat ${cls}"><span>${tr(n)}</span><em>${v}</em></div>`;
     const atributos = panel('Atributos', p.puntos ? tr('{0} pts libres', p.puntos) : '', `${p.puntos ? `<div class="paviso">✦ ${p.puntos} punto${p.puntos > 1 ? 's' : ''} para repartir</div>` : ''}${REGLAS_ATR.lista.map(filaAtr).join('')}`, 'patrs');
@@ -115,15 +134,21 @@ function pintarPj() {
     centro = `${panel('Conocidas', `lleva ${p.habilidades.length} de ${D.mazmorra.max_habilidades}`, `<div class="plista">${lista}</div>`, 'patrs')}<div class="pcol">${panel('Detalle', '', detalle, 'plleno')}</div>`;
   } else {
     const f0 = filas[PJ.sel], o = f0 && D.objetos[f0.obj], con = f0 && CONSUMIBLES[f0.cons];
-    const lista = filas.length ? filas.map(f => `<div class="pitem${elegida(f) ? ' sel' : ''}"><span>${f.cons ? tr(CONSUMIBLES[f.cons].nombre) : nombreObjeto(D.objetos[f.obj])}</span><em>${f.cons ? `×${P[f.cons]}` : textoBonos(D.objetos[f.obj])}</em></div>`).join('') : `<div class="pdesc">${tr('Está vacía.')}</div>`;
-    const detalle = `${o ? `<div class="pnom2">${nombreObjeto(o)}</div><div class="pdesc">${o.descripcion}</div>${o.clases ? `<div class="pdesc">${tr('Para: {0}', o.clases.map(k => D.clases[k].nombre).join(', '))}</div>` : ''}${o.requisito ? `<div class="pdesc ${NUCLEO.cumpleObjeto(D, p, filas[PJ.sel].obj) ? '' : 'no'}">${tr('Requiere {0}', textoRequisito(o))}</div>` : ''}<div class="pdesc">${tr('Se equipa desde Estado.')}</div>` : ''}${con ? `<div class="pnom2">${tr(con.nombre)}</div><div class="pdesc">${tr(con.descripcion)}</div><div class="pdesc">${tr('Te quedan {0}.', P[f0.cons])}</div><div class="pdesc">${tr('Se usa con')} ${glyph(con.accion)}</div>` : ''}`;
+    let grupoAntes = '';
+    const lista = filas.length ? filas.map(f => {
+      const ob = f.obj && D.objetos[f.obj], grupo = f.cons ? 'Consumibles' : TIPOS_OBJETO[ob.tipo], titulo = grupo !== grupoAntes ? `<div class="pgrupoit">${tr(grupo)}</div>` : '', sirve = !ob || NUCLEO.sirveAClase(D, p, f.obj);
+      grupoAntes = grupo;
+      return `${titulo}<div class="pitem${elegida(f) ? ' sel' : ''}${sirve ? '' : ' no'}"><span>${f.cons ? tr(CONSUMIBLES[f.cons].nombre) : nombreObjeto(ob)}</span><em>${f.cons ? `×${P[f.cons]}` : sirve ? '' : D.clases[ob.clases[0]].nombre}</em></div>`;
+    }).join('') : `<div class="pdesc">${tr('Está vacía.')}</div>`;
+    const detalle = `${o ? `${detalleObjeto(p, f0.obj)}<div class="pdesc nota">${tr('Se equipa desde Estado.')}</div>` : ''}${con ? `<div class="pnom2">${tr(con.nombre)}</div><div class="pdesc">${tr(con.descripcion)}</div><div class="pdesc">${tr('Te quedan {0}.', P[f0.cons])}</div><div class="pdesc">${tr('Se usa con')} ${glyph(con.accion)}</div>` : ''}`;
     centro = `${panel('Mochila', `${filas.length} objetos`, `<div class="plista">${lista}</div>`, 'patrs')}<div class="pcol">${panel('Detalle', '', detalle, 'plleno')}</div>`;
   }
+  const elegidoSub = PJ.sub && PJ.sub.opciones[PJ.sel];
   const sub = PJ.sub ? `<div class="psubm"><h4>${tr(LUGARES_EQUIPO.find(x => x[0] === PJ.sub.slot)[1])}</h4>${PJ.sub.opciones.map((id, i) => {
     const o = id && D.objetos[id];
     const puede = !o || NUCLEO.cumpleObjeto(D, p, id);
-    return `<div class="pitem${i === PJ.sel ? ' sel' : ''}${puede ? '' : ' no'}"><span>${o ? nombreObjeto(o) : tr('Dejar vacío')}</span><em>${o ? (puede ? textoBonos(o) : tr('Requiere {0}', textoRequisito(o))) : ''}</em></div>`;
-  }).join('')}</div>` : '';
+    return `<div class="pitem${i === PJ.sel ? ' sel' : ''}${puede ? '' : ' no'}"><span>${o ? nombreObjeto(o) : tr('Dejar vacío')}</span><em>${o && !puede ? tr('Requiere {0}', textoRequisito(o)) : ''}</em></div>`;
+  }).join('')}<div class="psubdet">${elegidoSub ? `${bonosLargos(D.objetos[elegidoSub])}<div class="psub">${tr('Si lo equipa')}</div>${comparar(p, PJ.sub.slot, elegidoSub)}` : p.equipo[PJ.sub.slot] ? `<div class="psub">${tr('Si se lo saca')}</div>${comparar(p, PJ.sub.slot, null)}` : ''}</div></div>` : '';
   $('personajes').innerHTML = `<div class="ptop"><div class="ptabs">${tecla('Q', 'strafeL')}${pestanas}${tecla('E', 'strafeR')}</div><div class="pgrupo">${uno ? '' : tecla('Z', 'lt')}<span>Grupo</span>${grupo}${uno ? '' : tecla('X', 'rt')}</div></div>
     <div class="pcuerpo">${ficha}<div class="pder">${centro}</div></div>${sub}
     <div class="pinfo">${tr(PJ.msg || '')}</div><div class="payuda">${glyph('ok')} ${tr('aceptar')} · ${glyph('cancel')} ${tr('volver')}${PJ.tab === 0 && !PJ.sub && filas[PJ.sel] && filas[PJ.sel].atr ? ` · ${tecla('I', 'inv')} ${tr('ver qué hace')}` : ''}</div>`;
