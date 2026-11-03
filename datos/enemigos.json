@@ -819,9 +819,31 @@
     },
     "fase": {
       "umbral": 0.5,
-      "escudos": 5,
+      "escudos": 10,
       "velocidad": 1.25,
-      "dano": 1.1
+      "dano": 1.1,
+      "mensaje": "{0} clava su pico y se alza un trono de huesos.",
+      "trono": {
+        "imagen": "rey_osario_trono",
+        "lado": 240,
+        "margen": 45,
+        "cuadros": 6,
+        "tiempos": [
+          0.25,
+          0.5,
+          0.75,
+          1.1,
+          1.45,
+          1.8
+        ],
+        "lluvia": {
+          "nombre": "hace llover huesos desde su trono",
+          "dano": [
+            18,
+            24
+          ]
+        }
+      }
     },
     "ojos": [
       [

@@ -2,7 +2,7 @@
 
 El camino del juego es la expedición de grupo. El plan del juego anterior está en `juego_viejo/ROADMAP.md`.
 
-**Versión actual: 0.4.15.** Lo próximo: 0.5.0.
+**Versión actual: 0.4.16.** Lo próximo: 0.5.0.
 
 ## Cómo se numeran las versiones
 
@@ -57,6 +57,7 @@ Ideas aprobadas, para hacer con sprites propios (hojas de 6 cuadros, `golpe_espe
 - Marcar a la presa: olfatea, señala con la lanza y aparece la mira roja en el retrato.
 - Silbido a la jauría: silba, la sala se oscurece y los perros entran corriendo desde los costados.
 - Lanzazo de frente: clava la lanza hacia la pantalla, con el arma creciendo en primer plano.
+- La Cacería (en su furia): apaga las antorchas y esquiva los golpes salvo que lo marquen; va siempre primero por el más herido.
 
 **Aldemar**
 
@@ -68,6 +69,7 @@ Ideas aprobadas, para hacer con sprites propios (hojas de 6 cuadros, `golpe_espe
 - Que ningún hombre descanse: si muere un Apagado, los demás ganan velocidad.
 - Los cuarenta: una vez por pelea, los Apagados caídos se levantan con poca vida.
 - Déjenme descansar (bajo el 15% de vida): deja caer el cuenco, recibe más daño y pega el doble.
+- Veo Todo (en su furia): repite contra el grupo la última habilidad que usó el grupo.
 
 ## Historia
 
@@ -115,6 +117,10 @@ La idea que une todo es una regla de las Guardianas: "quien le pida algo va a re
 - **Título:** el logo "The Last Flame" no cambia con el idioma.
 
 ## Historial
+
+### 0.4.16
+
+- El Rey del Osario: en su furia alza un trono de huesos. Mientras tenga escudos hace llover huesos, y al romperlos se derrumba y pierde un turno.
 
 ### 0.4.15
 

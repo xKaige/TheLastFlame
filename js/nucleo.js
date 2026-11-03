@@ -261,7 +261,12 @@ const NUCLEO = (() => {
 
   function herir(t, dano, eventos, critico = false) {
     // cada golpe se lleva un escudo entero, sin importar cuánto pegue
-    if (t.escudos > 0) { t.escudos--; eventos.push({ tipo: 'escudo', quien: t, quedan: t.escudos }); return; }
+    if (t.escudos > 0) {
+      t.escudos--;
+      if (!t.escudos && t.fase.trono) t.aturdido = true;      // sin escudos se le cae el trono encima
+      eventos.push({ tipo: 'escudo', quien: t, quedan: t.escudos });
+      return;
+    }
     if (t.guardia) dano = Math.max(1, Math.round(dano / 2));
     restarVida(t, dano, eventos);
     eventos.push({ tipo: 'dano', quien: t, valor: dano, critico });
@@ -419,9 +424,11 @@ const NUCLEO = (() => {
     }
   }
 
+  const enSuTrono = u => !!(u.enfurecido && u.fase.trono && u.escudos > 0);
+
   // Si en este turno le toca el golpe a todo el grupo: la pantalla lo anuncia antes de que pase
   const haraEspecial = u => {
-    if (!u.especial || u.aturdido) return false;
+    if (!u.especial || u.aturdido || enSuTrono(u)) return false;
     if (u.enfurecido && u.fase.ciclo) return u.fase.ciclo[u.pasoFase % u.fase.ciclo.length] === 'especial';
     return (u.turnos + 1) % u.especial.cada === 0;
   };
@@ -430,6 +437,12 @@ const NUCLEO = (() => {
     const eventos = [], grupo = vivos(b.aliados);
     if (u.aturdido) { u.aturdido = false; eventos.push({ tipo: 'texto', clave: 'pierde_turno', quien: u }); return eventos; }
     u.turnos++;
+    if (enSuTrono(u)) {
+      const t = blancoEnemigo(grupo, azar), r = u.fase.trono.lluvia;
+      eventos.push({ tipo: 'texto', clave: 'especial', quien: u, texto: r.nombre }, { tipo: 'huesos', quien: t });
+      herir(t, entre(azar, ...r.dano), eventos);
+      return eventos;
+    }
     if (u.enfurecido && u.fase.ciclo) { if (habilidadDeFase(D, b, u, grupo, azar, eventos)) return eventos; }
     else if (u.especial && u.turnos % u.especial.cada === 0) { especialDeJefe(u, grupo, azar, eventos); return eventos; }
     // la muestra enseguida: muchos enemigos no duran más de un par de turnos

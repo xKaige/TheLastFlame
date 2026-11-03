@@ -1308,12 +1308,19 @@ function mostrarEvento(e) {
   }
   if (e.tipo === 'antorcha') { P.fuel = Math.max(0, P.fuel - e.valor); updateHUD(); }
   if (e.tipo === 'invoca') { for (const n of e.nuevos) { n.x = Bt.lugares[n.i]; prepararEnemigo(n); chispas(n.x, FBASE - 24, 18, MARCO.vida, -24); } sfx('encounter'); Bt.temblor = 4; }
+  if (e.tipo === 'fase' && q.fase.trono) q.tronoDesde = Bt.t;
+  if (e.tipo === 'huesos') { Bt.fx.push({ tipo: 'huesos', x: CX[q.i] + 23, y: CY, t: 0, dur: 0.5, m: 1 }); sfx('hurt'); }
   if (e.tipo === 'fase') { Bt.msg = tr(q.fase.mensaje || '{0} se enfurece y se cubre de escudos.', q.nombre); Bt.temblor = 6; Bt.destello = 0.5; sfx('encounter'); chispas(q.x, FBASE - q.tam * 0.5, 30, VIDA_ESCUDO, -24); }
   if (e.tipo === 'escudo') {
     q.golpeado = 0.2; sfx(e.quedan ? 'miss' : 'chest');
     chispas(q.x, FBASE - q.tam * 0.45, e.quedan ? 10 : 34, VIDA_ESCUDO, -30);
     Bt.msg = e.quedan ? tr('Quedan {0} escudos.', e.quedan) : tr('Se rompen los escudos de {0}.', q.nombre);
     if (!e.quedan) Bt.temblor = 5;
+    if (!e.quedan && q.tronoDesde !== undefined) {
+      q.tronoDesde = undefined; Bt.temblor = 10; Bt.destello = 0.6; sfx('encounter');
+      Bt.msg = tr('El trono se derrumba sobre {0}.', q.nombre);
+      chispas(q.x, FBASE - 40, 60, [RAMPS[S.env][5], RAMPS[S.env][4], RAMPS[S.env][3]], -60, 150);
+    }
   }
   if (e.tipo === 'texto' && e.clave === 'aturdido') Bt.msg = tr('{0} no ve nada.', q.nombre);
   if (e.tipo === 'texto' && e.clave === 'pierde_turno') Bt.msg = tr('{0} pierde el turno.', q.nombre);
@@ -1362,7 +1369,11 @@ function dibujarFx(c) {
   for (const f of Bt.fx) {
     const k = clamp(f.t / f.dur, 0, 1), cols = coloresFx(f.tipo);
     c.save(); c.translate(f.x, f.y); c.rotate(f.giro || 0); c.lineCap = 'butt';
-    if (f.tipo === 'fuego') {
+    if (f.tipo === 'huesos') {
+      // caen sobre la tarjeta del elegido
+      c.rotate(-(f.giro || 0)); c.fillStyle = RAMPS[S.env][5];
+      for (let n = 0; n < 9; n++) { const q = clamp(k * 1.7 - n * 0.08, 0, 1); if (q < 1) c.fillRect((n * 17 % 52) - 26, -150 + q * 165, 2, 7); }
+    } else if (f.tipo === 'fuego') {
       for (let n = 0; n < 3; n++) { c.fillStyle = cols[n]; const r = (10 + 26 * k) * (1 - n * 0.28) * f.m; c.beginPath(); c.arc(0, 0, r * (1 - k * 0.3), 0, Math.PI * 2); c.globalAlpha = 1 - k; c.fill(); }
     } else if (f.tipo === 'veneno') {
       c.fillStyle = cols[0]; c.globalAlpha = 1 - k;
@@ -1827,7 +1838,7 @@ function dibujarOjos(c, e) {
     return;
   }
   const an = D.enemigos[e.tipo].animacion, ojos = D.enemigos[e.tipo].ojos;
-  if (!e.enfurecido || !ojos || e.vida <= 0 || e.especialDesde !== undefined) return;
+  if (!e.enfurecido || !ojos || e.vida <= 0 || e.especialDesde !== undefined || e.tronoDesde !== undefined) return;
   const k = e.tam / an.base, x0 = e.x - e.tam / 2, y0 = FBASE - e.tam, f = 0.75 + Math.sin(Bt.t * 9) * 0.25;
   for (const [ox, oy] of ojos) {
     const x = Math.round(x0 + ox * k), y = Math.round(y0 + oy * k);
