@@ -37,7 +37,7 @@
     "velocidad": 13,
     "critico": 0.2,
     "esquiva": 0.15,
-    "doble_golpe": 0.3,
+    "doble_golpe": 0.2,
     "habilidades": [
       "punalada",
       "hoja_envenenada"

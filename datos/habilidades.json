@@ -13,7 +13,10 @@
         "estallido": 0.15
       }
     ],
-    "descripcion": "Daño doble que hace sangrar."
+    "descripcion": "Daño doble que hace sangrar.",
+    "clase": "guerrero",
+    "acumula": "usos",
+    "meta": 10
   },
   "provocar": {
     "nombre": "Provocar",
@@ -25,7 +28,10 @@
         "turnos": 2
       }
     ],
-    "descripcion": "Los enemigos te atacan a ti durante 2 turnos."
+    "descripcion": "Atraés los ataques 2 turnos, con 30% de contraatacar cada golpe.",
+    "clase": "guerrero",
+    "acumula": "contraataques",
+    "meta": 10
   },
   "punalada": {
     "nombre": "Puñalada",
@@ -35,15 +41,19 @@
       {
         "tipo": "dano",
         "mult": 1.5,
-        "critico_seguro": true,
-        "ignora_defensa": true
+        "ignora_defensa": true,
+        "con_estado": 2
       },
       {
         "tipo": "sangrado",
         "estallido": 0.2
       }
     ],
-    "descripcion": "Crítico seguro que ignora la defensa y hace sangrar."
+    "descripcion": "Ignora la defensa y pega el doble a quien sangra o está envenenado.",
+    "clase": "picaro",
+    "acumula": "usos",
+    "meta": 10,
+    "atributo": "des"
   },
   "hoja_envenenada": {
     "nombre": "Hoja Envenenada",
@@ -61,7 +71,11 @@
         "max": 5
       }
     ],
-    "descripcion": "Corta y envenena unos turnos."
+    "descripcion": "Corta y envenena unos turnos.",
+    "clase": "picaro",
+    "acumula": "veneno",
+    "meta": 60,
+    "atributo": "des"
   },
   "llama_arcana": {
     "nombre": "Llama Arcana",
@@ -80,7 +94,10 @@
         "max": 4
       }
     ],
-    "descripcion": "Fuego puro que deja al enemigo ardiendo."
+    "descripcion": "Fuego puro que deja al enemigo ardiendo.",
+    "clase": "mago",
+    "acumula": "dano",
+    "meta": 120
   },
   "tormenta": {
     "nombre": "Tormenta de Fuego",
@@ -99,7 +116,10 @@
         "max": 3
       }
     ],
-    "descripcion": "Fuego sobre todos los enemigos."
+    "descripcion": "Fuego sobre todos los enemigos.",
+    "clase": "mago",
+    "acumula": "dano",
+    "meta": 150
   },
   "sanar": {
     "nombre": "Sanar",
@@ -111,7 +131,10 @@
         "porcentaje": 0.3
       }
     ],
-    "descripcion": "Devuelve el 30% de la vida a un aliado."
+    "descripcion": "Devuelve el 30% de la vida a un aliado.",
+    "clase": "sanador",
+    "acumula": "cura",
+    "meta": 150
   },
   "bendicion": {
     "nombre": "Bendición",
@@ -127,7 +150,10 @@
         "valor": 2
       }
     ],
-    "descripcion": "Cura un poco a todos y les da +2 de defensa en esta pelea."
+    "descripcion": "Cura un poco a todos y les da +2 de defensa en esta pelea.",
+    "clase": "sanador",
+    "acumula": "cura",
+    "meta": 200
   },
   "muro_escudos": {
     "nombre": "Muro de Escudos",
@@ -144,7 +170,10 @@
       "vit": 12
     },
     "fuente": "compra",
-    "precio": 10
+    "precio": 10,
+    "clase": "sanador",
+    "acumula": "usos",
+    "meta": 12
   },
   "ultimo_aliento": {
     "nombre": "Último Aliento",
@@ -158,7 +187,10 @@
     "fuente": "jefe",
     "jefe": "reyOsario",
     "pista": "Algo así solo lo enseña quien gobierna entre huesos.",
-    "pasiva": true
+    "pasiva": true,
+    "clase": "guerrero",
+    "acumula": "golpes_heridos",
+    "meta": 15
   },
   "tajo_giratorio": {
     "nombre": "Tajo Giratorio",
@@ -176,7 +208,10 @@
       "des": 9
     },
     "fuente": "compra",
-    "precio": 14
+    "precio": 14,
+    "clase": "guerrero",
+    "acumula": "usos",
+    "meta": 10
   },
   "paso_sombra": {
     "nombre": "Paso de Sombra",
@@ -192,7 +227,10 @@
       "des": 13
     },
     "fuente": "cofre",
-    "pista": "Dicen que hay un pergamino en un cofre de la cripta."
+    "pista": "Dicen que hay un pergamino en un cofre de la cripta.",
+    "clase": "picaro",
+    "acumula": "esquivas",
+    "meta": 15
   },
   "abrir_herida": {
     "nombre": "Abrir la Herida",
@@ -213,7 +251,11 @@
       "des": 14
     },
     "fuente": "compra",
-    "precio": 12
+    "precio": 12,
+    "clase": "picaro",
+    "acumula": "usos",
+    "meta": 15,
+    "atributo": "des"
   },
   "polvo_ojos": {
     "nombre": "Polvo en los Ojos",
@@ -229,7 +271,10 @@
       "per": 13
     },
     "fuente": "cofre",
-    "pista": "Dicen que hay un pergamino en un cofre de la cripta."
+    "pista": "Dicen que hay un pergamino en un cofre de la cripta.",
+    "clase": "picaro",
+    "acumula": "usos",
+    "meta": 8
   },
   "brasa_avida": {
     "nombre": "Brasa Ávida",
@@ -248,7 +293,10 @@
       "ard": 12
     },
     "fuente": "compra",
-    "precio": 8
+    "precio": 8,
+    "clase": "mago",
+    "acumula": "usos",
+    "meta": 12
   },
   "muro_llamas": {
     "nombre": "Muro de Llamas",
@@ -265,7 +313,10 @@
       "ard": 14
     },
     "fuente": "cofre",
-    "pista": "Dicen que hay un pergamino en un cofre de la cripta."
+    "pista": "Dicen que hay un pergamino en un cofre de la cripta.",
+    "clase": "mago",
+    "acumula": "usos",
+    "meta": 15
   },
   "manos_tibias": {
     "nombre": "Manos Tibias",
@@ -282,7 +333,10 @@
       "fe": 9
     },
     "fuente": "compra",
-    "precio": 6
+    "precio": 6,
+    "clase": "sanador",
+    "acumula": "cura",
+    "meta": 80
   },
   "chispa_prestada": {
     "nombre": "Chispa Prestada",
@@ -300,7 +354,10 @@
     },
     "fuente": "jefe",
     "jefe": "cazador",
-    "pista": "Quien guió al rey hasta el fuego sabe cómo prestarlo."
+    "pista": "Quien guió al rey hasta el fuego sabe cómo prestarlo.",
+    "clase": "sanador",
+    "acumula": "usos",
+    "meta": 10
   },
   "gracia": {
     "nombre": "Gracia",
@@ -317,7 +374,10 @@
       "fe": 16
     },
     "fuente": "compra",
-    "precio": 16
+    "precio": 16,
+    "clase": "sanador",
+    "acumula": "cura",
+    "meta": 250
   },
   "milagro": {
     "nombre": "Milagro",
@@ -334,7 +394,10 @@
       "fe": 20
     },
     "fuente": "compra",
-    "precio": 24
+    "precio": 24,
+    "clase": "sanador",
+    "acumula": "cura",
+    "meta": 300
   },
   "lanza_ignea": {
     "nombre": "Lanza Ígnea",
@@ -358,7 +421,10 @@
       "ard": 16
     },
     "fuente": "compra",
-    "precio": 16
+    "precio": 16,
+    "clase": "mago",
+    "acumula": "dano",
+    "meta": 200
   },
   "incendio": {
     "nombre": "Incendio",
@@ -382,6 +448,208 @@
       "ard": 20
     },
     "fuente": "compra",
-    "precio": 24
+    "precio": 24,
+    "clase": "mago",
+    "acumula": "dano",
+    "meta": 250
+  },
+  "quebrantar": {
+    "nombre": "Quebrantar",
+    "costo": 2,
+    "objetivo": "enemigo",
+    "efectos": [
+      {
+        "tipo": "dano",
+        "mult": 1.2
+      },
+      {
+        "tipo": "quebrar",
+        "turnos": 3
+      }
+    ],
+    "descripcion": "Pega y baja 30% la defensa del enemigo por 3 turnos.",
+    "requisito": {
+      "fue": 16
+    },
+    "fuente": "compra",
+    "precio": 12,
+    "clase": "guerrero",
+    "acumula": "usos",
+    "meta": 10
+  },
+  "golpe_final": {
+    "nombre": "Golpe Final",
+    "costo": 1,
+    "gasta_todo": true,
+    "objetivo": "enemigo",
+    "efectos": [
+      {
+        "tipo": "dano",
+        "mult_por_impetu": 1.5
+      }
+    ],
+    "descripcion": "Gasta todo el Ímpetu: daño ×1,5 por cada punto.",
+    "requisito": {
+      "fue": 18
+    },
+    "fuente": "compra",
+    "precio": 18,
+    "clase": "guerrero",
+    "acumula": "impetu",
+    "meta": 30
+  },
+  "piel_hierro": {
+    "nombre": "Piel de Hierro",
+    "pasiva": true,
+    "costo": 0,
+    "objetivo": "propio",
+    "efectos": [],
+    "descripcion": "Pasiva. Recibís 6% menos de daño.",
+    "fuente": "compra",
+    "precio": 10,
+    "requisito": {
+      "vit": 14
+    },
+    "clase": "guerrero",
+    "acumula": "recibido",
+    "meta": 150
+  },
+  "represalia": {
+    "nombre": "Represalia",
+    "pasiva": true,
+    "costo": 0,
+    "objetivo": "propio",
+    "efectos": [],
+    "descripcion": "Pasiva. 25% de ganar 1 de Ímpetu al recibir un golpe.",
+    "fuente": "compra",
+    "precio": 10,
+    "requisito": {
+      "vit": 14
+    },
+    "clase": "guerrero",
+    "acumula": "golpes_recibidos",
+    "meta": 30
+  },
+  "muro_viviente": {
+    "nombre": "Muro Viviente",
+    "pasiva": true,
+    "costo": 0,
+    "objetivo": "propio",
+    "efectos": [],
+    "descripcion": "Pasiva. Los aliados con menos vida que vos reciben 8% menos de daño.",
+    "fuente": "compra",
+    "precio": 16,
+    "requisito": {
+      "vit": 18
+    },
+    "clase": "guerrero",
+    "acumula": "evitado",
+    "meta": 100
+  },
+  "danza_cuchillas": {
+    "nombre": "Danza de Cuchillas",
+    "costo": 3,
+    "objetivo": "propio",
+    "efectos": [
+      {
+        "tipo": "golpes",
+        "cantidad": 3,
+        "mult": 0.6
+      }
+    ],
+    "descripcion": "Tres golpes rápidos a enemigos al azar.",
+    "requisito": {
+      "des": 18
+    },
+    "fuente": "compra",
+    "precio": 16,
+    "clase": "picaro",
+    "acumula": "usos",
+    "meta": 8,
+    "atributo": "des"
+  },
+  "sangre_fria": {
+    "nombre": "Sangre Fría",
+    "pasiva": true,
+    "costo": 0,
+    "objetivo": "propio",
+    "efectos": [],
+    "descripcion": "Pasiva. +5% de crítico contra enemigos con estados.",
+    "fuente": "compra",
+    "precio": 10,
+    "requisito": {
+      "des": 16
+    },
+    "clase": "picaro",
+    "acumula": "criticos",
+    "meta": 25
+  },
+  "oportunista": {
+    "nombre": "Oportunista",
+    "pasiva": true,
+    "costo": 0,
+    "objetivo": "propio",
+    "efectos": [],
+    "descripcion": "Pasiva. +20% de daño a quien todavía no actuó.",
+    "fuente": "compra",
+    "precio": 12,
+    "requisito": {
+      "per": 15
+    },
+    "clase": "picaro",
+    "acumula": "extra",
+    "meta": 100
+  },
+  "detonar": {
+    "nombre": "Detonar",
+    "costo": 2,
+    "objetivo": "enemigo",
+    "efectos": [
+      {
+        "tipo": "detonar",
+        "mult": 2
+      }
+    ],
+    "descripcion": "Consume la quemadura del enemigo y hace el doble de lo que le quedaba.",
+    "requisito": {
+      "ard": 15
+    },
+    "fuente": "compra",
+    "precio": 12,
+    "clase": "mago",
+    "acumula": "dano",
+    "meta": 150
+  },
+  "combustion": {
+    "nombre": "Combustión",
+    "pasiva": true,
+    "costo": 0,
+    "objetivo": "propio",
+    "efectos": [],
+    "descripcion": "Pasiva. Tus quemaduras hacen 15% más.",
+    "fuente": "compra",
+    "precio": 12,
+    "requisito": {
+      "ard": 16
+    },
+    "clase": "mago",
+    "acumula": "quemadura",
+    "meta": 120
+  },
+  "fe_inquebrantable": {
+    "nombre": "Fe Inquebrantable",
+    "pasiva": true,
+    "costo": 0,
+    "objetivo": "propio",
+    "efectos": [],
+    "descripcion": "Pasiva. Al curar, ganás +2 de defensa en esta pelea.",
+    "fuente": "compra",
+    "precio": 10,
+    "requisito": {
+      "fe": 15
+    },
+    "clase": "sanador",
+    "acumula": "curaciones",
+    "meta": 30
   }
 }

@@ -2,7 +2,7 @@
 
 El camino del juego es la expedición de grupo. El plan del juego anterior está en `juego_viejo/ROADMAP.md`.
 
-**Versión actual: 0.4.29.** Lo próximo: 0.5.0.
+**Versión actual: 0.4.30.** Lo próximo: 0.5.0.
 
 ## Cómo se numeran las versiones
 
@@ -22,12 +22,8 @@ Cada parche sube la versión en `package.json` y en `index.html`, y se anota ac�
 
 ### 0.6.0: Habilidades
 
-- Cada habilidad es de una clase: unas 6 u 8 para elegir, y se llevan hasta 4.
-- Las habilidades suben de nivel con el uso, del 1 al 5, y en el 5 se transforman.
-- Cada habilidad escala con su atributo.
-- Guerrero: más pasivas y pocas activas, pero devastadoras. Provocar da chance de contraatacar al recibir golpes.
-- Pícaro: Puñalada deja de ser crítico seguro; pega más fuerte a quien sangra o está envenenado.
-- Hace falta antes que las runas, porque se apoyan en este sistema.
+- Ya está en el juego (0.4.30): habilidades por clase, niveles con tope por zona y efectos nuevos.
+- Falta: las transformaciones de los niveles 5 y 10 (`HABILIDADES.md`). Necesitan la zona 4 en adelante.
 
 ### 0.7.0: Runas
 
@@ -117,6 +113,13 @@ La idea que une todo es una regla de las Guardianas: "quien le pida algo va a re
 - **Título:** el logo "The Last Flame" no cambia con el idioma.
 
 ## Historial
+
+### 0.4.30
+
+- Sistema de habilidades: cada clase tiene las suyas, y suben de nivel con el uso, con tope por zona.
+- Habilidades nuevas: Quebrantar, Golpe Final, Piel de Hierro, Represalia, Muro Viviente, Danza de Cuchillas, Sangre Fría, Oportunista, Detonar, Combustión y Fe Inquebrantable.
+- Provocar da chance de contraatacar.
+- Pícaro: Puñalada deja de ser crítico seguro y pega el doble a enemigos con estados. Baja su doble golpe.
 
 ### 0.4.29
 

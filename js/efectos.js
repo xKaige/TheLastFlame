@@ -55,6 +55,10 @@ const FX_HABILIDAD = {
   } },
   // las curas y el fuego más fuertes usan el dibujo de los comunes
   get gracia() { return this.sanar; },
+  get quebrantar() { return this.golpe_brutal; },
+  get golpe_final() { return this.abrir_herida; },
+  get danza_cuchillas() { return this.tajo_giratorio; },
+  get detonar() { return this.brasa_avida; },
   get milagro() { return this.bendicion; },
   get lanza_ignea() { return this.llama_arcana; },
   get incendio() { return this.tormenta; },

@@ -9,6 +9,7 @@ const PJ = { lista: [], i: 0, tab: 0, sel: 0, sub: null, prev: 'explore', edita:
 
 function abrirPersonajes(lista, edita) {
   if (!lista.length) return;
+  for (const q of lista) q.habilidades = q.habilidades.filter(id => D.habilidades[id].clase === q.clase);    // las de antes se compartían entre clases
   Object.assign(PJ, { lista, i: 0, tab: 0, sel: 0, sub: null, info: false, prev: S.mode, edita });
   S.mode = 'xpj';
   $('personajes').classList.remove('hidden');
@@ -44,13 +45,19 @@ function cerrarPersonajes() {
 
 const textoBonos = o => [...Object.entries(o.bonos).map(([k, v]) => `${v > 0 ? '+' : '−'}${Math.abs(v)} ${(REGLAS_ATR.nombres[k] || k).toUpperCase().slice(0, 3)}`), ...(o.magico ? [tr('ATQ +{0}% INT', Math.round(o.magico * 100))] : [])].join(' · ');
 const nombreObjeto = o => `${o.rareza === 'rara' ? '✦ ' : ''}${o.nombre}`;
+const COMO_SUBE = { usos: 'Sube al usarla', dano: 'Sube con el daño hecho', cura: 'Sube con la vida curada', impetu: 'Sube con el Ímpetu gastado', recibido: 'Sube con el daño recibido', golpes_recibidos: 'Sube con los golpes recibidos', golpes_heridos: 'Sube pegando con poca vida', evitado: 'Sube con el daño evitado', contraataques: 'Sube al contraatacar', veneno: 'Sube con el daño de veneno', esquivas: 'Sube al esquivar', criticos: 'Sube con los críticos', extra: 'Sube con el daño extra', quemadura: 'Sube con el daño de quemaduras', curaciones: 'Sube al curar' };
+function textoMaestria(p, id) {
+  const m = NUCLEO.maestria(p, id), tope = NUCLEO.topeMaestria(PJ.lista === X.grupo ? S.floor : X.memoria.hondo), h = D.habilidades[id];
+  if (m.nivel >= tope) return tr('Nivel {0}: máximo de esta zona.', m.nivel);
+  return tr('Nivel {0}. {1}: {2}/{3}.', m.nivel, tr(COMO_SUBE[h.acumula]), Math.floor(m.valor), NUCLEO.metaMaestria(D, id, m.nivel));
+}
 const textoRequisito = h => Object.entries(h.requisito || {}).map(([k, v]) => `${REGLAS_ATR.nombres[k]} ${v}`).join(' · ');
 // Lo que se gasta también se ve en la mochila, primero que el resto
 const CONSUMIBLES = {
   potions: { nombre: 'Poción', descripcion: 'Cura un 40% al aliado más herido.', accion: 'potion' },
   oil: { nombre: 'Aceite', descripcion: 'Aviva la antorcha.', accion: 'oil' },
 };
-const habilidadesConocidas = p => [...D.clases[p.clase].habilidades, ...X.grimorio.filter(id => !D.clases[p.clase].habilidades.includes(id))];
+const habilidadesConocidas = p => [...D.clases[p.clase].habilidades, ...X.grimorio.filter(id => D.habilidades[id].clase === p.clase && !D.clases[p.clase].habilidades.includes(id))];
 
 // Lo que se puede elegir en la pestaña abierta
 function filasTab() {
@@ -102,9 +109,9 @@ function pintarPj() {
     const h = filas[PJ.sel] && D.habilidades[filas[PJ.sel].hab];
     const lista = filas.map(f => {
       const x = D.habilidades[f.hab], lleva = p.habilidades.includes(f.hab), puede = NUCLEO.cumpleRequisito(D, p, f.hab);
-      return `<div class="pitem${elegida(f) ? ' sel' : ''}${puede ? '' : ' no'}"><span>${lleva ? '✦ ' : ''}${x.nombre}</span><em>${x.pasiva ? tr('Pasiva') : '◆'.repeat(x.costo)}</em></div>`;
+      return `<div class="pitem${elegida(f) ? ' sel' : ''}${puede ? '' : ' no'}"><span>${lleva ? '✦ ' : ''}${x.nombre}</span><em>${tr('Nv {0}', NUCLEO.maestria(p, f.hab).nivel)} · ${x.pasiva ? tr('Pasiva') : '◆'.repeat(x.costo)}</em></div>`;
     }).join('');
-    const detalle = h ? `<div class="pnom2">${h.nombre}</div><div class="pdesc">${h.descripcion}</div>${h.pasiva ? '' : `<div class="pdesc">${tr('Costo')}: ${'◆'.repeat(h.costo)}</div>`}${h.requisito ? `<div class="pdesc ${NUCLEO.cumpleRequisito(D, p, filas[PJ.sel].hab) ? '' : 'no'}">Requiere ${textoRequisito(h)}</div>` : ''}${PJ.edita ? '' : `<div class="pdesc nota">${tr('Sólo se cambian en el Hogar o en un santuario.')}</div>`}` : '';
+    const detalle = h ? `<div class="pnom2">${h.nombre}</div><div class="pdesc">${h.descripcion}</div>${h.pasiva ? '' : `<div class="pdesc">${tr('Costo')}: ${'◆'.repeat(h.costo)}</div>`}<div class="pdesc">${textoMaestria(p, filas[PJ.sel].hab)}</div>${h.requisito ? `<div class="pdesc ${NUCLEO.cumpleRequisito(D, p, filas[PJ.sel].hab) ? '' : 'no'}">Requiere ${textoRequisito(h)}</div>` : ''}${PJ.edita ? '' : `<div class="pdesc nota">${tr('Sólo se cambian en el Hogar o en un santuario.')}</div>`}` : '';
     centro = `${panel('Conocidas', `lleva ${p.habilidades.length} de ${D.mazmorra.max_habilidades}`, `<div class="plista">${lista}</div>`, 'patrs')}<div class="pcol">${panel('Detalle', '', detalle, 'plleno')}</div>`;
   } else {
     const f0 = filas[PJ.sel], o = f0 && D.objetos[f0.obj], con = f0 && CONSUMIBLES[f0.cons];
@@ -232,6 +239,7 @@ function darObjeto(jefe = false) {
 }
 
 const sinDesbloquear = fuente => Object.keys(D.habilidades).filter(id => D.habilidades[id].fuente === fuente && !X.grimorio.includes(id));
+const deClase = h => (h.clase ? ` · ${D.clases[h.clase].nombre}` : '');
 
 function abrirGrimorio() {
   const m = { title: 'Grimorio', cls: 'altar', items: [] };
@@ -239,8 +247,8 @@ function abrirGrimorio() {
     m.text = tr('Lo que encuentres queda acá para siempre. Ceniza: <b>{0}</b>', X.ceniza);
     m.items = Object.keys(D.habilidades).filter(id => D.habilidades[id].fuente).map(id => {
       const h = D.habilidades[id], tiene = X.grimorio.includes(id), req = h.requisito ? tr(' Requiere {0}.', textoRequisito(h)) : '';
-      if (tiene) return { label: h.nombre, sub: `${h.descripcion}${req}`, fn: () => {} };
-      if (h.fuente === 'compra') return { label: tr('{0} <small>· {1} de Ceniza</small>', h.nombre, h.precio), sub: `${h.descripcion}${req}`, off: X.ceniza < h.precio, fn: () => { X.ceniza -= h.precio; desbloquear(id); sfx('level'); m.refresh(); renderMenu(); } };
+      if (tiene) return { label: `${h.nombre}<small>${deClase(h)}</small>`, sub: `${h.descripcion}${req}`, fn: () => {} };
+      if (h.fuente === 'compra') return { label: tr('{0} <small>· {1} de Ceniza{2}</small>', h.nombre, h.precio, deClase(h)), sub: `${h.descripcion}${req}`, off: X.ceniza < h.precio, fn: () => { X.ceniza -= h.precio; desbloquear(id); sfx('level'); m.refresh(); renderMenu(); } };
       return { label: '???', sub: h.pista, off: true, fn: () => {} };
     });
   };

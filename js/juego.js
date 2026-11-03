@@ -335,6 +335,7 @@ function grupoDePrueba(piso) {
     const propios = Object.keys(D.clases[p.clase].crecimiento);
     for (let i = 0; p.puntos; i++) NUCLEO.subirAtributo(D, p, propios[i % propios.length]);
     p.vida = p.vidaMax;
+    for (const id of Object.keys(D.habilidades)) if (D.habilidades[id].clase === p.clase) NUCLEO.maestria(p, id).nivel = NUCLEO.topeMaestria(piso);
   }
   X.sel = X.plantel.slice();
 }
@@ -1229,7 +1230,7 @@ function prepararEnemigo(e) {
 
 function iniciarPelea(ent, ids, entrada = 0.95, emboscada = false) {
   const b = NUCLEO.iniciarBatalla(D, X.grupo, ids, emboscada);
-  b.antorcha = P.fuel;
+  b.antorcha = P.fuel; b.piso = S.floor;
   if (S.flags.impetu) { for (const u of b.aliados) u.impetu = Math.min(NUCLEO.IMP_TOPE, u.impetu + S.flags.impetu); delete S.flags.impetu; }
   const fx = ids.length === 1 ? [240] : ids.length === 2 ? [190, 290] : ids.some(id => D.enemigos[id].tam_batalla) ? [92, 240, 388] : FX3;   // un jefe grande necesita lugar
   for (const e of b.enemigos) { e.x = fx[e.i]; prepararEnemigo(e); }
@@ -1271,6 +1272,7 @@ function siguiente() {
 // Convierte los eventos del núcleo en números, mensajes y efectos. Cada golpe a un enemigo se muestra
 // por separado, así el doble golpe del Pícaro se ve como dos impactos.
 function mostrar(eventos) {
+  eventos = eventos.concat(NUCLEO.sacarAvisos());
   let espera = 0;
   for (const e of eventos) {
     const uno = () => { if (Bt) { mostrarEvento(e); pintarBatalla(); } };
@@ -1328,6 +1330,10 @@ function mostrarEvento(e) {
     const r = e.desde.hojaActiva;
     if (r) Bt.fx.push({ tipo: 'cadena', x: e.desde.x - e.desde.tam / 2 - r.margen + r.cadena[0], y: FBASE - e.desde.tam - r.margen + r.cadena[1], hx: CX[q.i] + 23, hy: CY + 10, t: 0, dur: 0.6, m: 1 });
   }
+  if (e.tipo === 'maestria') { numero(CX[q.i] + 26, CY - 16, tr('Nv {0}', e.nivel), 'heal'); sfx('level'); Bt.msg = tr('{0}: {1} sube a nivel {2}.', q.nombre, e.habilidad, e.nivel); }
+  if (e.tipo === 'texto' && e.clave === 'contraataque') Bt.msg = tr('{0} contraataca.', q.nombre);
+  if (e.tipo === 'texto' && e.clave === 'quebrado') Bt.msg = tr('{0} queda con la defensa rota.', q.nombre);
+  if (e.tipo === 'texto' && e.clave === 'sin_quemadura') Bt.msg = tr('{0} no está ardiendo.', q.nombre);
   if (e.tipo === 'huesos') { Bt.fx.push({ tipo: 'huesos', x: CX[q.i] + 23, y: CY, t: 0, dur: 0.5, m: 1 }); sfx('hurt'); }
   if (e.tipo === 'fase') { Bt.msg = tr(q.fase.mensaje || '{0} se enfurece y se cubre de escudos.', q.nombre); Bt.temblor = 6; Bt.destello = 0.5; sfx('encounter'); chispas(q.x, FBASE - q.tam * 0.5, 30, VIDA_ESCUDO, -24); }
   if (e.tipo === 'escudo') {
