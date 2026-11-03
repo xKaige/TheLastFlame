@@ -706,6 +706,8 @@ window.enterLevel = (floor, level) => {
   if (level > 0 && !D.mazmorra.niveles.includes(level)) level = D.mazmorra.niveles.find(n => n > level);
   aplicarTexturas();
   baseX.enterLevel(floor, level);
+  // sin luz y sin aceite no se puede seguir jugando: cada piso nuevo deja al menos un frasco a mano
+  if (level > 0 && P.fuel <= 25 && !P.oil) { P.oil = 1; log('Al pie de la escalera hay un frasco de aceite.', 'good'); }
   const w = W_();
   w.ents = w.ents.filter(e => !['event', 'reliquary', 'merchant'].includes(e.type));
   decorarMuros(w, level);
@@ -889,7 +891,8 @@ window.openChest = c => {
   if (c.open) { log('El cofre está vacío.'); sfx('bump'); return; }
   c.open = true; sfx('chest');
   const r = azarX(), lista = sinDesbloquear('cofre');
-  if (lista.length && azarX() < D.mazmorra.botin.habilidad) {
+  if (P.fuel <= 40 && !P.oil) { P.oil = 1; log('Encuentras un frasco de aceite.', 'good'); }
+  else if (lista.length && azarX() < D.mazmorra.botin.habilidad) {
     const id = lista[Math.floor(azarX() * lista.length)];
     desbloquear(id); sfx('level'); log(tr('Un pergamino: {0} queda en el Grimorio.', D.habilidades[id].nombre), 'em');
   } else if (azarX() < D.mazmorra.botin.objeto) {
@@ -1513,6 +1516,7 @@ function terminarPelea(gano) {
   if (ent.def.boss && S.floor < LAST_FLOOR) { W_().map[ent.y * MW + ent.x] = 2; W_().explored[ent.y * MW + ent.x] = 1; }   // se abre la bajada
   const exp = b.enemigos.reduce((n, e) => n + e.exp, 0);
   const hallado = soltarBotin(ent.def.boss);
+  if (azarX() < D.mazmorra.botin.aceite && P.oil < BAL.maxOil) { P.oil++; log('Encuentras un frasco de aceite.', 'good'); updateHUD(); }
   for (const id of sinDesbloquear('jefe')) if (b.enemigos.some(e => e.tipo === D.habilidades[id].jefe)) { desbloquear(id); log(tr('{0} queda en el Grimorio.', D.habilidades[id].nombre), 'em'); }
   X.ceniza += Math.round((ent.def.boss ? D.mazmorra.ceniza.por_jefe : D.mazmorra.ceniza.por_grupo) * porGrupo('ceniza'));
   const tope = NUCLEO.topeNivel(D, S.floor);

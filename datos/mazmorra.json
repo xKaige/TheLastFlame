@@ -517,6 +517,7 @@
     "habilidad": 0.25,
     "enemigo": 0.3,
     "rara": 0.2,
-    "rara_jefe": 0.7
+    "rara_jefe": 0.7,
+    "aceite": 0.15
   }
 }

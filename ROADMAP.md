@@ -2,7 +2,7 @@
 
 El camino del juego es la expedición de grupo. El plan del juego anterior está en `juego_viejo/ROADMAP.md`.
 
-**Versión actual: 0.4.26.** Lo próximo: 0.5.0.
+**Versión actual: 0.4.27.** Lo próximo: 0.5.0.
 
 ## Cómo se numeran las versiones
 
@@ -108,6 +108,10 @@ La idea que une todo es una regla de las Guardianas: "quien le pida algo va a re
 - **Título:** el logo "The Last Flame" no cambia con el idioma.
 
 ## Historial
+
+### 0.4.27
+
+- Aceite: 15% de encontrar un frasco tras cada pelea, los cofres lo aseguran con poca luz, y un piso nuevo deja un frasco si no te queda nada.
 
 ### 0.4.26
 
