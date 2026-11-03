@@ -37,29 +37,11 @@ const FX_HABILIDAD = {
   llama_arcana: { pixel: 'meteoro', corta: 1.5, adelanto: 0.42 },
   // el piso se abre y sube una columna de fuego bajo cada enemigo, de a una
   tormenta: { pixel: 'pilar', corta: 1.5 },
-  // cruces de luz que suben
-  sanar: { dur: 0.6, dibujar(c, k) {
-    c.fillStyle = COL_FX.luz; c.globalAlpha = 1 - k;
-    for (let n = 0; n < 5; n++) { const x = -18 + n * 9, y = 18 - (k * 40 + (n % 2) * 12); c.fillRect(x - 1, y - 4, 3, 9); c.fillRect(x - 4, y - 1, 9, 3); }
-  } },
-  // una columna de luz baja sobre cada uno
-  bendicion: { dur: 0.7, dibujar(c, k) {
-    const a = Math.sin(k * Math.PI), w = 34 * a;
-    c.fillStyle = COL_FX.luz; c.globalAlpha = a * 0.35; c.fillRect(-w / 2, -240, w, 280);
-    c.globalAlpha = a; c.fillRect(-1, -240, 2, 280);
-  } },
-  // un escudo se arma delante de cada uno
-  muro_escudos: { dur: 0.6, dibujar(c, k) {
-    const a = Math.min(1, k * 3); c.globalAlpha = 1 - k * k; c.strokeStyle = COL_FX.hueso; c.lineWidth = 2;
-    c.beginPath(); c.moveTo(-22 * a, -22); c.lineTo(22 * a, -22); c.lineTo(22 * a, 4); c.lineTo(0, 26 * a); c.lineTo(-22 * a, 4); c.closePath(); c.stroke();
-  } },
   // las curas y el fuego más fuertes usan el dibujo de los comunes
-  get gracia() { return this.sanar; },
   get quebrantar() { return this.golpe_brutal; },
   get golpe_final() { return this.abrir_herida; },
   get danza_cuchillas() { return this.tajo_giratorio; },
   get detonar() { return this.brasa_avida; },
-  get milagro() { return this.bendicion; },
   get lanza_ignea() { return this.llama_arcana; },
   get incendio() { return this.tormenta; },
   // una cruz de sangre que crece y estalla
@@ -97,18 +79,14 @@ const FX_HABILIDAD = {
   } },
   // un anillo de fuego corre por el piso y separa al grupo de los enemigos
   muro_llamas: { pixel: 'anillo', corta: 2, x: 240, y: 14, opciones: { reach: 215 } },
-  // dos arcos tibios que se cierran
-  manos_tibias: { dur: 0.6, dibujar(c, k) {
-    const d = (1 - k) * 26; c.strokeStyle = COL_FX.brasa; c.lineWidth = 3; c.globalAlpha = Math.sin(k * Math.PI);
-    arco(c, -d, 0, 18, -1.2, 1.2); arco(c, d, 0, 18, Math.PI - 1.2, Math.PI + 1.2);
-  } },
-  // una chispa viaja desde quien la presta hasta el otro
-  chispa_prestada: { dur: 0.5, dibujar(c, k, m, t, f) {
-    const q = clamp(k * 1.3, 0, 1), x = (f.desdeX || 0) * (1 - q), y = (f.desdeY || 0) * (1 - q) - Math.sin(q * Math.PI) * 30;
-    c.fillStyle = COL_FX.luz; circulo(c, x, y, 3); c.fillStyle = COL_FX.fuego;
-    for (let n = 1; n < 5; n++) { const p = Math.max(0, q - n * 0.05); c.fillRect((f.desdeX || 0) * (1 - p) - 1, (f.desdeY || 0) * (1 - p) - Math.sin(p * Math.PI) * 30, 2, 2); }
-    if (k > 0.75) { c.globalAlpha = (1 - k) * 4; c.strokeStyle = COL_FX.luz; c.lineWidth = 2; arco(c, 0, 0, (k - 0.75) * 120, 0, Math.PI * 2); }
-  } },
+  // las curas: luz dorada de pixelfx sobre la tarjeta de cada uno
+  sanar: { pixel: 'cura', corta: 1.6 },
+  manos_tibias: { pixel: 'cura', corta: 1.3 },
+  gracia: { pixel: 'resurreccion', corta: 2.2 },
+  bendicion: { pixel: 'bendicion', corta: 1.5 },
+  milagro: { pixel: 'pilar_luz', corta: 2.2, sobre: 'grupo' },
+  muro_escudos: { pixel: 'escudo', corta: 1.4 },
+  chispa_prestada: { pixel: 'plumas', corta: 1.6, alto: -18 },
 };
 
 // Dónde pega: al centro de cada blanco de la habilidad
@@ -116,7 +94,12 @@ function lanzarEfecto(id, u, t) {
   const fx = FX_HABILIDAD[id], b = Bt.b, h = D.habilidades[id];
   if (!fx) return;
   const blancos = { enemigo: [t], enemigos: NUCLEO.vivos(b.enemigos), aliado: [t], aliados: NUCLEO.vivos(b.aliados), propio: [u] }[h.objetivo];
-  if (fx.pixel) { blancos.forEach((q, n) => later(n * 140, () => { if (Bt) fuegoPixel(fx, fx.x ?? q.x); })); return; }
+  if (fx.pixel) {
+    // sobre el enemigo nace del piso; sobre el grupo, del borde de arriba de su tarjeta
+    const donde = q => (fx.sobre === 'grupo' ? [240, CY + 4] : fx.x !== undefined ? [fx.x, FBASE + (fx.y || 0)] : q.enemigo ? [q.x, FBASE] : [CX[q.i] + 23, CY + 4 + (fx.alto || 0)]);
+    (fx.sobre === 'grupo' ? [u] : blancos).forEach((q, n) => later(n * 140, () => { if (Bt) efectoPixel(fx, ...donde(q)); }));
+    return;
+  }
   const lugar = q => (q.enemigo ? { x: q.x, y: FBASE - q.tam * 0.45, m: q.tam / FTAM } : { x: CX[q.i] + 23, y: CY + 23, m: 1 });
   const o = lugar(u);
   for (const q of blancos) {
@@ -148,9 +131,9 @@ function golpePixel(id, q) {
   Bt.fxPixel.push(f);
 }
 
-// El fuego es el único acento fijo del juego: conserva su color en todas las zonas
-function fuegoPixel(fx, x) {
-  const f = PIXELFX.createFx(PIXELFX.EFECTOS[fx.pixel], { x, y: FBASE + (fx.y || 0), seed: 1 + Math.floor(azarX() * 9999), ...fx.opciones });
+// El fuego y la luz de las curas conservan su color en todas las zonas
+function efectoPixel(fx, x, y) {
+  const f = PIXELFX.createFx(PIXELFX.EFECTOS[fx.pixel], { x, y, seed: 1 + Math.floor(azarX() * 9999), ...fx.opciones });
   f.corta = fx.corta;
   if (fx.adelanto) f.update(fx.adelanto);
   Bt.fxPixel.push(f);
