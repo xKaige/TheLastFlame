@@ -226,7 +226,7 @@ function soltarBotin(jefe) {
 }
 // Todo objeto que encuentra el grupo pasa por acá
 function darObjeto(jefe = false) {
-  const tenidos = [...X.mochila, ...[...X.plantel, ...X.grupo].flatMap(p => Object.values(p.equipo))], id = NUCLEO.elegirObjeto(D, azarX, tenidos, jefe);
+  const tenidos = [...X.mochila, ...[...X.plantel, ...X.grupo].flatMap(p => Object.values(p.equipo))], id = NUCLEO.elegirObjeto(D, azarX, tenidos, jefe, S.floor);
   X.mochila.push(id); guardarX();
   return D.objetos[id];
 }

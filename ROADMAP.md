@@ -2,7 +2,7 @@
 
 El camino del juego es la expedición de grupo. El plan del juego anterior está en `juego_viejo/ROADMAP.md`.
 
-**Versión actual: 0.4.25.** Lo próximo: 0.5.0.
+**Versión actual: 0.4.26.** Lo próximo: 0.5.0.
 
 ## Cómo se numeran las versiones
 
@@ -95,7 +95,7 @@ La idea que une todo es una regla de las Guardianas: "quien le pida algo va a re
 - **Nombres:** lo que acá se llama zona, en el código es `piso` (`pisos` en `datos/mazmorra.json`), y lo que acá se llama piso, en el código es `nivel`.
 - **Nivel máximo:** cada zona sube el tope 10 niveles: 10, 20, 30... hasta 90 en la zona 9 (`zonas` en `datos/mazmorra.json`). En una zona ya superada el personaje no gana experiencia.
 - **Continuar:** la expedición se guarda sola explorando, nunca en medio de una pelea. Morir no se deshace cerrando el juego.
-- **Botín:** los objetos raros (✦) salen el 20% de las veces, y el 70% si los suelta un jefe (`botin` en `datos/mazmorra.json`).
+- **Botín:** los objetos raros (✦) salen el 20% de las veces, y el 70% si los suelta un jefe (`botin` en `datos/mazmorra.json`). No aparecen antes de la zona 2 (`zona` en `datos/objetos.json`).
 - **Personajes:** no hay protagonistas fijos. Son al azar, se conocen entre sí, y la historia importante está en notas por la mazmorra.
 - **Encuentros:** el enemigo del mapa siempre está en la pelea, en el centro. Los acompañantes salen de los grupos del piso.
 - **Enemigos:** ninguno pelea igual; cada uno tiene al menos una habilidad propia, y cada jefe, una fase de furia distinta.
@@ -108,6 +108,11 @@ La idea que une todo es una regla de las Guardianas: "quien le pida algo va a re
 - **Título:** el logo "The Last Flame" no cambia con el idioma.
 
 ## Historial
+
+### 0.4.26
+
+- Armas mágicas más parejas: suman del 25% al 45% del Intelecto al ataque.
+- Los objetos raros salen desde la zona 2, y las armas raras piden más atributos.
 
 ### 0.4.25
 

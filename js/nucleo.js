@@ -103,8 +103,8 @@ const NUCLEO = (() => {
   }
 
   // Botín: lo que el grupo todavía no tiene sale antes que lo repetido. Si no queda de esa rareza, sale de cualquiera.
-  function elegirObjeto(D, azar, tenidos, jefe) {
-    const rara = azar() < D.mazmorra.botin[jefe ? 'rara_jefe' : 'rara'], todos = Object.keys(D.objetos), nuevos = todos.filter(id => !tenidos.includes(id));
+  function elegirObjeto(D, azar, tenidos, jefe, piso = 1) {
+    const rara = azar() < D.mazmorra.botin[jefe ? 'rara_jefe' : 'rara'], todos = Object.keys(D.objetos).filter(id => (D.objetos[id].zona || 1) <= piso), nuevos = todos.filter(id => !tenidos.includes(id));
     const pool = nuevos.length ? nuevos : todos, deRareza = pool.filter(id => (D.objetos[id].rareza === 'rara') === rara);
     return elegir(azar, deRareza.length ? deRareza : pool);
   }

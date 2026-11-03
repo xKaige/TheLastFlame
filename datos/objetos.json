@@ -43,7 +43,7 @@
       "int": 14,
       "ard": 13
     },
-    "magico": 0.5
+    "magico": 0.3
   },
   "cota_malla": {
     "nombre": "Cota de Malla",
@@ -126,7 +126,7 @@
       "int": 12,
       "fe": 13
     },
-    "magico": 0.4
+    "magico": 0.25
   },
   "hacha_verdugo": {
     "nombre": "Hacha del Verdugo",
@@ -141,9 +141,10 @@
       "guerrero"
     ],
     "requisito": {
-      "fue": 18,
-      "vit": 16
-    }
+      "fue": 22,
+      "vit": 20
+    },
+    "zona": 2
   },
   "estoque_negro": {
     "nombre": "Estoque Negro",
@@ -158,9 +159,10 @@
       "picaro"
     ],
     "requisito": {
-      "des": 18,
-      "per": 15
-    }
+      "des": 22,
+      "per": 18
+    },
+    "zona": 2
   },
   "cetro_agrietado": {
     "nombre": "Cetro Agrietado",
@@ -175,10 +177,11 @@
       "mago"
     ],
     "requisito": {
-      "int": 18,
-      "ard": 16
+      "int": 22,
+      "ard": 20
     },
-    "magico": 0.8
+    "magico": 0.45,
+    "zona": 2
   },
   "jubon_cuero": {
     "nombre": "Jubón de Cuero",
@@ -206,7 +209,8 @@
       "des": -2
     },
     "descripcion": "Lo que no te mata te hace más lento.",
-    "rareza": "rara"
+    "rareza": "rara",
+    "zona": 2
   },
   "manto_ceniza": {
     "nombre": "Manto de Ceniza",
@@ -216,7 +220,8 @@
       "ard": 2
     },
     "descripcion": "Se deshace un poco con cada paso, y nunca se termina.",
-    "rareza": "rara"
+    "rareza": "rara",
+    "zona": 2
   },
   "diente_rata": {
     "nombre": "Collar de Dientes",
@@ -243,7 +248,8 @@
       "vit": -1
     },
     "descripcion": "Mira para otro lado. Ve más que vos.",
-    "rareza": "rara"
+    "rareza": "rara",
+    "zona": 2
   },
   "pluma_negra": {
     "nombre": "Pluma Negra",
@@ -252,7 +258,8 @@
       "des": 3
     },
     "descripcion": "No hay pájaros acá abajo.",
-    "rareza": "rara"
+    "rareza": "rara",
+    "zona": 2
   },
   "baculo_guardiana": {
     "nombre": "Báculo de la Guardiana",
@@ -267,9 +274,10 @@
       "sanador"
     ],
     "requisito": {
-      "int": 16,
-      "fe": 18
+      "int": 20,
+      "fe": 22
     },
-    "magico": 0.65
+    "magico": 0.4,
+    "zona": 2
   }
 }
