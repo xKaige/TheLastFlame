@@ -476,7 +476,7 @@
         "defensa": 0.34
       },
       "int": {
-        "magia": 0.04
+        "magia": 0.03
       },
       "per": {
         "critico": 0.015
@@ -485,16 +485,16 @@
         "cura": 0.05
       },
       "ard": {
-        "fuego": 0.05
+        "fuego": 0.03
       }
     },
     "descripciones": {
       "fue": "Cada punto suma 1 de Ataque. Las armas pesadas la piden.",
       "des": "Cada punto suma 0,5 de Velocidad y 1% de Esquiva. Las armas livianas la piden.",
       "vit": "Cada punto suma 3 de Vida y 1 de Defensa cada 3 puntos.",
-      "int": "Cada punto suma 4% a toda la magia, curas y fuego. Las armas mágicas lo suman al ataque básico.",
+      "int": "Cada punto suma 3% a toda la magia, curas y fuego. Las armas mágicas lo suman al ataque básico.",
       "fe": "Cada punto suma 5% a las curas. Hace falta para aprender las curas más fuertes.",
-      "ard": "Cada punto suma 5% al daño de fuego y a las quemaduras. Hace falta para aprender el fuego más fuerte.",
+      "ard": "Cada punto suma 3% al daño de fuego y a las quemaduras. Hace falta para aprender el fuego más fuerte.",
       "per": "Cada punto suma 1,5% de Crítico. Algunos eventos la piden."
     },
     "crece_cada": 3,

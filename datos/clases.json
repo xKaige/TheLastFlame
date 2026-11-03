@@ -25,7 +25,9 @@
     "crecimiento": {
       "fue": 1,
       "vit": 1
-    }
+    },
+    "bloqueo": 2,
+    "impetu_al_recibir": 1
   },
   "picaro": {
     "nombre": "Pícaro",

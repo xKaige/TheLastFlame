@@ -4,7 +4,7 @@
 // Es la parte que se traduce tal cual a GDScript (ver MIGRACION.md).
 
 const NUCLEO = (() => {
-  const IMP_TOPE = 3;
+  const IMP_TOPE = 4;
   const clampN = (v, a, b) => Math.min(b, Math.max(a, v));
   const entre = (azar, a, b) => a + Math.floor(azar() * (b - a + 1));
   const elegir = (azar, lista) => lista[Math.floor(azar() * lista.length)];
@@ -349,7 +349,7 @@ const NUCLEO = (() => {
 
   function defender(D, u) {
     u.guardia = true;
-    u.impetu = Math.min(IMP_TOPE, u.impetu + (D.clases[u.clase].concentra || 1));
+    u.impetu = Math.min(IMP_TOPE, u.impetu + (D.clases[u.clase].concentra || D.clases[u.clase].bloqueo || 1));
     return [{ tipo: 'texto', clave: 'defiende', quien: u }];
   }
 
@@ -358,7 +358,7 @@ const NUCLEO = (() => {
     u.impetu -= gastado;
     b.ultimaHabilidad = id;
     // las habilidades del Pícaro crecen con su atributo, las demás ya crecen con el ataque o la magia
-    const base = D.clases[u.clase].atributos[h.atributo], extra = h.atributo ? 1 + Math.max(0, atributosDe(D, u)[h.atributo] - base) * 0.01 : 1;
+    const base = D.clases[u.clase].atributos[h.atributo], extra = h.atributo ? 1 + Math.max(0, atributosDe(D, u)[h.atributo] - base) * 0.005 : 1;
     const blancos = { enemigo: [objetivo], enemigos: vivos(b.enemigos), aliado: [objetivo], aliados: vivos(b.aliados), propio: [u] }[h.objetivo];
     for (const t of blancos) for (const e of h.efectos) {
       if (t.vida <= 0 && e.tipo !== 'cura') continue;
@@ -476,9 +476,13 @@ const NUCLEO = (() => {
 
   // Lo que hace un personaje en el momento de recibir un golpe
   function respuesta(u, t, azar, eventos) {
+    // el Guerrero se carga con los golpes que recibe
+    const carga = BAT && BAT.D.clases[t.clase].impetu_al_recibir;
+    if (carga) t.impetu = Math.min(IMP_TOPE, t.impetu + carga);
     if (tiene(t, 'represalia')) {
       sumarMaestria(t, 'represalia', 1);
-      if (azar() < 0.25 * poderDe(t, 'represalia')) t.impetu = Math.min(IMP_TOPE, t.impetu + 1);
+      const otro = vivos(BAT.b.aliados).filter(q => q !== t && q.impetu < IMP_TOPE).sort((x, y) => x.impetu - y.impetu)[0];
+      if (otro && azar() < 0.5 * poderDe(t, 'represalia')) otro.impetu++;
     }
     if (t.provoca > 0 && u.vida > 0 && azar() < 0.3 * poderDe(t, 'provocar')) {
       sumarMaestria(t, 'provocar', 1);

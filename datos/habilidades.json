@@ -28,7 +28,7 @@
         "turnos": 2
       }
     ],
-    "descripcion": "Atraés los ataques 2 turnos, con 30% de contraatacar cada golpe.",
+    "descripcion": "Atraés los ataques 2 turnos, con 30% de contraatacar cada golpe. Cada golpe recibido te carga Ímpetu.",
     "clase": "guerrero",
     "acumula": "contraataques",
     "meta": 10
@@ -42,14 +42,14 @@
         "tipo": "dano",
         "mult": 1.5,
         "ignora_defensa": true,
-        "con_estado": 2
+        "con_estado": 1.6
       },
       {
         "tipo": "sangrado",
         "estallido": 0.2
       }
     ],
-    "descripcion": "Ignora la defensa y pega el doble a quien sangra o está envenenado.",
+    "descripcion": "Ignora la defensa y pega 60% más a quien sangra o está envenenado.",
     "clase": "picaro",
     "acumula": "usos",
     "meta": 10,
@@ -488,7 +488,7 @@
         "mult_por_impetu": 1.5
       }
     ],
-    "descripcion": "Gasta todo el Ímpetu: daño ×1,5 por cada punto.",
+    "descripcion": "Gasta todo el Ímpetu (hasta 4): daño ×1,5 por cada punto.",
     "requisito": {
       "fue": 18
     },
@@ -520,7 +520,7 @@
     "costo": 0,
     "objetivo": "propio",
     "efectos": [],
-    "descripcion": "Pasiva. 25% de ganar 1 de Ímpetu al recibir un golpe.",
+    "descripcion": "Pasiva. Al recibir un golpe, 50% de darle 1 de Ímpetu a un aliado.",
     "fuente": "compra",
     "precio": 10,
     "requisito": {

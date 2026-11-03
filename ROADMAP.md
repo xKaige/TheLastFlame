@@ -2,7 +2,7 @@
 
 El camino del juego es la expedición de grupo. El plan del juego anterior está en `juego_viejo/ROADMAP.md`.
 
-**Versión actual: 0.4.33.** Lo próximo: 0.5.0.
+**Versión actual: 0.4.34.** Lo próximo: 0.5.0.
 
 ## Cómo se numeran las versiones
 
@@ -113,6 +113,13 @@ La idea que une todo es una regla de las Guardianas: "quien le pida algo va a re
 - **Título:** el logo "The Last Flame" no cambia con el idioma.
 
 ## Historial
+
+### 0.4.34
+
+- Ímpetu máximo 4.
+- Guerrero: gana 1 de Ímpetu con cada golpe recibido y 2 al defender. Represalia carga Ímpetu a un aliado.
+- Mago y Pícaro más moderados: Intelecto y Arcano suman 3% por punto, Puñalada pega 60% más con estado, y la Destreza suma 0,5% por punto a sus habilidades.
+- Valores y cálculos de crecimiento en `CRECIMIENTO.txt`.
 
 ### 0.4.33
 
