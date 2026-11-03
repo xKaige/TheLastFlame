@@ -430,6 +430,14 @@
         120.298
       ],
       "volumen": 0.28
+    },
+    "jefe_3": {
+      "archivo": "assets/musica/jefe_piso_3.ogg",
+      "bucle": [
+        37.605,
+        159.786
+      ],
+      "volumen": 0.28
     }
   },
   "max_habilidades": 4,
