@@ -1881,7 +1881,7 @@
     "jefe": true,
     "especial": {
       "cada": 3,
-      "nombre": "abraza al grupo con la oscuridad",
+      "nombre": "hace sonar la última campanada",
       "dano": [
         12,
         17
@@ -2058,6 +2058,98 @@
           }
         }
       ]
+    },
+    "golpe_especial": {
+      "imagen": "aldemar_campanada",
+      "lado": 260,
+      "margen": 55,
+      "cuadros": 6,
+      "tiempos": [
+        0.4,
+        0.8,
+        1.3,
+        1.55,
+        2.05,
+        2.4
+      ],
+      "efecto": "campanada",
+      "impacto": 1.55,
+      "campanas": [
+        0.35,
+        0.85,
+        1.35
+      ]
+    },
+    "habilidades": [
+      {
+        "nombre": "te clava los ojos que nunca cierra",
+        "prob": 0.3,
+        "mult": 0,
+        "mira": 2,
+        "hoja": {
+          "imagen": "aldemar_mirada",
+          "lado": 260,
+          "margen": 55,
+          "cuadros": 6,
+          "tiempos": [
+            0.25,
+            0.55,
+            0.9,
+            1.2,
+            1.7,
+            2
+          ],
+          "efecto": "mirada",
+          "impacto": 1.4
+        }
+      },
+      {
+        "nombre": "hunde la luz en su cuenco",
+        "prob": 0.3,
+        "mult": 0,
+        "apaga": 15,
+        "hoja": {
+          "imagen": "aldemar_ceniza",
+          "lado": 260,
+          "margen": 55,
+          "cuadros": 6,
+          "tiempos": [
+            0.3,
+            0.6,
+            1,
+            1.4,
+            1.8,
+            2.1
+          ],
+          "efecto": "ceniza",
+          "impacto": 1.2
+        }
+      }
+    ],
+    "oscuridad": {
+      "umbral": 40,
+      "dano": 1.35
+    },
+    "ultimo": {
+      "umbral": 0.15,
+      "dano": 2,
+      "recibe": 1.5,
+      "mensaje": "{0} deja caer el cuenco. Ya no quiere cuidar nada.",
+      "hoja": {
+        "imagen": "aldemar_descanso",
+        "lado": 260,
+        "margen": 55,
+        "cuadros": 6,
+        "tiempos": [
+          0.35,
+          0.7,
+          1,
+          1.35,
+          1.8,
+          2.2
+        ],
+        "efecto": "descanso"
+      }
     }
   },
   "perro": {

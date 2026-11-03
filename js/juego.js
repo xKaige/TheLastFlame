@@ -1226,6 +1226,7 @@ function prepararEnemigo(e) {
 
 function iniciarPelea(ent, ids, entrada = 0.95, emboscada = false) {
   const b = NUCLEO.iniciarBatalla(D, X.grupo, ids, emboscada);
+  b.antorcha = P.fuel;
   if (S.flags.impetu) { for (const u of b.aliados) u.impetu = Math.min(NUCLEO.IMP_TOPE, u.impetu + S.flags.impetu); delete S.flags.impetu; }
   const fx = ids.length === 1 ? [240] : ids.length === 2 ? [190, 290] : ids.some(id => D.enemigos[id].tam_batalla) ? [92, 240, 388] : FX3;   // un jefe grande necesita lugar
   for (const e of b.enemigos) { e.x = fx[e.i]; prepararEnemigo(e); }
@@ -1250,7 +1251,8 @@ function siguiente() {
   if (u.vida <= 0) return later(500, siguiente);
   if (u.enemigo) {
     Bt.fase = 'espera'; Bt.msg = ''; pintarBatalla();
-    const hoja = NUCLEO.haraEspecial(u) ? D.enemigos[u.tipo].golpe_especial : NUCLEO.pasoDeFase(u) === 'gancho' ? u.fase.gancho.hoja : null;
+    const propia = NUCLEO.prepararTurno(u, azarX);
+    const hoja = NUCLEO.haraEspecial(u) ? D.enemigos[u.tipo].golpe_especial : NUCLEO.pasoDeFase(u) === 'gancho' ? u.fase.gancho.hoja : propia && propia.hoja;
     if (hoja && cuadrosEspeciales(u, hoja)) return golpeImponente(u, hoja);
     iniciarAtaqueAnimado(u);
     later(600, () => { if (Bt) { mostrar(NUCLEO.turnoEnemigo(D, Bt.b, u, azarX)); later(450, () => { if (Bt) Bt.fase = 'cambio'; }); later(800, siguiente); } });
@@ -1279,12 +1281,14 @@ function mostrar(eventos) {
 // El golpe a todo el grupo se anuncia: la sala se apaga, el jefe se prepara y recién ahí pega
 function golpeImponente(u, r) {
   u.especialDesde = Bt.t; u.hojaActiva = r; sfx('encounter');
+  for (const t of r.campanas || []) later(t * 1000, () => { if (Bt) { sfx('encounter'); Bt.temblor = Math.max(Bt.temblor, 3); Bt.destello = Math.max(Bt.destello, 0.25); } });
   later(r.impacto * 1000, () => {
     if (!Bt) return;
     mostrar(NUCLEO.turnoEnemigo(D, Bt.b, u, azarX));
-    if (r.efecto === 'gancho') { Bt.temblor = 6; Bt.destello = 0.4; Bt.congelado = 0.1; sfx('slash'); }
+    if (['gancho', 'mirada', 'ceniza'].includes(r.efecto)) { Bt.temblor = 6; Bt.destello = 0.4; Bt.congelado = 0.1; sfx('slash'); }
     else {
-      if (r.efecto === 'caida') { golpePixel('golpe', u); golpePixel('critico', u); } else golpePixel('barrido', u);
+      if (r.efecto === 'campanada') Bt.fx.push({ tipo: 'onda', x: u.x, y: FBASE - 70, t: 0, dur: 0.75, m: 1 });
+      else if (r.efecto === 'caida') { golpePixel('golpe', u); golpePixel('critico', u); } else golpePixel('barrido', u);
       for (let x = 50; x <= 430; x += 38) chispas(x, FBASE, 4, coloresFx(), -46, 60);
       Bt.temblor = 13; Bt.destello = 0.9; Bt.congelado = 0.16; sfx('slash');
     }
@@ -1312,7 +1316,9 @@ function mostrarEvento(e) {
   }
   if (e.tipo === 'antorcha') { P.fuel = Math.max(0, P.fuel - e.valor); updateHUD(); }
   if (e.tipo === 'invoca') { for (const n of e.nuevos) { n.x = Bt.lugares[n.i]; prepararEnemigo(n); chispas(n.x, FBASE - 24, 18, MARCO.vida, -24); } sfx('encounter'); Bt.temblor = 4; }
-  if (e.tipo === 'fase' && q.fase.trono) q.tronoDesde = Bt.t;
+  if (e.tipo === 'fase' && q.fase.trono) { q.tronoDesde = Bt.t; q.hojaFija = q.fase.trono; }
+  if (e.tipo === 'desesperado') { q.tronoDesde = Bt.t; q.hojaFija = q.ultimo.hoja; Bt.msg = tr(q.ultimo.mensaje, q.nombre); Bt.temblor = 8; Bt.destello = 0.5; sfx('encounter'); }
+  if (e.tipo === 'texto' && e.clave === 'refleja') Bt.msg = tr('La mirada le devuelve el golpe a {0}.', q.nombre);
   if (e.tipo === 'gancho') {
     const r = e.desde.hojaActiva;
     if (r) Bt.fx.push({ tipo: 'cadena', x: e.desde.x - e.desde.tam / 2 - r.margen + r.cadena[0], y: FBASE - e.desde.tam - r.margen + r.cadena[1], hx: CX[q.i] + 23, hy: CY + 10, t: 0, dur: 0.6, m: 1 });
@@ -1377,7 +1383,11 @@ function dibujarFx(c) {
   for (const f of Bt.fx) {
     const k = clamp(f.t / f.dur, 0, 1), cols = coloresFx(f.tipo);
     c.save(); c.translate(f.x, f.y); c.rotate(f.giro || 0); c.lineCap = 'butt';
-    if (f.tipo === 'cadena') {
+    if (f.tipo === 'onda') {
+      // la oscuridad se abre desde el cuenco y barre toda la sala
+      c.rotate(-(f.giro || 0)); c.strokeStyle = '#000'; c.globalAlpha = 1 - k * k;
+      for (let n = 0; n < 3; n++) { const r = Math.max(1, (k * 1.2 - n * 0.12) * 300); c.lineWidth = (1 - k) * 22 + 2; c.beginPath(); c.ellipse(0, 0, r, r * 0.45, 0, 0, Math.PI * 2); c.stroke(); }
+    } else if (f.tipo === 'cadena') {
       // sale de la mano del Cazador y se clava en la tarjeta del elegido
       c.rotate(-(f.giro || 0));
       const dx = f.hx - f.x, dy = f.hy - f.y, q = clamp(k * 5, 0, 1), n = Math.ceil(Math.hypot(dx, dy) / 4);
@@ -1403,7 +1413,7 @@ function dibujarFx(c) {
 
 function actualizarFx(dt) {
   Bt.temblor = Math.max(0, Bt.temblor - dt * 22);
-  const prepara = Bt.b.enemigos.some(e => e.especialDesde !== undefined && e.hojaActiva.efecto !== 'gancho' && Bt.t - e.especialDesde < e.hojaActiva.impacto);
+  const prepara = Bt.b.enemigos.some(e => e.especialDesde !== undefined && !['gancho', 'mirada'].includes(e.hojaActiva.efecto) && Bt.t - e.especialDesde < e.hojaActiva.impacto);
   Bt.oscuro = clamp(Bt.oscuro + (prepara ? dt * 1.5 : -dt * 3), 0, 1);
   Bt.destello = Math.max(0, Bt.destello - dt * 2.2);
   for (const f of Bt.fx) f.t += dt;
@@ -1704,7 +1714,7 @@ function rombo(c, x, y, lleno) {
 // Fila de estados: lo que afecta a cada personaje ahora
 function estadosDe(q) {
   const on = [q.guardia && ['escudo', icon('shield'), 'En guardia'], q.provoca > 0 && ['ira', icon('cross'), 'Provocando'],
-    q.defensaExtra > 0 && ['bonus', iconoEstado('bonus'), `Defensa +${q.defensaExtra}`], q.marcado && ['marca', icon('ash'), 'Marcado'], q.presa > 0 && ['presa', iconoEstado('presa'), 'Presa'], q.enganchado && ['aturdido', iconoEstado('aturdido'), 'Pierde el turno'], q.hechizado && ['hechizado', iconoEstado('hechizado'), 'Hechizado'], q.debil > 0 && ['debil', iconoEstado('debil'), 'Debilitado'],
+    q.defensaExtra > 0 && ['bonus', iconoEstado('bonus'), `Defensa +${q.defensaExtra}`], q.marcado && ['marca', icon('ash'), 'Marcado'], q.presa > 0 && ['presa', iconoEstado('presa'), 'Presa'], q.mirado && ['ojo', iconoEstado('ojo'), 'Bajo su mirada'], q.enganchado && ['aturdido', iconoEstado('aturdido'), 'Pierde el turno'], q.hechizado && ['hechizado', iconoEstado('hechizado'), 'Hechizado'], q.debil > 0 && ['debil', iconoEstado('debil'), 'Debilitado'],
     ...(q.estados || []).map(v => [v.tipo, ICONOS[v.tipo] ? iconoEstado(v.tipo) : '●', v.tipo])].filter(Boolean).slice(-4);
   return Array.from({ length: 4 }, (_, i) => (on[i] ? `<i class="${on[i][0]}" title="${on[i][2]}">${on[i][1]}</i>` : '<i></i>')).join('');
 }
@@ -1802,7 +1812,7 @@ function dibujarMenu(c) {
 }
 
 // ---------- Vida y estados de los enemigos ----------
-const COLOR_ESTADO = { veneno: ['#2f6a2a', '#5fbf4a', '#b6e36a'], quemadura: ['#8a3a10', '#e8761c', '#fbbf5a'], sangrado: ['#6a1518', '#b52a2a', '#e0605a'], aturdido: ['#6a5a10', '#c8a81c', '#ffe14a'], hechizado: ['', '', '#e060c0'], presa: ['', '', '#e0261c'], debil: ['', '', '#5aa0e8'], bonus: ['', '', '#e0261c'] };
+const COLOR_ESTADO = { veneno: ['#2f6a2a', '#5fbf4a', '#b6e36a'], quemadura: ['#8a3a10', '#e8761c', '#fbbf5a'], sangrado: ['#6a1518', '#b52a2a', '#e0605a'], aturdido: ['#6a5a10', '#c8a81c', '#ffe14a'], hechizado: ['', '', '#e060c0'], presa: ['', '', '#e0261c'], debil: ['', '', '#5aa0e8'], bonus: ['', '', '#e0261c'], ojo: ['', '', '#f2efe6'] };
 const ICONOS = {
   veneno: ['.#####.', '#######', '#..#..#', '#######', '.##.##.', '.#####.', '.#.#.#.'],
   quemadura: ['...#...', '..##...', '..###..', '.#####.', '.##.##.', '.#####.', '..###..'],
@@ -1811,6 +1821,7 @@ const ICONOS = {
   presa: ['....#....', '..#####..', '.#..#..#.', '.#.....#.', '###.#.###', '.#.....#.', '.#..#..#.', '..#####..', '....#....'],
   debil: ['..###..', '..###..', '..###..', '#######', '.#####.', '..###..', '...#...'],
   bonus: ['...#...', '..###..', '.#####.', '#######', '..###..', '..###..', '..###..'],
+  ojo: ['.......', '..###..', '.#...#.', '#..#..#', '.#...#.', '..###..', '.......'],
   hechizado: ['.##.##.', '#######', '#######', '.#####.', '..###..', '...#...', '.......'],
 };
 // El mismo dibujo para las tarjetas del grupo

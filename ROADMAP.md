@@ -2,7 +2,7 @@
 
 El camino del juego es la expedición de grupo. El plan del juego anterior está en `juego_viejo/ROADMAP.md`.
 
-**Versión actual: 0.4.17.** Lo próximo: 0.5.0.
+**Versión actual: 0.4.18.** Lo próximo: 0.5.0.
 
 ## Cómo se numeran las versiones
 
@@ -60,14 +60,10 @@ Ideas aprobadas, para hacer con sprites propios (hojas de 6 cuadros, `golpe_espe
 
 **Aldemar**
 
-- La Última Campanada (golpe especial): alza el cuenco, suenan tres campanadas y una onda de oscuridad golpea a todo el grupo.
-- Nunca cierra los ojos: marca a un personaje; si ataca a Aldemar, recibe parte del daño de vuelta.
 - Lo que hiciste: Debilitado a un personaje y a quien tenga vínculo con él.
-- Ceniza en el cuenco: apaga parte de la antorcha; con poca antorcha, Aldemar pega más.
 - Sin oscuridad: durante 2 turnos, curar a un aliado también daña a quien cura.
 - Que ningún hombre descanse: si muere un Apagado, los demás ganan velocidad.
 - Los cuarenta: una vez por pelea, los Apagados caídos se levantan con poca vida.
-- Déjenme descansar (bajo el 15% de vida): deja caer el cuenco, recibe más daño y pega el doble.
 - Veo Todo (en su furia): repite contra el grupo la última habilidad que usó el grupo.
 
 ## Historia
@@ -116,6 +112,10 @@ La idea que une todo es una regla de las Guardianas: "quien le pida algo va a re
 - **Título:** el logo "The Last Flame" no cambia con el idioma.
 
 ## Historial
+
+### 0.4.18
+
+- Aldemar: La Última Campanada, Nunca cierra los ojos, Ceniza en el cuenco y Déjenme descansar, cada una dibujada cuadro por cuadro.
 
 ### 0.4.17
 

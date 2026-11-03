@@ -148,7 +148,7 @@ const NUCLEO = (() => {
   const crearEnemigo = (D, id, i, fuerza, nombre) => {
     const d = D.enemigos[id], dif = D.mazmorra.dificultad, vida = Math.round(d.vida * fuerza * dif.vida);
     return { enemigo: true, tipo: id, i, nombre, sprite: d.sprite, imagen: d.imagen || null, vida, vidaMax: vida,
-      golpe: d.ataque.map(n => Math.round(n * dif.dano)), defensa: d.defensa, velocidad: d.velocidad, critico: 0.05, esquiva: 0, exp: d.exp, jefe: !!d.jefe, especial: d.especial || null, robaImpetu: !!d.roba_impetu, turnos: 0, estados: [], fase: d.fase || null, escudos: 0, enfurecido: false, pasoFase: 0, habilidades: d.habilidades || [], resisteFisico: d.resiste_fisico || 0, alMorir: d.al_morir || null };
+      golpe: d.ataque.map(n => Math.round(n * dif.dano)), defensa: d.defensa, velocidad: d.velocidad, critico: 0.05, esquiva: 0, exp: d.exp, jefe: !!d.jefe, especial: d.especial || null, robaImpetu: !!d.roba_impetu, turnos: 0, estados: [], fase: d.fase || null, escudos: 0, enfurecido: false, pasoFase: 0, habilidades: d.habilidades || [], resisteFisico: d.resiste_fisico || 0, alMorir: d.al_morir || null, oscuridad: d.oscuridad || null, ultimo: d.ultimo || null };
   };
 
   function iniciarBatalla(D, grupo, ids, emboscada = false) {
@@ -159,12 +159,12 @@ const NUCLEO = (() => {
       return crearEnemigo(D, id, i, fuerza, D.enemigos[id].nombre + (n > 1 ? ` ${'ABCD'[letras[id] - 1]}` : ''));
     });
     const aliados = vivos(grupo);
-    aliados.forEach((u, i) => Object.assign(u, { i, impetu: Math.min(IMP_TOPE, u.impetuInicial + (D.clases[u.clase].impetu_inicial || 0)), guardia: false, provoca: 0, defensaExtra: 0, esquivaSegura: false, presa: 0, enganchado: false, hechizado: false, estados: [], debil: 0 }));
+    aliados.forEach((u, i) => Object.assign(u, { i, impetu: Math.min(IMP_TOPE, u.impetuInicial + (D.clases[u.clase].impetu_inicial || 0)), guardia: false, provoca: 0, defensaExtra: 0, esquivaSegura: false, presa: 0, enganchado: false, hechizado: false, mirado: null, miradoTurnos: 0, estados: [], debil: 0 }));
     const unidades = [...aliados, ...enemigos];
     for (const e of enemigos) e.aliados = aliados;      // lo que estalla al morir necesita saber a quién alcanza
     for (const u of unidades) u.reloj = 100 / u.velocidad;
     if (emboscada) enemigos.forEach((u, i) => { u.reloj = i * 0.01; });     // te sorprenden: todos actúan antes que el grupo
-    return { aliados, enemigos, unidades, actual: null, muroLlamas: 0, fuerza, lugares: ids.length };
+    return { aliados, enemigos, unidades, actual: null, muroLlamas: 0, fuerza, lugares: ids.length, antorcha: 100 };
   }
 
   const haTerminado = b => (!vivos(b.enemigos).length ? 'victoria' : !vivos(b.aliados).length ? 'derrota' : null);
@@ -232,11 +232,25 @@ const NUCLEO = (() => {
     if (critico) dano *= 2;
     if (t.resisteFisico) dano = Math.max(1, Math.round(dano * t.resisteFisico));     // un golpe apenas abolla lo que no tiene cuerpo
     herir(t, dano, eventos, critico);
+    reflejar(u, t, dano, eventos);
+  }
+
+  // Quien tiene encima la mirada de un enemigo y le pega, recibe la mitad de vuelta
+  function reflejar(u, t, dano, eventos) {
+    if (u.mirado !== t || t.vida <= 0) return;
+    eventos.push({ tipo: 'texto', clave: 'refleja', quien: u });
+    herir(u, Math.max(1, Math.round(dano / 2)), eventos);
   }
 
   // Baja la vida; al cruzar el umbral de su fase, el enemigo se detiene ahí y se cubre con escudos
   function restarVida(t, dano, eventos) {
     t.vida -= dano;
+    if (t.ultimo && !t.desesperado && t.vida > 0 && t.vida <= t.vidaMax * t.ultimo.umbral) {
+      t.desesperado = true;
+      t.golpe = t.golpe.map(v => Math.round(v * t.ultimo.dano));
+      eventos.push({ tipo: 'desesperado', quien: t });
+      return;
+    }
     if (!t.fase || t.enfurecido || t.vida <= 0 || t.vida > t.vidaMax * t.fase.umbral) return;
     const f = t.fase;
     t.enfurecido = true; t.escudos = f.escudos;
@@ -268,6 +282,7 @@ const NUCLEO = (() => {
       return;
     }
     if (t.guardia) dano = Math.max(1, Math.round(dano / 2));
+    if (t.desesperado) dano = Math.round(dano * t.ultimo.recibe);
     restarVida(t, dano, eventos);
     eventos.push({ tipo: 'dano', quien: t, valor: dano, critico });
     if (t.vida <= 0) morir(t, eventos);
@@ -295,7 +310,7 @@ const NUCLEO = (() => {
     for (const t of blancos) for (const e of h.efectos) {
       if (t.vida <= 0 && e.tipo !== 'cura') continue;
       if (e.tipo === 'dano') golpear(azar, u, t, eventos, { mult: e.mult + (e.por_herida || 0) * (1 - u.vida / u.vidaMax), criticoSeguro: e.critico_seguro, ignoraDefensa: e.ignora_defensa });
-      else if (e.tipo === 'dano_fijo') herir(t, Math.round(entre(azar, e.min, e.max) * (1 + (u.magia || 0) + (u.fuego || 0))), eventos);
+      else if (e.tipo === 'dano_fijo') { const v = Math.round(entre(azar, e.min, e.max) * (1 + (u.magia || 0) + (u.fuego || 0))); herir(t, v, eventos); reflejar(u, t, v, eventos); }
       else if (e.tipo === 'quemadura') aplicarEstado(t, { ...e, por_turno: Math.round(e.por_turno * (1 + (u.magia || 0) + (u.fuego || 0))) }, azar, eventos);
       else if (e.tipo === 'veneno') aplicarEstado(t, e, azar, eventos);
       else if (e.tipo === 'sangrado') sangrar(t, e, azar, eventos);
@@ -404,7 +419,7 @@ const NUCLEO = (() => {
     eventos.push({ tipo: 'texto', clave: 'especial', quien: u, texto: h.nombre });
     if (h.propia === 'guardia') { u.guardia = true; return; }
     if (h.refuerza) { for (const e of vivos(b.enemigos)) e.defensaExtra = Math.max(e.defensaExtra || 0, h.refuerza); return; }
-    if (h.apaga) eventos.push({ tipo: 'antorcha', quien: u, valor: h.apaga });
+    if (h.apaga) { b.antorcha = Math.max(0, b.antorcha - h.apaga); eventos.push({ tipo: 'antorcha', quien: u, valor: h.apaga }); }
     const herido = grupo.find(t => t.provoca > 0) || grupo.slice().sort((x, y) => x.vida / x.vidaMax - y.vida / y.vidaMax)[0];
     const blancos = h.blanco === 'todos' ? grupo : [h.blanco === 'herido' ? herido : blancoEnemigo(grupo, azar)], mult = h.mult ?? 1;
     for (const t of blancos) {
@@ -420,16 +435,30 @@ const NUCLEO = (() => {
       if (h.debilita) { t.debil = h.debilita; eventos.push({ tipo: 'texto', clave: 'debilitado', quien: t }); }
       if (h.aturde) { t.enganchado = true; eventos.push({ tipo: 'texto', clave: 'aturdido_grupo', quien: t }); }
       if (h.hechiza) t.hechizado = true;
+      if (h.mira) { t.mirado = u; t.miradoTurnos = h.mira; }
       if (h.quita_impetu) t.impetu = Math.max(0, t.impetu - h.quita_impetu);
     }
   }
 
-  const pasoDeFase = u => (u.enfurecido && u.fase.ciclo && !u.aturdido ? u.fase.ciclo[u.pasoFase % u.fase.ciclo.length] : null);
+  const pasoDeFase = u => (u.enfurecido && u.fase.ciclo && !u.aturdido && !u.desesperado ? u.fase.ciclo[u.pasoFase % u.fase.ciclo.length] : null);
+
+  // Elige la habilidad propia antes del turno: si tiene animación, la pantalla la muestra antes de que pase
+  const elegirPropia = (u, azar, primera) => (primera ? elegir(azar, u.habilidades) : u.habilidades.find(h => azar() < h.prob));
+  function prepararTurno(u, azar) {
+    const paso = pasoDeFase(u);
+    u.proxima = undefined;
+    if (u.aturdido || u.desesperado || haraEspecial(u) || enSuTrono(u) || (paso && paso !== 'golpe')) return null;
+    u.proxima = elegirPropia(u, azar, u.turnos === 0) || null;
+    return u.proxima;
+  }
+
+  // Más fuerte cuanto menos luz le quede al grupo
+  const fuerzaOscura = (b, u) => (u.oscuridad && b.antorcha <= u.oscuridad.umbral ? u.oscuridad.dano : 1);
   const enSuTrono = u => !!(u.enfurecido && u.fase.trono && u.escudos > 0);
 
   // Si en este turno le toca el golpe a todo el grupo: la pantalla lo anuncia antes de que pase
   const haraEspecial = u => {
-    if (!u.especial || u.aturdido || enSuTrono(u)) return false;
+    if (!u.especial || u.aturdido || enSuTrono(u) || u.desesperado) return false;
     if (u.enfurecido && u.fase.ciclo) return u.fase.ciclo[u.pasoFase % u.fase.ciclo.length] === 'especial';
     return (u.turnos + 1) % u.especial.cada === 0;
   };
@@ -438,6 +467,8 @@ const NUCLEO = (() => {
     const eventos = [], grupo = vivos(b.aliados);
     if (u.aturdido) { u.aturdido = false; eventos.push({ tipo: 'texto', clave: 'pierde_turno', quien: u }); return eventos; }
     u.turnos++;
+    for (const q of grupo) if (q.mirado === u && --q.miradoTurnos <= 0) q.mirado = null;
+    if (u.desesperado) { golpeEnemigo(u, blancoEnemigo(grupo, azar), azar, eventos, fuerzaOscura(b, u)); return eventos; }
     if (enSuTrono(u)) {
       const t = blancoEnemigo(grupo, azar), r = u.fase.trono.lluvia;
       eventos.push({ tipo: 'texto', clave: 'especial', quien: u, texto: r.nombre }, { tipo: 'huesos', quien: t });
@@ -447,16 +478,17 @@ const NUCLEO = (() => {
     if (u.enfurecido && u.fase.ciclo) { if (habilidadDeFase(D, b, u, grupo, azar, eventos)) return eventos; }
     else if (u.especial && u.turnos % u.especial.cada === 0) { especialDeJefe(u, grupo, azar, eventos); return eventos; }
     // la muestra enseguida: muchos enemigos no duran más de un par de turnos
-    const propia = u.turnos === 1 ? elegir(azar, u.habilidades) : u.habilidades.find(h => azar() < h.prob);
+    const propia = u.proxima !== undefined ? u.proxima : elegirPropia(u, azar, u.turnos === 1);
+    u.proxima = undefined;
     if (propia) { habilidadEnemiga(b, u, propia, grupo, azar, eventos); return eventos; }
     const t = blancoEnemigo(grupo, azar);
     if (b.muroLlamas > 0) { b.muroLlamas--; aplicarEstado(u, { tipo: 'quemadura', por_turno: 2, min: 2, max: 3 }, azar, eventos); }
-    if (!golpeEnemigo(u, t, azar, eventos)) return eventos;
+    if (!golpeEnemigo(u, t, azar, eventos, fuerzaOscura(b, u))) return eventos;
     if (u.robaImpetu && t.impetu > 0) { t.impetu--; eventos.push({ tipo: 'texto', clave: 'roba', quien: t }); }
     return eventos;
   }
 
-  return { IMP_TOPE, vivos, crearPersonaje, asegurarPersonaje, ajustarModelo, atributosDe, recalcular, subirAtributo, cumpleRequisito, sirveAClase, cumpleObjeto, sortearCandidatos, elegirObjeto, sortearCaidos, aplicarCondicion, topeNivel, ganarExp, iniciarBatalla, haTerminado, vistaPrevia, proximoTurno, opciones, atacar, defender, usarHabilidad, haraEspecial, pasoDeFase, turnoEnemigo };
+  return { IMP_TOPE, vivos, crearPersonaje, asegurarPersonaje, ajustarModelo, atributosDe, recalcular, subirAtributo, cumpleRequisito, sirveAClase, cumpleObjeto, sortearCandidatos, elegirObjeto, sortearCaidos, aplicarCondicion, topeNivel, ganarExp, iniciarBatalla, haTerminado, vistaPrevia, proximoTurno, opciones, atacar, defender, usarHabilidad, haraEspecial, pasoDeFase, prepararTurno, turnoEnemigo };
 })();
 
 if (typeof module !== 'undefined') module.exports = NUCLEO;
