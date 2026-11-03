@@ -1437,7 +1437,9 @@ function numero(x, y, text, kind) {
 // La explicación de la acción elegida: se abre y se cierra con el botón del inventario y queda así entre turnos
 let ayudaBatalla = false;
 function pintarAyuda(ver) {
-  const a = $('bAyuda'), o = ver && ayudaBatalla && Bt.ops[Bt.sel];
+  const a = $('bAyuda'), o = ver && ayudaBatalla && Bt.ops[Bt.sel], efectos = ver && ayudaBatalla ? Bt.b.aliados.flatMap(q => listaEstados(q).map(e => [q.nombre, ...e])) : [];
+  $('bEfectos').classList.toggle('hidden', !efectos.length);
+  $('bEfectos').innerHTML = efectos.slice(0, 8).map(([n, cl, ic, nom, txt]) => `<div class="${cl}"><i>${ic}</i><span><b>${n} · ${tr(nom)}</b>${tr(txt)}</span></div>`).join('');
   a.classList.toggle('hidden', !o);
   if (!o) return;
   const costo = o.costo ? tr('Cuesta {0} de Ímpetu.', o.costo) : '', falta = o.apagada && o.costo ? ` ${tr('Te falta Ímpetu: atacá o defendé para juntarlo.')}` : '';
@@ -1672,6 +1674,10 @@ function pintarBatalla() {
   const m = $('bMenu'), ver = Bt.fase === 'menu' || Bt.fase === 'objetivo';
   m.classList.toggle('hidden', !ver);
   pintarAyuda(ver);
+  const luz = Math.ceil(P.fuel);
+  $('bAntorcha').classList.toggle('hidden', Bt.fase === 'botin');
+  $('bAntorcha').classList.toggle('baja', luz <= 40);
+  $('bAntorcha').innerHTML = `<i style="background-image:url(${casilleroX('antorcha')})"></i><span>${tr('Antorcha')}<b>${luz}</b><u><s style="width:${luz}%"></s></u></span>`;
   if (ver) {
     const opcion = (o, i) => `<div class="bopt${i === Bt.sel ? ' sel' : ''}${o.apagada ? ' off' : ''}">${o.nombre}${o.costo ? ` <span>${'◆'.repeat(o.costo)}</span>` : ''}</div>`;
     const fila = (d, h, cls = '') => `<div class="bopts ${cls}">${Bt.ops.map(opcion).slice(d, h).join('')}</div>`;
@@ -1712,11 +1718,24 @@ function rombo(c, x, y, lleno) {
 }
 
 // Fila de estados: lo que afecta a cada personaje ahora
+// Todo lo que tiene encima un personaje: el ícono de su tarjeta y lo que significa
+const NOMBRE_ESTADO = { veneno: 'Envenenado', quemadura: 'Quemado', sangrado: 'Sangrando' };
+function listaEstados(q) {
+  return [q.guardia && ['escudo', icon('shield'), 'En guardia', 'Recibe la mitad del daño hasta su próximo turno.'],
+    q.provoca > 0 && ['ira', icon('cross'), 'Provocando', 'Atrae los ataques enemigos.'],
+    q.defensaExtra > 0 && ['bonus', iconoEstado('bonus'), `Defensa +${q.defensaExtra}`, 'Recibe menos daño durante esta pelea.'],
+    q.marcado && ['marca', icon('ash'), 'Marcado', 'Volvió de la muerte con menos vida.'],
+    q.presa > 0 && ['presa', iconoEstado('presa'), 'Presa', 'Atrae los ataques y recibe 50% más de daño.'],
+    q.mirado && ['ojo', iconoEstado('ojo'), 'Bajo su mirada', 'Si ataca a quien le clavó la mirada, recibe la mitad del daño.'],
+    q.enganchado && ['aturdido', iconoEstado('aturdido'), 'Enganchado', 'Pierde su próximo turno.'],
+    q.hechizado && ['ira', icon('cross'), 'Hechizado', 'En su próximo turno ataca a su propio grupo.'],
+    q.debil > 0 && ['debil', iconoEstado('debil'), 'Debilitado', 'Pega 30% menos.'],
+    ...(q.estados || []).map(v => [v.tipo, ICONOS[v.tipo] ? iconoEstado(v.tipo) : '●', NOMBRE_ESTADO[v.tipo] || v.tipo,
+      v.por_turno ? tr('Pierde {0} de vida por turno.', v.por_turno) : 'Al juntar varias heridas, se abren de golpe.'])].filter(Boolean);
+}
 function estadosDe(q) {
-  const on = [q.guardia && ['escudo', icon('shield'), 'En guardia'], q.provoca > 0 && ['ira', icon('cross'), 'Provocando'],
-    q.defensaExtra > 0 && ['bonus', iconoEstado('bonus'), `Defensa +${q.defensaExtra}`], q.marcado && ['marca', icon('ash'), 'Marcado'], q.presa > 0 && ['presa', iconoEstado('presa'), 'Presa'], q.mirado && ['ojo', iconoEstado('ojo'), 'Bajo su mirada'], q.enganchado && ['aturdido', iconoEstado('aturdido'), 'Pierde el turno'], q.hechizado && ['hechizado', iconoEstado('hechizado'), 'Hechizado'], q.debil > 0 && ['debil', iconoEstado('debil'), 'Debilitado'],
-    ...(q.estados || []).map(v => [v.tipo, ICONOS[v.tipo] ? iconoEstado(v.tipo) : '●', v.tipo])].filter(Boolean).slice(-4);
-  return Array.from({ length: 4 }, (_, i) => (on[i] ? `<i class="${on[i][0]}" title="${on[i][2]}">${on[i][1]}</i>` : '<i></i>')).join('');
+  const on = listaEstados(q).slice(-4);
+  return Array.from({ length: 4 }, (_, i) => (on[i] ? `<i class="${on[i][0]}" title="${on[i][2]}: ${tr(on[i][3])}">${on[i][1]}</i>` : '<i></i>')).join('');
 }
 
 // ---------- Escena de la batalla ----------

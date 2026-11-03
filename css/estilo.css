@@ -81,6 +81,21 @@
 #bMenu .bpista { position: absolute; right: 0; top: -12px; font-size: 7.5px; color: var(--c4); text-shadow: 0 1px 0 #000, 0 0 3px #000; }
 #bAyuda { position: absolute; left: 110px; right: 110px; bottom: 90px; padding: 3px 6px 4px; text-align: center; background: rgba(0, 0, 0, 0.88); box-shadow: 0 0 0 0.5px var(--c3); }
 #bAyuda.hidden { display: none; }
+#bAntorcha { position: absolute; right: 8px; top: 6px; display: flex; align-items: center; gap: 3px; padding: 2px 5px 3px 3px; background: rgba(0, 0, 0, 0.72); box-shadow: 0 0 0 0.5px var(--c3); }
+#bAntorcha.hidden, #bEfectos.hidden { display: none; }
+#bAntorcha i { display: block; width: 15px; height: 13px; background-position: center; background-size: 23px 21px; image-rendering: pixelated; }
+#bAntorcha span { display: block; width: 62px; font-size: 7.5px; line-height: 9px; color: var(--c4); }
+#bAntorcha b { float: right; font-weight: 600; color: var(--c5); }
+#bAntorcha u { display: block; height: 3px; margin-top: 1px; background: var(--c1); text-decoration: none; }
+#bAntorcha s { display: block; height: 100%; background: #ee9a3a; }
+#bAntorcha.baja b { color: #e0605a; }
+#bAntorcha.baja s { background: #e0261c; }
+#bEfectos { position: absolute; left: 6px; top: 30px; width: 158px; padding: 3px 4px; background: rgba(0, 0, 0, 0.88); box-shadow: 0 0 0 0.5px var(--c3); }
+#bEfectos div { display: flex; gap: 3px; margin-bottom: 2px; }
+#bEfectos i { flex: none; width: 10px; height: 10px; font-style: normal; font-size: 7px; line-height: 10px; text-align: center; color: var(--c5); }
+#bEfectos .ipix, #bEfectos .ic { width: 9px; height: 9px; image-rendering: pixelated; }
+#bEfectos span { font-size: 7px; line-height: 8.5px; color: var(--c4); }
+#bEfectos b { display: block; font-weight: 600; color: var(--c5); }
 #bAyuda b { display: block; font-size: 10px; line-height: 12px; color: var(--c5); }
 #bAyuda p { margin: 0; font-size: 8.5px; line-height: 11px; color: var(--c4); }
 #bAyuda em { display: block; font-style: normal; font-size: 7.5px; line-height: 10px; color: var(--c5); }
