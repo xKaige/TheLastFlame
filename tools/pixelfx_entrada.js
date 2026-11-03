@@ -6,4 +6,5 @@ import * as estocada from './src/fx/melee/thrust.js';
 import * as golpe from './src/fx/impacts/blunt-hit.js';
 import * as chispa from './src/fx/impacts/hit-spark.js';
 import * as critico from './src/fx/impacts/crit-hit.js';
-export const EFECTOS = { tajo, estocada, golpe, chispa, critico };
+import * as pilar from './src/fx/fire/flame-pillar.js';
+export const EFECTOS = { tajo, estocada, golpe, chispa, critico, pilar };
