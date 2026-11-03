@@ -1782,6 +1782,47 @@
         "turnos": 2,
         "dano": 1.5
       }
+    },
+    "golpe_especial": {
+      "imagen": "cazador_salto",
+      "lado": 240,
+      "margen": 55,
+      "cuadros": 6,
+      "efecto": "caida",
+      "orden": [
+        0,
+        1,
+        2,
+        null,
+        3,
+        4,
+        5
+      ],
+      "tiempos": [
+        0.25,
+        0.55,
+        0.8,
+        1.35,
+        1.5,
+        1.95,
+        2.3
+      ],
+      "vuelo": [
+        null,
+        null,
+        [
+          0,
+          -240
+        ],
+        null,
+        [
+          -250,
+          0
+        ],
+        null,
+        null
+      ],
+      "impacto": 1.5
     }
   },
   "habitante": {

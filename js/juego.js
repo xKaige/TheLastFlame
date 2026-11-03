@@ -1281,7 +1281,7 @@ function golpeImponente(u) {
   later(D.enemigos[u.tipo].golpe_especial.impacto * 1000, () => {
     if (!Bt) return;
     mostrar(NUCLEO.turnoEnemigo(D, Bt.b, u, azarX));
-    golpePixel('barrido', u);
+    if (D.enemigos[u.tipo].golpe_especial.efecto === 'caida') { golpePixel('golpe', u); golpePixel('critico', u); } else golpePixel('barrido', u);
     for (let x = 50; x <= 430; x += 38) chispas(x, FBASE, 4, coloresFx(), -46, 60);
     Bt.temblor = 13; Bt.destello = 0.9; Bt.congelado = 0.16; sfx('slash');
     later(850, () => { if (Bt) Bt.fase = 'cambio'; });
@@ -1733,7 +1733,7 @@ function dibujarEscena(c, ex, ey) {
     if (e.vida <= 0 && !e.muriendo) continue;
     const sale = aparicion(e);
     posar(e);
-    if (sale > 0) ponerEnemigo(e, Math.round(e.x + ex + (e.retro || 0) * (e.dir || 1) - e.tam / 2), FBASE - e.tam + ey + Math.round((1 - sale) * 12));
+    if (sale > 0 && !e.oculto) ponerEnemigo(e, Math.round(e.x + ex + (e.retro || 0) * (e.dir || 1) - e.tam / 2), FBASE - e.tam + ey + Math.round((1 - sale) * 12) + Math.round(e.vuelo || 0));
   }
   const f = clamp(flick, 0.7, 1.05), alcance = (110 + 170 * P.fuel / 100) * (0.94 + f * 0.06), lat = 120 * (0.86 + f * 0.14);
   const entra = clamp(Bt.ini / (Bt.entrada * 0.75), 0, 1), focos = Bt.b.enemigos.filter(e => e.vida > 0 && e.luz).map(e => e.luz);
@@ -1820,6 +1820,12 @@ function dibujarEscudo(c, x, y) {
 
 // Los ojos encendidos del enemigo furioso, sobre el dibujo
 function dibujarOjos(c, e) {
+  // lo único que se ve de quien saltó a la penumbra
+  if (e.oculto) {
+    const x = Math.round(240 + Math.sin(Bt.t * 2.6) * 170), y = Math.round(58 + Math.sin(Bt.t * 5) * 8);
+    c.fillStyle = '#ff2a14'; c.fillRect(x - 5, y, 3, 2); c.fillRect(x + 3, y, 3, 2);
+    return;
+  }
   const an = D.enemigos[e.tipo].animacion, ojos = D.enemigos[e.tipo].ojos;
   if (!e.enfurecido || !ojos || e.vida <= 0 || e.especialDesde !== undefined) return;
   const k = e.tam / an.base, x0 = e.x - e.tam / 2, y0 = FBASE - e.tam, f = 0.75 + Math.sin(Bt.t * 9) * 0.25;

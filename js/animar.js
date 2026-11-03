@@ -147,9 +147,16 @@ function iniciarAtaqueAnimado(e) {
 // Elige la pose de este momento: mientras ataca sigue la secuencia y después vuelve a respirar
 function posar(e) {
   if (e.especialDesde !== undefined) {
-    const i = D.enemigos[e.tipo].golpe_especial.tiempos.findIndex(v => Bt.t - e.especialDesde < v);
-    if (i >= 0) { e.gris = cuadrosEspeciales(e)[i]; return; }
-    e.especialDesde = undefined;
+    // cada tramo muestra un cuadro ("orden"; null es fuera de la pantalla) y puede subir o bajar al enemigo ("vuelo")
+    const r = D.enemigos[e.tipo].golpe_especial, t = Bt.t - e.especialDesde, i = r.tiempos.findIndex(v => t < v);
+    if (i >= 0) {
+      const c = r.orden ? r.orden[i] : i, v = r.vuelo && r.vuelo[i], ini = i ? r.tiempos[i - 1] : 0;
+      e.oculto = c === null;
+      if (c !== null) e.gris = cuadrosEspeciales(e)[c];
+      e.vuelo = v ? v[0] + (v[1] - v[0]) * (t - ini) / (r.tiempos[i] - ini) : 0;
+      return;
+    }
+    e.especialDesde = undefined; e.oculto = false; e.vuelo = 0;
   }
   if (!e.poses) return;
   const n = e.poses.ataque.length, t = e.atacaDesde === undefined ? -1 : Bt.t - e.atacaDesde, mitad = Math.floor(n / 2);

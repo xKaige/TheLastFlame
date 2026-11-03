@@ -2,7 +2,7 @@
 
 El camino del juego es la expedición de grupo. El plan del juego anterior está en `juego_viejo/ROADMAP.md`.
 
-**Versión actual: 0.4.14.** Lo próximo: 0.5.0.
+**Versión actual: 0.4.15.** Lo próximo: 0.5.0.
 
 ## Cómo se numeran las versiones
 
@@ -46,6 +46,28 @@ Cada parche sube la versión en `package.json` y en `index.html`, y se anota ac�
 
 - Mostrar en los créditos los avisos de `js/pixelfx.LICENCIA.txt`.
 - Steam sigue en pausa hasta que el juego esté pulido. Sus notas están en `juego_viejo/STEAM.md`.
+
+## Ataques de jefes para retomar
+
+Ideas aprobadas, para hacer con sprites propios (hojas de 6 cuadros, `golpe_especial` en `datos/enemigos.json`).
+
+**El Cazador Gris**
+
+- Cadena y gancho: gira la cadena, la lanza a la pantalla y agarra a un personaje, que pierde el turno.
+- Marcar a la presa: olfatea, señala con la lanza y aparece la mira roja en el retrato.
+- Silbido a la jauría: silba, la sala se oscurece y los perros entran corriendo desde los costados.
+- Lanzazo de frente: clava la lanza hacia la pantalla, con el arma creciendo en primer plano.
+
+**Aldemar**
+
+- La Última Campanada (golpe especial): alza el cuenco, suenan tres campanadas y una onda de oscuridad golpea a todo el grupo.
+- Nunca cierra los ojos: marca a un personaje; si ataca a Aldemar, recibe parte del daño de vuelta.
+- Lo que hiciste: Debilitado a un personaje y a quien tenga vínculo con él.
+- Ceniza en el cuenco: apaga parte de la antorcha; con poca antorcha, Aldemar pega más.
+- Sin oscuridad: durante 2 turnos, curar a un aliado también daña a quien cura.
+- Que ningún hombre descanse: si muere un Apagado, los demás ganan velocidad.
+- Los cuarenta: una vez por pelea, los Apagados caídos se levantan con poca vida.
+- Déjenme descansar (bajo el 15% de vida): deja caer el cuenco, recibe más daño y pega el doble.
 
 ## Historia
 
@@ -93,6 +115,10 @@ La idea que une todo es una regla de las Guardianas: "quien le pida algo va a re
 - **Título:** el logo "The Last Flame" no cambia con el idioma.
 
 ## Historial
+
+### 0.4.15
+
+- El Cazador Gris: salto desde la penumbra dibujado cuadro por cuadro.
 
 ### 0.4.14
 

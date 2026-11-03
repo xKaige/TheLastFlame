@@ -420,7 +420,11 @@ const NUCLEO = (() => {
   }
 
   // Si en este turno le toca el golpe a todo el grupo: la pantalla lo anuncia antes de que pase
-  const haraEspecial = u => !!u.especial && !u.aturdido && !(u.enfurecido && u.fase.ciclo) && (u.turnos + 1) % u.especial.cada === 0;
+  const haraEspecial = u => {
+    if (!u.especial || u.aturdido) return false;
+    if (u.enfurecido && u.fase.ciclo) return u.fase.ciclo[u.pasoFase % u.fase.ciclo.length] === 'especial';
+    return (u.turnos + 1) % u.especial.cada === 0;
+  };
 
   function turnoEnemigo(D, b, u, azar) {
     const eventos = [], grupo = vivos(b.aliados);
