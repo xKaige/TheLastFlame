@@ -45,6 +45,11 @@ function cerrarPersonajes() {
 const textoBonos = o => [...Object.entries(o.bonos).map(([k, v]) => `${v > 0 ? '+' : '−'}${Math.abs(v)} ${(REGLAS_ATR.nombres[k] || k).toUpperCase().slice(0, 3)}`), ...(o.magico ? [tr('ATQ +{0}% INT', Math.round(o.magico * 100))] : [])].join(' · ');
 const nombreObjeto = o => `${o.rareza === 'rara' ? '✦ ' : ''}${o.nombre}`;
 const textoRequisito = h => Object.entries(h.requisito || {}).map(([k, v]) => `${REGLAS_ATR.nombres[k]} ${v}`).join(' · ');
+// Lo que se gasta también se ve en la mochila, primero que el resto
+const CONSUMIBLES = {
+  potions: { nombre: 'Poción', descripcion: 'Cura un 40% al aliado más herido.', accion: 'potion' },
+  oil: { nombre: 'Aceite', descripcion: 'Aviva la antorcha.', accion: 'oil' },
+};
 const habilidadesConocidas = p => [...D.clases[p.clase].habilidades, ...X.grimorio.filter(id => !D.clases[p.clase].habilidades.includes(id))];
 
 // Lo que se puede elegir en la pestaña abierta
@@ -52,7 +57,7 @@ function filasTab() {
   const p = PJ.lista[PJ.i];
   if (PJ.tab === 0) return [...REGLAS_ATR.lista.map(a => ({ atr: a })), ...LUGARES_EQUIPO.map(s => ({ slot: s[0] }))];
   if (PJ.tab === 1) return habilidadesConocidas(p).map(id => ({ hab: id }));
-  return X.mochila.map(id => ({ obj: id }));
+  return [...Object.keys(CONSUMIBLES).filter(k => P && P[k] > 0).map(k => ({ cons: k })), ...X.mochila.map(id => ({ obj: id }))];
 }
 
 const filasPj = () => (PJ.sub ? PJ.sub.opciones : filasTab());
@@ -102,9 +107,9 @@ function pintarPj() {
     const detalle = h ? `<div class="pnom2">${h.nombre}</div><div class="pdesc">${h.descripcion}</div><div class="pdesc">${tr('Costo')}: ${'◆'.repeat(h.costo)}</div>${h.requisito ? `<div class="pdesc ${NUCLEO.cumpleRequisito(D, p, filas[PJ.sel].hab) ? '' : 'no'}">Requiere ${textoRequisito(h)}</div>` : ''}${PJ.edita ? '' : `<div class="pdesc nota">${tr('Sólo se cambian en el Hogar o en un santuario.')}</div>`}` : '';
     centro = `${panel('Conocidas', `lleva ${p.habilidades.length} de ${D.mazmorra.max_habilidades}`, `<div class="plista">${lista}</div>`, 'patrs')}<div class="pcol">${panel('Detalle', '', detalle, 'plleno')}</div>`;
   } else {
-    const o = filas[PJ.sel] && D.objetos[filas[PJ.sel].obj];
-    const lista = filas.length ? filas.map(f => `<div class="pitem${elegida(f) ? ' sel' : ''}"><span>${nombreObjeto(D.objetos[f.obj])}</span><em>${textoBonos(D.objetos[f.obj])}</em></div>`).join('') : `<div class="pdesc">${tr('Está vacía.')}</div>`;
-    const detalle = `${o ? `<div class="pnom2">${nombreObjeto(o)}</div><div class="pdesc">${o.descripcion}</div>${o.clases ? `<div class="pdesc">${tr('Para: {0}', o.clases.map(k => D.clases[k].nombre).join(', '))}</div>` : ''}${o.requisito ? `<div class="pdesc ${NUCLEO.cumpleObjeto(D, p, filas[PJ.sel].obj) ? '' : 'no'}">${tr('Requiere {0}', textoRequisito(o))}</div>` : ''}<div class="pdesc">${tr('Se equipa desde Estado.')}</div>` : ''}<div class="pdesc nota">${P ? `${P.potions || 0} pociones · ${P.oil || 0} de aceite` : ''}</div>`;
+    const f0 = filas[PJ.sel], o = f0 && D.objetos[f0.obj], con = f0 && CONSUMIBLES[f0.cons];
+    const lista = filas.length ? filas.map(f => `<div class="pitem${elegida(f) ? ' sel' : ''}"><span>${f.cons ? tr(CONSUMIBLES[f.cons].nombre) : nombreObjeto(D.objetos[f.obj])}</span><em>${f.cons ? `×${P[f.cons]}` : textoBonos(D.objetos[f.obj])}</em></div>`).join('') : `<div class="pdesc">${tr('Está vacía.')}</div>`;
+    const detalle = `${o ? `<div class="pnom2">${nombreObjeto(o)}</div><div class="pdesc">${o.descripcion}</div>${o.clases ? `<div class="pdesc">${tr('Para: {0}', o.clases.map(k => D.clases[k].nombre).join(', '))}</div>` : ''}${o.requisito ? `<div class="pdesc ${NUCLEO.cumpleObjeto(D, p, filas[PJ.sel].obj) ? '' : 'no'}">${tr('Requiere {0}', textoRequisito(o))}</div>` : ''}<div class="pdesc">${tr('Se equipa desde Estado.')}</div>` : ''}${con ? `<div class="pnom2">${tr(con.nombre)}</div><div class="pdesc">${tr(con.descripcion)}</div><div class="pdesc">${tr('Te quedan {0}.', P[f0.cons])}</div><div class="pdesc">${tr('Se usa con')} ${glyph(con.accion)}</div>` : ''}`;
     centro = `${panel('Mochila', `${filas.length} objetos`, `<div class="plista">${lista}</div>`, 'patrs')}<div class="pcol">${panel('Detalle', '', detalle, 'plleno')}</div>`;
   }
   const sub = PJ.sub ? `<div class="psubm"><h4>${tr(LUGARES_EQUIPO.find(x => x[0] === PJ.sub.slot)[1])}</h4>${PJ.sub.opciones.map((id, i) => {

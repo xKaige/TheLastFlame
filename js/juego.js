@@ -935,11 +935,11 @@ function casilleroX(n) {
 window.updateHUD = () => {
   baseX.updateHUD();
   const heridos = NUCLEO.vivos(X.grupo).filter(p => p.vida < p.vidaMax * 0.3).length;
-  const objeto = (img, n) => `<div class="obj"><i style="background-image:url(${casilleroX(img)})"></i><b>${n}</b></div>`;
+  const objeto = (img, n, accion) => `<div class="obj"><i style="background-image:url(${casilleroX(img)})"></i><b>${n}</b>${accion ? `<span class="tecla">${glyph(accion)}</span>` : ''}</div>`;
   const i = D.mazmorra.niveles.indexOf(S.level), total = D.mazmorra.niveles.length;
   const nivel = !S.level ? '<small>Santuario</small>' : tr('<small>{0}</small>', i === total - 1 ? 'La guarida' : ['Primer', 'Segundo'][i] + ' descenso');
   $('xEsq').innerHTML = `<div class="zona">${D.mazmorra.pisos[S.floor - 1].nombre}${nivel}</div>` +
-    `<div class="fila">${objeto('pocion', P.potions)}${objeto('aceite', P.oil)}${objeto('antorcha', Math.ceil(P.fuel))}</div>` +
+    `<div class="fila">${objeto('pocion', P.potions, 'potion')}${objeto('aceite', P.oil, 'oil')}${objeto('antorcha', Math.ceil(P.fuel))}</div>` +
     (heridos ? `<div class="alerta">${heridos} en peligro · ${glyph('inv')}</div>` : '');
 };
 
