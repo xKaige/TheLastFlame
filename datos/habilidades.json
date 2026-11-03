@@ -148,22 +148,17 @@
   },
   "ultimo_aliento": {
     "nombre": "Último Aliento",
-    "costo": 3,
-    "objetivo": "enemigo",
-    "efectos": [
-      {
-        "tipo": "dano",
-        "mult": 1,
-        "por_herida": 2
-      }
-    ],
-    "descripcion": "Pega más fuerte cuanta menos vida te quede.",
+    "costo": 0,
+    "objetivo": "propio",
+    "efectos": [],
+    "descripcion": "Pasiva. Tus golpes pegan hasta 75% más cuanta menos vida te quede.",
     "requisito": {
       "fue": 12
     },
     "fuente": "jefe",
     "jefe": "reyOsario",
-    "pista": "Algo así solo lo enseña quien gobierna entre huesos."
+    "pista": "Algo así solo lo enseña quien gobierna entre huesos.",
+    "pasiva": true
   },
   "tajo_giratorio": {
     "nombre": "Tajo Giratorio",

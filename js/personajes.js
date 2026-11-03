@@ -102,9 +102,9 @@ function pintarPj() {
     const h = filas[PJ.sel] && D.habilidades[filas[PJ.sel].hab];
     const lista = filas.map(f => {
       const x = D.habilidades[f.hab], lleva = p.habilidades.includes(f.hab), puede = NUCLEO.cumpleRequisito(D, p, f.hab);
-      return `<div class="pitem${elegida(f) ? ' sel' : ''}${puede ? '' : ' no'}"><span>${lleva ? '✦ ' : ''}${x.nombre}</span><em>${'◆'.repeat(x.costo)}</em></div>`;
+      return `<div class="pitem${elegida(f) ? ' sel' : ''}${puede ? '' : ' no'}"><span>${lleva ? '✦ ' : ''}${x.nombre}</span><em>${x.pasiva ? tr('Pasiva') : '◆'.repeat(x.costo)}</em></div>`;
     }).join('');
-    const detalle = h ? `<div class="pnom2">${h.nombre}</div><div class="pdesc">${h.descripcion}</div><div class="pdesc">${tr('Costo')}: ${'◆'.repeat(h.costo)}</div>${h.requisito ? `<div class="pdesc ${NUCLEO.cumpleRequisito(D, p, filas[PJ.sel].hab) ? '' : 'no'}">Requiere ${textoRequisito(h)}</div>` : ''}${PJ.edita ? '' : `<div class="pdesc nota">${tr('Sólo se cambian en el Hogar o en un santuario.')}</div>`}` : '';
+    const detalle = h ? `<div class="pnom2">${h.nombre}</div><div class="pdesc">${h.descripcion}</div>${h.pasiva ? '' : `<div class="pdesc">${tr('Costo')}: ${'◆'.repeat(h.costo)}</div>`}${h.requisito ? `<div class="pdesc ${NUCLEO.cumpleRequisito(D, p, filas[PJ.sel].hab) ? '' : 'no'}">Requiere ${textoRequisito(h)}</div>` : ''}${PJ.edita ? '' : `<div class="pdesc nota">${tr('Sólo se cambian en el Hogar o en un santuario.')}</div>`}` : '';
     centro = `${panel('Conocidas', `lleva ${p.habilidades.length} de ${D.mazmorra.max_habilidades}`, `<div class="plista">${lista}</div>`, 'patrs')}<div class="pcol">${panel('Detalle', '', detalle, 'plleno')}</div>`;
   } else {
     const f0 = filas[PJ.sel], o = f0 && D.objetos[f0.obj], con = f0 && CONSUMIBLES[f0.cons];

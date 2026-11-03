@@ -11,6 +11,7 @@ const NUCLEO = (() => {
   const vivos = lista => lista.filter(u => u.vida > 0);
 
   const PRESA_DANO = 1.5;     // cuánto más le pegan a la presa marcada
+  const ALIENTO_DANO = 0.75;   // lo que suma Último Aliento con la vida casi en cero
   const DEBIL_DANO = 0.7;     // lo que pega quien quedó debilitado
   // ---------- Personajes ----------
   // Un personaje es un modelo (quién es); cada modelo tiene su clase (qué hace), así el retrato siempre la muestra
@@ -219,10 +220,11 @@ const NUCLEO = (() => {
     return { unidad: u, eventos };
   }
 
-  const opciones = (D, u) => u.habilidades.filter(id => cumpleRequisito(D, u, id)).map(id => ({ id, ...D.habilidades[id], apagada: u.impetu < D.habilidades[id].costo }));
+  const opciones = (D, u) => u.habilidades.filter(id => !D.habilidades[id].pasiva && cumpleRequisito(D, u, id)).map(id => ({ id, ...D.habilidades[id], apagada: u.impetu < D.habilidades[id].costo }));
 
   function golpear(azar, u, t, eventos, { mult = 1, criticoSeguro = false, ignoraDefensa = false } = {}) {
     if (u.debil > 0) mult *= DEBIL_DANO;
+    if (!u.enemigo && u.habilidades.includes('ultimo_aliento')) mult *= 1 + ALIENTO_DANO * (1 - u.vida / u.vidaMax);
     // en la penumbra sólo se le pega justo después de que ataca
     if (t.enemigo && cazando(t) && !t.expuesto) { eventos.push({ tipo: 'texto', clave: 'penumbra', quien: t }); return; }
     if (azar() < t.esquiva) {
