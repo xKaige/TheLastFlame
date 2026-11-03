@@ -101,6 +101,10 @@ for (const k in COFRES) COFRES[k] = Object.assign(new Image(), { src: tr('interf
 
 // Los enemigos de Los Salones y El Fondo existen sólo en esta versión del juego: el motor los necesita para ponerlos en el mapa
 Object.assign(ENEMIES, {
+  minero: { name: 'Minero Dorado', idle: 'heavy', hitFx: 'blade', spr: 'minero', hp: 34, atk: [6, 10], def: 3, xp: 26, ramp: 0, speed: 0.7, scale: 1, flee: 0.5 },
+  veta_viva: { name: 'Veta Viva', idle: 'heavy', hitFx: 'smash', spr: 'veta_viva', hp: 40, atk: [5, 9], def: 5, xp: 28, ramp: 0, speed: 0.5, scale: 0.95, flee: 0.5 },
+  buscador: { name: 'Buscador', idle: 'float', hitFx: 'claw', spr: 'buscador', hp: 26, atk: [5, 8], def: 1, xp: 22, ramp: 0, speed: 1, scale: 0.9, flee: 0.5 },
+  vagoneta: { name: 'Vagoneta Hambrienta', idle: 'heavy', hitFx: 'smash', spr: 'vagoneta', hp: 36, atk: [5, 9], def: 3, xp: 24, ramp: 0, speed: 0.8, scale: 0.9, flee: 0.5 },
   capataz: { name: 'El Capataz', hitFx: 'smash', spr: 'capataz', hp: 400, atk: [16, 24], def: 5, xp: 80, ramp: 1, speed: 0, scale: 1.3, boss: true, flee: 0 },
   portadora: { name: 'Portadora Velada', idle: 'float', hitFx: 'shadow', spr: 'portadora', hp: 26, atk: [4, 8], def: 2, xp: 20, ramp: 0, speed: 0.7, scale: 1, flee: 0.5 },
   tachado: { name: 'El Tachado', idle: 'heavy', hitFx: 'blade', spr: 'tachado', hp: 32, atk: [5, 9], def: 4, xp: 24, ramp: 0, speed: 0.5, scale: 1, flee: 0.5 },
@@ -113,7 +117,7 @@ Object.assign(ENEMIES, {
 });
 POOLS[2].push('armadura', 'armadura', 'retrato', 'retrato', 'dama', 'dama', 'copero', 'copero');
 POOLS[3].push('portadora', 'portadora', 'tachado', 'tachado', 'apagado', 'apagado', 'perdido', 'perdido');
-POOLS[4] = POOLS[3].slice();      // La Veta usa los enemigos de El Fondo hasta tener los suyos
+POOLS[4] = ['minero', 'minero', 'veta_viva', 'buscador', 'buscador', 'vagoneta'];
 
 function aplicarEnemigosEnMapa() {
   for (const [k, img] of Object.entries(COFRES)) {

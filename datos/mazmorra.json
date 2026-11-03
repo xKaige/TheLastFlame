@@ -355,51 +355,30 @@
     ],
     "4": [
       [
-        "caballero",
-        "sombra"
+        "minero",
+        "buscador"
       ],
       [
-        "necrofago",
-        "acechador"
+        "veta_viva",
+        "minero"
       ],
       [
-        "caballero",
-        "soplo",
-        "soplo"
+        "vagoneta",
+        "buscador",
+        "minero"
       ],
       [
-        "acechador",
-        "acechador"
+        "buscador",
+        "buscador"
       ],
       [
-        "cebado",
-        "necrofago"
+        "veta_viva",
+        "vagoneta"
       ],
       [
-        "portadora",
-        "caballero"
-      ],
-      [
-        "tachado",
-        "apagado"
-      ],
-      [
-        "apagado",
-        "portadora",
-        "apagado"
-      ],
-      [
-        "perdido",
-        "necrofago"
-      ],
-      [
-        "tachado",
-        "portadora"
-      ],
-      [
-        "perdido",
-        "apagado",
-        "perdido"
+        "minero",
+        "minero",
+        "buscador"
       ]
     ]
   },
@@ -420,9 +399,9 @@
       "apagado"
     ],
     "4": [
-      "perdido",
+      "minero",
       "capataz",
-      "perdido"
+      "minero"
     ]
   },
   "grupo": {
