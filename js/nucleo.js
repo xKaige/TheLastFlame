@@ -197,6 +197,7 @@ const NUCLEO = (() => {
     if (u.vida <= 0) morir(u, eventos);
     u.guardia = false;
     if (!u.enemigo) {
+      for (const e of b.enemigos) if (e.expuesto && e.expuestoQuedan-- <= 0) e.expuesto = false;
       if (u.vida <= 0) return { unidad: u, eventos };
       if (u.provoca > 0) u.provoca--;
       if (u.debil > 0) u.debil--;
@@ -222,6 +223,8 @@ const NUCLEO = (() => {
 
   function golpear(azar, u, t, eventos, { mult = 1, criticoSeguro = false, ignoraDefensa = false } = {}) {
     if (u.debil > 0) mult *= DEBIL_DANO;
+    // en la penumbra sólo se le pega justo después de que ataca
+    if (t.enemigo && cazando(t) && !t.expuesto) { eventos.push({ tipo: 'texto', clave: 'penumbra', quien: t }); return; }
     if (azar() < t.esquiva) {
       eventos.push({ tipo: 'esquiva', quien: t });
       if (!t.enemigo) t.impetu = Math.min(IMP_TOPE, t.impetu + 1);
@@ -360,7 +363,9 @@ const NUCLEO = (() => {
   }
 
   // A quién le pegan: quien provoca, después la presa marcada, si no cualquiera
-  const blancoEnemigo = (grupo, azar) => grupo.find(t => t.provoca > 0) || grupo.find(t => t.presa > 0) || elegir(azar, grupo);
+  const cazando = u => !!(u.enfurecido && u.fase && u.fase.caceria);
+  const blancoEnemigo = (grupo, azar, u) => grupo.find(t => t.provoca > 0) || grupo.find(t => t.presa > 0)
+    || (u && cazando(u) ? grupo.slice().sort((x, y) => x.vida / x.vidaMax - y.vida / y.vidaMax)[0] : elegir(azar, grupo));
 
   function especialDeJefe(u, grupo, azar, eventos) {
     eventos.push({ tipo: 'texto', clave: 'especial', quien: u, texto: u.especial.nombre });
@@ -392,7 +397,7 @@ const NUCLEO = (() => {
     return false;
   }
   function usarGancho(u, grupo, azar, eventos) {
-    const f = u.fase, t = blancoEnemigo(grupo, azar);
+    const f = u.fase, t = blancoEnemigo(grupo, azar, u);
     eventos.push({ tipo: 'texto', clave: 'especial', quien: u, texto: f.gancho.nombre }, { tipo: 'gancho', quien: t, desde: u });
     if (t.esquivaSegura || azar() < t.esquiva) { t.esquivaSegura = false; eventos.push({ tipo: 'esquiva', quien: t }); return true; }
     herir(t, entre(azar, ...f.gancho.dano), eventos);
@@ -421,7 +426,7 @@ const NUCLEO = (() => {
     if (h.refuerza) { for (const e of vivos(b.enemigos)) e.defensaExtra = Math.max(e.defensaExtra || 0, h.refuerza); return; }
     if (h.apaga) { b.antorcha = Math.max(0, b.antorcha - h.apaga); eventos.push({ tipo: 'antorcha', quien: u, valor: h.apaga }); }
     const herido = grupo.find(t => t.provoca > 0) || grupo.slice().sort((x, y) => x.vida / x.vidaMax - y.vida / y.vidaMax)[0];
-    const blancos = h.blanco === 'todos' ? grupo : [h.blanco === 'herido' ? herido : blancoEnemigo(grupo, azar)], mult = h.mult ?? 1;
+    const blancos = h.blanco === 'todos' ? grupo : [h.blanco === 'herido' ? herido : blancoEnemigo(grupo, azar, u)], mult = h.mult ?? 1;
     for (const t of blancos) {
       let acierta = !mult;
       for (let n = 0; mult && n < (h.veces || 1) && t.vida > 0; n++) {
@@ -467,6 +472,7 @@ const NUCLEO = (() => {
     const eventos = [], grupo = vivos(b.aliados);
     if (u.aturdido) { u.aturdido = false; eventos.push({ tipo: 'texto', clave: 'pierde_turno', quien: u }); return eventos; }
     u.turnos++;
+    if (cazando(u)) { u.expuesto = true; u.expuestoQuedan = 1; }
     for (const q of grupo) if (q.mirado === u && --q.miradoTurnos <= 0) q.mirado = null;
     if (u.desesperado) { golpeEnemigo(u, blancoEnemigo(grupo, azar), azar, eventos, fuerzaOscura(b, u)); return eventos; }
     if (enSuTrono(u)) {
@@ -481,7 +487,7 @@ const NUCLEO = (() => {
     const propia = u.proxima !== undefined ? u.proxima : elegirPropia(u, azar, u.turnos === 1);
     u.proxima = undefined;
     if (propia) { habilidadEnemiga(b, u, propia, grupo, azar, eventos); return eventos; }
-    const t = blancoEnemigo(grupo, azar);
+    const t = blancoEnemigo(grupo, azar, u);
     if (b.muroLlamas > 0) { b.muroLlamas--; aplicarEstado(u, { tipo: 'quemadura', por_turno: 2, min: 2, max: 3 }, azar, eventos); }
     if (!golpeEnemigo(u, t, azar, eventos, fuerzaOscura(b, u))) return eventos;
     if (u.robaImpetu && t.impetu > 0) { t.impetu--; eventos.push({ tipo: 'texto', clave: 'roba', quien: t }); }

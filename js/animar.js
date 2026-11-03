@@ -121,7 +121,7 @@ function prepararPoses(e) {
 
 // El golpe especial dibujado cuadro por cuadro (campo "golpe_especial" de enemigos.json): una hoja con un cuadro al lado del otro
 const HOJAS_ESPECIAL = {}, CUADROS_ESPECIAL = {};
-for (const d of Object.values(D.enemigos)) for (const r of [d.golpe_especial, d.fase && d.fase.trono, d.fase && d.fase.gancho && d.fase.gancho.hoja, d.ultimo && d.ultimo.hoja, ...(d.habilidades || []).map(h => h.hoja)]) if (r) HOJAS_ESPECIAL[r.imagen] = Object.assign(new Image(), { src: `interfaz/enemigos/${r.imagen}.png` });
+for (const d of Object.values(D.enemigos)) for (const r of [d.golpe_especial, d.fase && d.fase.trono, d.fase && d.fase.caceria, d.fase && d.fase.gancho && d.fase.gancho.hoja, d.ultimo && d.ultimo.hoja, ...(d.habilidades || []).map(h => h.hoja)]) if (r) HOJAS_ESPECIAL[r.imagen] = Object.assign(new Image(), { src: `interfaz/enemigos/${r.imagen}.png` });
 
 function cuadrosEspeciales(e, r = D.enemigos[e.tipo].golpe_especial) {
   const hoja = r && HOJAS_ESPECIAL[r.imagen];
@@ -146,11 +146,6 @@ function iniciarAtaqueAnimado(e) {
 
 // Elige la pose de este momento: mientras ataca sigue la secuencia y después vuelve a respirar
 function posar(e) {
-  // el trono se arma cuadro por cuadro y queda armado hasta que se rompan los escudos
-  if (e.tronoDesde !== undefined) {
-    const r = e.hojaFija, c = cuadrosEspeciales(e, r), i = r.tiempos.findIndex(v => Bt.t - e.tronoDesde < v);
-    if (c) { e.gris = c[i < 0 ? c.length - 1 : i]; return; }
-  }
   if (e.especialDesde !== undefined) {
     // cada tramo muestra un cuadro ("orden"; null es fuera de la pantalla) y puede subir o bajar al enemigo ("vuelo")
     const r = e.hojaActiva, t = Bt.t - e.especialDesde, i = r.tiempos.findIndex(v => t < v);
@@ -162,6 +157,11 @@ function posar(e) {
       return;
     }
     e.especialDesde = undefined; e.oculto = false; e.vuelo = 0;
+  }
+  // una hoja que termina en una pose que se queda: el trono armado, o el Cazador oculto mientras no ataca
+  if (e.tronoDesde !== undefined && !e.expuesto) {
+    const r = e.hojaFija, c = cuadrosEspeciales(e, r), i = r.tiempos.findIndex(v => Bt.t - e.tronoDesde < v);
+    if (c) { e.gris = c[i < 0 ? c.length - 1 : i]; return; }
   }
   if (!e.poses) return;
   const n = e.poses.ataque.length, t = e.atacaDesde === undefined ? -1 : Bt.t - e.atacaDesde, mitad = Math.floor(n / 2);

@@ -1779,7 +1779,7 @@
       "escudos": 0,
       "velocidad": 1.2,
       "dano": 1.1,
-      "mensaje": "{0} se enfurece y olfatea la sangre.",
+      "mensaje": "{0} apaga las antorchas y se hunde en la penumbra.",
       "ciclo": [
         "jauria",
         "gancho",
@@ -1823,6 +1823,20 @@
         "nombre": "elige a su presa",
         "turnos": 2,
         "dano": 1.5
+      },
+      "caceria": {
+        "imagen": "cazador_caceria",
+        "lado": 240,
+        "margen": 55,
+        "cuadros": 6,
+        "tiempos": [
+          0.3,
+          0.7,
+          1.05,
+          1.4,
+          1.75,
+          2.1
+        ]
       }
     },
     "golpe_especial": {

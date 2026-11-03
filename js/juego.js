@@ -1316,7 +1316,9 @@ function mostrarEvento(e) {
   }
   if (e.tipo === 'antorcha') { P.fuel = Math.max(0, P.fuel - e.valor); updateHUD(); }
   if (e.tipo === 'invoca') { for (const n of e.nuevos) { n.x = Bt.lugares[n.i]; prepararEnemigo(n); chispas(n.x, FBASE - 24, 18, MARCO.vida, -24); } sfx('encounter'); Bt.temblor = 4; }
-  if (e.tipo === 'fase' && q.fase.trono) { q.tronoDesde = Bt.t; q.hojaFija = q.fase.trono; }
+  if (e.tipo === 'fase' && (q.fase.trono || q.fase.caceria)) { q.tronoDesde = Bt.t; q.hojaFija = q.fase.trono || q.fase.caceria; }
+  if (e.tipo === 'fase' && q.fase.caceria) Bt.penumbra = 0.6;
+  if (e.tipo === 'texto' && e.clave === 'penumbra') { Bt.msg = 'Golpe al humo. Pegale justo después de que ataque.'; sfx('miss'); }
   if (e.tipo === 'desesperado') { q.tronoDesde = Bt.t; q.hojaFija = q.ultimo.hoja; Bt.msg = tr(q.ultimo.mensaje, q.nombre); Bt.temblor = 8; Bt.destello = 0.5; sfx('encounter'); }
   if (e.tipo === 'texto' && e.clave === 'refleja') Bt.msg = tr('La mirada le devuelve el golpe a {0}.', q.nombre);
   if (e.tipo === 'gancho') {
@@ -1800,7 +1802,7 @@ function dibujarEscena(c, ex, ey) {
   for (let y = 0, i = 0; y < h; y++) for (let x = 0; x < w; x++, i++) {
     let l = ambiente + Bt.destello + Math.max(0, 1 - dc[i] / alcance) * 0.8 + Math.max(0, 1 - dl[i] / lat) * 0.95;
     for (const d of focos) { const q = 1 - d[i] / 52; if (q > 0) l += q * 0.5; }
-    const b = lum[i] * l * entra * (1 - Bt.oscuro * 0.6), v = (b > 1 ? 1 : b) * n;
+    const b = lum[i] * l * entra * (1 - Math.max(Bt.oscuro, Bt.penumbra || 0) * 0.6), v = (b > 1 ? 1 : b) * n;
     let k = v | 0;
     if (v - k > BAYER[((y & 3) << 2) | (x & 3)]) k++;
     px[i] = pal[k];
@@ -2018,7 +2020,7 @@ function dibujarBatalla(c) {
   const ex = Math.round((azarX() - 0.5) * tm), ey = Math.round((azarX() - 0.5) * tm);
   dibujarEscena(c, ex, ey);
   // lo que da luz o informa va por encima de la oscuridad: llamas, brasas, vida y marca de turno
-  for (const [x, y] of ANTORCHAS[S.env] || ANTORCHAS.crypt) drawFlame(c, x, y, 18, 26, Bt.t, 0.75 * clamp(Bt.ini / (Bt.entrada * 0.5), 0, 1), 'fuegoX');
+  if (!Bt.penumbra) for (const [x, y] of ANTORCHAS[S.env] || ANTORCHAS.crypt) drawFlame(c, x, y, 18, 26, Bt.t, 0.75 * clamp(Bt.ini / (Bt.entrada * 0.5), 0, 1), 'fuegoX');
   dibujarParticulas(c);
   for (const e of b.enemigos) {
     if (e.vida <= 0 || aparicion(e) < 1) continue;
