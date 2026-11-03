@@ -7,4 +7,6 @@ import * as golpe from './src/fx/impacts/blunt-hit.js';
 import * as chispa from './src/fx/impacts/hit-spark.js';
 import * as critico from './src/fx/impacts/crit-hit.js';
 import * as pilar from './src/fx/fire/flame-pillar.js';
-export const EFECTOS = { tajo, estocada, golpe, chispa, critico, pilar };
+import * as meteoro from './src/fx/fire/meteor.js';
+import * as anillo from './src/fx/fire/fire-ring.js';
+export const EFECTOS = { tajo, estocada, golpe, chispa, critico, pilar, meteoro, anillo };

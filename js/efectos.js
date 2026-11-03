@@ -33,14 +33,10 @@ const FX_HABILIDAD = {
     c.fillStyle = COL_FX.veneno;
     for (let n = 0; n < 7; n++) c.fillRect(-14 + n * 5, -14 + (n % 3) * 7 + k * k * 34, 2, 3);
   } },
-  // una bola de fuego cae en arco sobre el blanco
-  llama_arcana: { dur: 0.5, dibujar(c, k, m) {
-    const q = clamp(k * 1.6, 0, 1), x = (1 - q) * -60 * m, y = (1 - q) * -70 * m, r = k > 0.62 ? (k - 0.62) * 90 * m : 6 * m;
-    c.globalAlpha = k > 0.62 ? 1 - (k - 0.62) / 0.38 : 1;
-    c.fillStyle = COL_FX.fuego; circulo(c, x, y, r + 3); c.fillStyle = COL_FX.luz; circulo(c, x, y, r * 0.6);
-  } },
+  // una roca en llamas cae sobre el blanco; arranca avanzada para que el impacto coincida con el daño
+  llama_arcana: { pixel: 'meteoro', corta: 1.5, adelanto: 0.42 },
   // el piso se abre y sube una columna de fuego bajo cada enemigo, de a una
-  tormenta: { pilar: true },
+  tormenta: { pixel: 'pilar', corta: 1.5 },
   // cruces de luz que suben
   sanar: { dur: 0.6, dibujar(c, k) {
     c.fillStyle = COL_FX.luz; c.globalAlpha = 1 - k;
@@ -95,14 +91,8 @@ const FX_HABILIDAD = {
     for (let n = 0; n < 14; n++) { const a = n * 0.9 + k * 7, r = (1 - k) * (30 + n * 3) * m; c.fillRect(Math.cos(a) * r, Math.sin(a) * r, 3, 3); }
     c.globalAlpha = k; c.fillStyle = COL_FX.fuego; circulo(c, 0, 0, k * 9 * m);
   } },
-  // una ola de fuego corre por delante del grupo
-  muro_llamas: { dur: 0.8, dibujar(c, k, m, t) {
-    const a = Math.sin(k * Math.PI); c.globalAlpha = a;
-    for (let n = -5; n <= 5; n++) {
-      const h = (14 + Math.sin(t * 22 + n * 1.7) * 8) * a;
-      c.fillStyle = COL_FX.fuego; c.fillRect(n * 9 - 4, -30 - h, 8, h); c.fillStyle = COL_FX.luz; c.fillRect(n * 9 - 2, -30 - h * 0.5, 4, h * 0.5);
-    }
-  } },
+  // un anillo de fuego corre por el piso y separa al grupo de los enemigos
+  muro_llamas: { pixel: 'anillo', corta: 2, x: 240, y: 14, opciones: { reach: 215 } },
   // dos arcos tibios que se cierran
   manos_tibias: { dur: 0.6, dibujar(c, k) {
     const d = (1 - k) * 26; c.strokeStyle = COL_FX.brasa; c.lineWidth = 3; c.globalAlpha = Math.sin(k * Math.PI);
@@ -122,7 +112,7 @@ function lanzarEfecto(id, u, t) {
   const fx = FX_HABILIDAD[id], b = Bt.b, h = D.habilidades[id];
   if (!fx) return;
   const blancos = { enemigo: [t], enemigos: NUCLEO.vivos(b.enemigos), aliado: [t], aliados: NUCLEO.vivos(b.aliados), propio: [u] }[h.objetivo];
-  if (fx.pilar) { blancos.forEach((q, n) => later(n * 140, () => { if (Bt) pilarDeFuego(q); })); return; }
+  if (fx.pixel) { blancos.forEach((q, n) => later(n * 140, () => { if (Bt) fuegoPixel(fx, fx.x ?? q.x); })); return; }
   const lugar = q => (q.enemigo ? { x: q.x, y: FBASE - q.tam * 0.45, m: q.tam / FTAM } : { x: CX[q.i] + 23, y: CY + 23, m: 1 });
   const o = lugar(u);
   for (const q of blancos) {
@@ -155,9 +145,10 @@ function golpePixel(id, q) {
 }
 
 // El fuego es el único acento fijo del juego: conserva su color en todas las zonas
-function pilarDeFuego(q) {
-  const f = PIXELFX.createFx(PIXELFX.EFECTOS.pilar, { x: q.x, y: FBASE, seed: 1 + Math.floor(azarX() * 9999) });
-  f.corta = 1.5;
+function fuegoPixel(fx, x) {
+  const f = PIXELFX.createFx(PIXELFX.EFECTOS[fx.pixel], { x, y: FBASE + (fx.y || 0), seed: 1 + Math.floor(azarX() * 9999), ...fx.opciones });
+  f.corta = fx.corta;
+  if (fx.adelanto) f.update(fx.adelanto);
   Bt.fxPixel.push(f);
 }
 
