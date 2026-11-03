@@ -74,6 +74,9 @@ const TEXTURAS_X = [
   { tema: 'abyss', clave: 'walls', src: 'interfaz/mazmorra/fondo/muro_1.png' },
   { tema: 'abyss', clave: 'floor', src: 'interfaz/mazmorra/fondo/piso_1.png' },
   { tema: 'abyss', clave: 'ceil', src: 'interfaz/mazmorra/fondo/techo_1.png' },
+  { tema: 'veta', clave: 'walls', src: 'interfaz/mazmorra/veta/muro_1.png' },
+  { tema: 'veta', clave: 'floor', src: 'interfaz/mazmorra/veta/piso_1.png' },
+  { tema: 'veta', clave: 'ceil', src: 'interfaz/mazmorra/veta/techo_1.png' },
 ];
 for (const t of TEXTURAS_X) { t.img = new Image(); t.img.src = t.src; }
 // Los dibujos propios de enemigos también van en la mazmorra: se pasan al formato de sprite del motor
@@ -98,6 +101,7 @@ for (const k in COFRES) COFRES[k] = Object.assign(new Image(), { src: tr('interf
 
 // Los enemigos de Los Salones y El Fondo existen sólo en esta versión del juego: el motor los necesita para ponerlos en el mapa
 Object.assign(ENEMIES, {
+  capataz: { name: 'El Capataz', hitFx: 'smash', spr: 'capataz', hp: 400, atk: [16, 24], def: 5, xp: 80, ramp: 1, speed: 0, scale: 1.3, boss: true, flee: 0 },
   portadora: { name: 'Portadora Velada', idle: 'float', hitFx: 'shadow', spr: 'portadora', hp: 26, atk: [4, 8], def: 2, xp: 20, ramp: 0, speed: 0.7, scale: 1, flee: 0.5 },
   tachado: { name: 'El Tachado', idle: 'heavy', hitFx: 'blade', spr: 'tachado', hp: 32, atk: [5, 9], def: 4, xp: 24, ramp: 0, speed: 0.5, scale: 1, flee: 0.5 },
   apagado: { name: 'El Apagado', idle: 'heavy', hitFx: 'smash', spr: 'apagado', hp: 22, atk: [4, 7], def: 1, xp: 18, ramp: 0, speed: 0.8, scale: 0.95, flee: 0.5 },
@@ -109,6 +113,7 @@ Object.assign(ENEMIES, {
 });
 POOLS[2].push('armadura', 'armadura', 'retrato', 'retrato', 'dama', 'dama', 'copero', 'copero');
 POOLS[3].push('portadora', 'portadora', 'tachado', 'tachado', 'apagado', 'apagado', 'perdido', 'perdido');
+POOLS[4] = POOLS[3].slice();      // La Veta usa los enemigos de El Fondo hasta tener los suyos
 
 function aplicarEnemigosEnMapa() {
   for (const [k, img] of Object.entries(COFRES)) {
@@ -120,10 +125,10 @@ function aplicarEnemigosEnMapa() {
   }
   for (const [id, d] of Object.entries(D.enemigos)) {
     const img = IMG_ENEMIGOS[d.imagen];
-    if (!img || img.enMapa || !img.complete || !img.naturalWidth) continue;
+    if (!img || d.enMapa || !img.complete || !img.naturalWidth) continue;      // dos enemigos pueden compartir dibujo
     (SPRITES[d.sprite] || (SPRITES[d.sprite] = {})).w = spriteDesdeImagen(img, 96);
     if (d.escala_mapa) ENEMIES[id].scale = d.escala_mapa;
-    img.enMapa = true;
+    d.enMapa = true;
   }
 }
 
@@ -355,7 +360,7 @@ function explorarDePrueba(piso, nivel) {
 function abrirPeleasDePrueba() {
   const nombre = ids => ids.map(id => D.enemigos[id].nombre).join(' + ');
   const items = [];
-  for (const piso of [1, 2, 3]) {
+  for (const piso of D.mazmorra.pisos.map((_, i) => i + 1)) {
     const jefes = D.mazmorra.jefes[piso];
     items.push({ label: tr('Jefe del piso {0}', piso), sub: nombre(jefes), fn: () => pelearDePrueba(jefes, piso, true) });
     for (const ids of D.mazmorra.grupos_por_piso[piso]) items.push({ label: tr('Piso {0} <small>· {1}</small>', piso, nombre(ids)), fn: () => pelearDePrueba(ids, piso, false) });
@@ -1084,11 +1089,13 @@ function revelar(n) {
   return `revelacion_${n}`;
 }
 // El motor pide diálogos al cambiar de piso: se reemplazan por los del grupo
+LINES.floor4 = [];
 window.showDialog = (lineas, quien, cara, listo) => {
-  const piso = lineas === LINES.floor2 ? 2 : lineas === LINES.floor3 ? 3 : 0;
+  const piso = S.floor > 1 && lineas === LINES['floor' + S.floor] ? S.floor : 0;
   if (!piso) { if (listo) listo(); return; }
   X.memoria.hondo = Math.max(X.memoria.hondo, piso); guardarX();
-  encadenar([`piso_${piso}`, revelar(piso), dichoDeAlguien('piso')], listo);
+  // la revelación 4 es la del final: la zona 4 no la dispara
+  encadenar([`piso_${piso}`, piso <= 3 ? revelar(piso) : null, dichoDeAlguien('piso')], listo);
 };
 function pintarCharla() {
   const { n, i, sel } = CH, q = n.titulo ? [0, 0, n.titulo] : n.p ? [0, 0, n.p.nombre] : QUIEN[n.quien], ops = i >= n.lineas.length - 1 && n.opciones ? n.opciones.filter(o => o.requiere !== 'pocion' || P.potions > 0) : null;
@@ -1189,8 +1196,8 @@ function dibujarCierre(c, k = clamp(Tr.t / Tr.cierre, 0, 1), rojo = Tr.rojo) {
 
 // Fondo pintado de cada zona; si no cargó, el procedural
 // por ahora todos los pisos pelean en el mismo escenario, pasado por la paleta de cada uno
-const FONDOS = { crypt: Object.assign(new Image(), { src: 'interfaz/batalla/cripta.png' }), castle: Object.assign(new Image(), { src: 'interfaz/batalla/salones.png' }), engrave: Object.assign(new Image(), { src: 'interfaz/batalla/fondo.png' }) };
-const ANTORCHAS = { crypt: [[25, 77], [454, 77]], castle: [[19, 48], [458, 48]], engrave: [[20, 54], [463, 54]] };
+const FONDOS = { crypt: Object.assign(new Image(), { src: 'interfaz/batalla/cripta.png' }), castle: Object.assign(new Image(), { src: 'interfaz/batalla/salones.png' }), engrave: Object.assign(new Image(), { src: 'interfaz/batalla/fondo.png' }), veta: Object.assign(new Image(), { src: 'interfaz/batalla/veta.png' }) };
+const ANTORCHAS = { crypt: [[25, 77], [454, 77]], castle: [[19, 48], [458, 48]], engrave: [[20, 54], [463, 54]], veta: [[48, 86], [430, 86]] };
 // Dibujos propios de enemigos (campo "imagen" de enemigos.json); los demás usan el sprite del juego base
 const IMG_ENEMIGOS = {};
 for (const d of Object.values(D.enemigos)) if (d.imagen) IMG_ENEMIGOS[d.imagen] = Object.assign(new Image(), { src: tr('interfaz/enemigos/{0}.png', d.imagen) });
@@ -1598,9 +1605,9 @@ function seguirTrasPelea() {
   const { jefe, piso, caido } = trasPelea;
   const muerte = caido && { quien: 'sombra', caras: ['risa'], lineas: [D.historia.modelos[caido.modelo].muerte.replace('{nombre}', caido.nombre)] };
   X.memoria.ultimoCaido = null;
-  if (jefe && piso === LAST_FLOOR) return encadenar([muerte, 'jefe_3_muerto', revelar(4)], elegirPortador);
+  if (jefe && piso === LAST_FLOOR) return encadenar([muerte, `jefe_${piso}_muerto`, revelar(4)], elegirPortador);
   guardarExpedicion();
-  encadenar([muerte, dueloPor(caido), caido ? revelar(1) : null, jefe ? tr('jefe_{0}_muerto', piso) : null, ...(!caido && !jefe && charlaDelGrupo() || [])]);
+  encadenar([muerte, dueloPor(caido), caido ? revelar(1) : null, jefe ? tr('jefe_{0}_muerto', piso) : null, jefe && D.dialogos[`jefe_${piso}_suelo`] ? `jefe_${piso}_suelo` : null, ...(!caido && !jefe && charlaDelGrupo() || [])]);
 }
 
 // ---------- El santuario ----------

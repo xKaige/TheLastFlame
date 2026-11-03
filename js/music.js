@@ -210,4 +210,5 @@ const TRACKS = {
 };
 
 // El tema que corresponde a dónde está el jugador
-function floorMusic() { return FLOOR_THEME[S.floor] || 'crypt'; }
+// las zonas nuevas usan la música de la caverna hasta tener la suya
+function floorMusic() { const t = FLOOR_THEME[S.floor] || 'crypt'; return t === 'veta' ? 'abyss' : t; }

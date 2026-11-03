@@ -3407,5 +3407,36 @@
         }
       ]
     }
+  },
+  "capataz": {
+    "nombre": "El Capataz",
+    "sprite": "capataz",
+    "imagen": "tachado",
+    "vida": 520,
+    "ataque": [
+      20,
+      28
+    ],
+    "defensa": 5,
+    "velocidad": 10,
+    "exp": 70,
+    "jefe": true,
+    "especial": {
+      "cada": 3,
+      "nombre": "cobra la cuota a todo el grupo",
+      "dano": [
+        14,
+        20
+      ]
+    },
+    "tam_batalla": 150,
+    "fase": {
+      "umbral": 0.5,
+      "escudos": 6,
+      "velocidad": 1.1,
+      "dano": 1.15,
+      "mensaje": "{0} abre su libro y empieza a anotar."
+    },
+    "provisorio": "Usa el dibujo del Tachado hasta tener el suyo."
   }
 }

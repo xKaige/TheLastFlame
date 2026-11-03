@@ -2,7 +2,7 @@
 
 El camino del juego es la expedición de grupo. El plan del juego anterior está en `juego_viejo/ROADMAP.md`.
 
-**Versión actual: 0.4.34.** Lo próximo: 0.5.0.
+**Versión actual: 0.4.35.** Lo próximo: 0.5.0.
 
 ## Cómo se numeran las versiones
 
@@ -113,6 +113,11 @@ La idea que une todo es una regla de las Guardianas: "quien le pida algo va a re
 - **Título:** el logo "The Last Flame" no cambia con el idioma.
 
 ## Historial
+
+### 0.4.35
+
+- Zona 4, La Veta: se baja al vencer a Aldemar. Muros, piso, techo, escenario de batalla y paleta propios.
+- Por ahora usa los enemigos de El Fondo y un jefe provisorio, El Capataz, con el dibujo del Tachado.
 
 ### 0.4.34
 

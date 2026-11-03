@@ -70,6 +70,7 @@ const RAMPS = {
   castle:  ['#07050c', '#22122e', '#4f2148', '#933a45', '#d9753f', '#f5c98a'], // luna naranja y bruma violeta
   engrave: ['#000000', '#121212', '#383836', '#77756f', '#c8c5bb', '#f2efe6'], // grabado blanco y negro
   shade:   ['#050a07', '#0f1f16', '#244032', '#4b7556', '#8fb38a', '#cfe3b8'], // verde espectral
+  veta:    ['#0a0703', '#241a0c', '#4a3414', '#86601f', '#c99a3a', '#f4d68a'], // oro sucio de mina
   blood:   ['#080305', '#2a0a10', '#5e1418', '#a3281f', '#e0603a', '#ffc58a'],
 };
 

@@ -2,7 +2,7 @@
 // Ambientación de cada piso: texturas de muros, suelo y techo, la guarida del jefe
 // y los objetos decorativos. Piso I: cripta · Piso II: castillo · Piso III: el fondo.
 
-const FLOOR_THEME = ['', 'crypt', 'castle', 'abyss'];
+const FLOOR_THEME = ['', 'crypt', 'castle', 'abyss', 'veta'];
 const STAIRS_TEX = () => TEXTURES.stairs;
 
 // Textura base por píxel + trazos dibujados encima (coordenadas 0..64)
@@ -224,8 +224,10 @@ function buildTextures() {
     }),
   };
 
+  // La Veta parte de la caverna: sus muros, piso y techo se reemplazan con los dibujos propios
+  TEXTURES.veta = { ...TEXTURES.abyss, walls: TEXTURES.abyss.walls.slice() };
   // variante 4 de cada piso: la pared hueca de las salas secretas
-  for (const th of ['crypt', 'castle', 'abyss']) TEXTURES[th].walls[4] = crackTex(TEXTURES[th].walls[0]);
+  for (const th of ['crypt', 'castle', 'abyss', 'veta']) TEXTURES[th].walls[4] = crackTex(TEXTURES[th].walls[0]);
 }
 
 // Pared agrietada de las salas secretas: la textura común del piso con grietas que se abren
@@ -320,6 +322,7 @@ const PROPS = {
           ['candles', 0.45, 0.85, 'Velas de sebo sobre una calavera. Alguien las sigue encendiendo.']],
   castle: [['armorStand', 0.95, 0, 'Una armadura vacía. Juras que antes miraba hacia el otro lado.'],
            ['brazier', 0.6, 0.9, 'Un brasero que todavía arde. El calor es casi una caricia.']],
+  get veta() { return this.abyss; },
   abyss: [['stalagmite', 0.95, 0, 'Roca que crece hacia arriba, buscando una luz que ya no existe.'],
           ['obelisk', 1.0, 0.3, 'Un obelisco cubierto de runas. Están escritas desde adentro.']],
 };

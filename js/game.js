@@ -3,8 +3,8 @@
 
 const DIRS = [[1, 0], [0, 1], [-1, 0], [0, -1]]; // E, S, O, N
 const ROMAN = ['', 'I', 'II', 'III'];
-const FLOOR_PAL = ['', 'crypt', 'castle', 'engrave'];
-const LAST_FLOOR = 3;
+const FLOOR_PAL = ['', 'crypt', 'castle', 'engrave', 'veta'];
+const LAST_FLOOR = 4;
 const LEVELS_PER_FLOOR = 5;           // el último nivel de cada piso es la guarida del jefe
 
 // ---------- Equilibrio: todos los números de dificultad en un solo lugar ----------
@@ -27,7 +27,7 @@ const BAL = {
   enemyDmgFlat: d => Math.floor((d - 1) / 3),              // daño extra fijo
   enemyDef: d => Math.floor((d - 1) / 4),                  // defensa extra
 };
-const FLOOR_BOSS = { 1: 'reyOsario', 2: 'cazador', 3: 'boss' };
+const FLOOR_BOSS = { 1: 'reyOsario', 2: 'cazador', 3: 'boss', 4: 'capataz' };
 
 // idle: cómo se mueve en combate (breathe por defecto, float, skitter, heavy)
 // hitFx: cómo se ve su golpe sobre la pantalla (blade por defecto, claw, bite, smash, shadow)
@@ -96,7 +96,7 @@ function later(ms, fn) { const id = runId; setTimeout(() => { if (id === runId) 
 // Cada piso tiene su propia forma: la cripta son salas chicas y pasillos angostos,
 // el castillo salones con columnatas y galerías anchas, el fondo cavernas orgánicas.
 // Valores del mapa: 0 suelo · 1 muro · 2 escalera · 3 suelo de la guarida
-const WALL_MIX = { crypt: [0.76, 0.94], castle: [0.8, 0.9], abyss: [0.74, 0.87] }; // umbrales de las variantes 0/1/2
+const WALL_MIX = { crypt: [0.76, 0.94], castle: [0.8, 0.9], abyss: [0.74, 0.87], veta: [0.74, 0.87] }; // umbrales de las variantes 0/1/2
 
 function carveRect(map, x, y, w, h) {
   for (let j = y; j < y + h; j++) for (let i = x; i < x + w; i++) map[j * MW + i] = 0;
@@ -270,7 +270,7 @@ function genFloor(kind) {
   const solids = [];
   let bossAt = null;
   if (kind === 'boss') {
-    bossAt = carveLair(map, wtype, far % MW, (far / MW) | 0, S.floor === LAST_FLOOR, solids, ents);
+    bossAt = carveLair(map, wtype, far % MW, (far / MW) | 0, S.floor === 3, solids, ents);     // la Cámara de la Llama es la guarida de Aldemar
     dist = distances(map, sx, sy);
   } else map[far] = 2;
 

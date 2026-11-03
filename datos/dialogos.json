@@ -215,5 +215,47 @@
     "lineas": [
       "{nombre} sigue sentado en el fondo. Si llegan, salúdenlo de mi parte."
     ]
+  },
+  "jefe_3_suelo": {
+    "quien": "sombra",
+    "caras": [
+      "base",
+      "enojo",
+      "base"
+    ],
+    "lineas": [
+      "¿Oyen eso? El suelo se está partiendo.",
+      "No. Debajo del fondo no había nada. Yo lo sé, yo estuve acá.",
+      "Hay una escalera. Más vieja que el palacio. Más vieja que la Llama."
+    ]
+  },
+  "piso_4": {
+    "quien": "sombra",
+    "caras": [
+      "base",
+      "risa"
+    ],
+    "lineas": [
+      "Huele a metal y a sudor viejo.",
+      "Acá cavaron antes que el rey. Pidieron riqueza sin fin, y la Llama se la dio."
+    ]
+  },
+  "jefe_4": {
+    "titulo": "El Capataz",
+    "lineas": [
+      "¿Turno de quién? Anoten.",
+      "Cuarenta y uno, cuarenta y dos... Nadie sale de la veta sin pagar la cuota."
+    ]
+  },
+  "jefe_4_muerto": {
+    "quien": "sombra",
+    "caras": [
+      "base",
+      "enojo"
+    ],
+    "lineas": [
+      "La cuenta no cierra. Nunca cerró.",
+      "Y todavía hay más abajo."
+    ]
   }
 }
