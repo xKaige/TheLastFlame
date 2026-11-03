@@ -2,7 +2,7 @@
 
 El camino del juego es la expedición de grupo. El plan del juego anterior está en `juego_viejo/ROADMAP.md`.
 
-**Versión actual: 0.4.22.** Lo próximo: 0.5.0.
+**Versión actual: 0.4.23.** Lo próximo: 0.5.0.
 
 ## Cómo se numeran las versiones
 
@@ -61,9 +61,6 @@ Ideas aprobadas, para hacer con sprites propios (hojas de 6 cuadros, `golpe_espe
 
 - Lo que hiciste: Debilitado a un personaje y a quien tenga vínculo con él.
 - Sin oscuridad: durante 2 turnos, curar a un aliado también daña a quien cura.
-- Que ningún hombre descanse: si muere un Apagado, los demás ganan velocidad.
-- Los cuarenta: una vez por pelea, los Apagados caídos se levantan con poca vida.
-- Veo Todo (en su furia): repite contra el grupo la última habilidad que usó el grupo.
 
 ## Historia
 
@@ -111,6 +108,12 @@ La idea que une todo es una regla de las Guardianas: "quien le pida algo va a re
 - **Título:** el logo "The Last Flame" no cambia con el idioma.
 
 ## Historial
+
+### 0.4.23
+
+- Aldemar: Veo Todo, su furia, le devuelve al grupo su última habilidad. El llamado levanta a los Apagados caídos una vez por pelea, y al morir uno los demás se apuran.
+- Los jefes tienen 50% más de vida (`vida_jefe` en `datos/mazmorra.json`).
+- Las animaciones de jefes ya no agrandan el dibujo.
 
 ### 0.4.22
 

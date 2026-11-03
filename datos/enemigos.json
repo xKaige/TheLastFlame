@@ -1814,8 +1814,8 @@
           ],
           "impacto": 1,
           "cadena": [
-            203,
-            139
+            195,
+            144
           ]
         }
       },
@@ -1918,30 +1918,21 @@
       "escudos": 0,
       "velocidad": 1.15,
       "dano": 1.1,
-      "mensaje": "{0} abre los ojos que nunca pudo cerrar.",
-      "ciclo": [
-        "jauria",
-        "gancho",
-        "presa",
-        "especial",
-        "golpe"
-      ],
-      "jauria": {
-        "nombre": "alza el cuenco y los suyos acuden",
-        "enemigo": "apagado",
-        "cantidad": 2
-      },
-      "gancho": {
-        "nombre": "te mira y no podés moverte",
-        "dano": [
-          10,
-          14
-        ]
-      },
-      "presa": {
-        "nombre": "elige a quien va a acompañarlo",
-        "turnos": 2,
-        "dano": 1.5
+      "mensaje": "{0} abre todos sus ojos. Ya vio lo que hicieron.",
+      "veo": {
+        "imagen": "aldemar_veotodo",
+        "lado": 260,
+        "margen": 55,
+        "cuadros": 6,
+        "tiempos": [
+          0.35,
+          0.7,
+          1.05,
+          1.45,
+          1.85,
+          2.2
+        ],
+        "efecto": "veotodo"
       }
     },
     "animacion": {
@@ -2137,6 +2128,28 @@
           ],
           "efecto": "ceniza",
           "impacto": 1.2
+        }
+      },
+      {
+        "nombre": "ordena a los suyos que se levanten",
+        "prob": 0.5,
+        "mult": 0,
+        "llama": "apagado",
+        "hoja": {
+          "imagen": "aldemar_llamado",
+          "lado": 260,
+          "margen": 55,
+          "cuadros": 6,
+          "tiempos": [
+            0.3,
+            0.6,
+            0.95,
+            1.3,
+            1.75,
+            2.1
+          ],
+          "efecto": "llamado",
+          "impacto": 1.3
         }
       }
     ],
@@ -3272,7 +3285,8 @@
           }
         }
       ]
-    }
+    },
+    "apresura": 1.2
   },
   "perdido": {
     "nombre": "Portador Perdido",

@@ -1251,7 +1251,7 @@ function siguiente() {
   if (u.vida <= 0) return later(500, siguiente);
   if (u.enemigo) {
     Bt.fase = 'espera'; Bt.msg = ''; pintarBatalla();
-    const propia = NUCLEO.prepararTurno(u, azarX);
+    const propia = NUCLEO.prepararTurno(D, Bt.b, u, azarX);
     const hoja = NUCLEO.haraEspecial(u) ? D.enemigos[u.tipo].golpe_especial : NUCLEO.pasoDeFase(u) === 'gancho' ? u.fase.gancho.hoja : propia && propia.hoja;
     if (hoja && cuadrosEspeciales(u, hoja)) return golpeImponente(u, hoja);
     iniciarAtaqueAnimado(u);
@@ -1285,7 +1285,7 @@ function golpeImponente(u, r) {
   later(r.impacto * 1000, () => {
     if (!Bt) return;
     mostrar(NUCLEO.turnoEnemigo(D, Bt.b, u, azarX));
-    if (['gancho', 'mirada', 'ceniza'].includes(r.efecto)) { Bt.temblor = 6; Bt.destello = 0.4; Bt.congelado = 0.1; sfx('slash'); }
+    if (['gancho', 'mirada', 'ceniza', 'llamado'].includes(r.efecto)) { Bt.temblor = 6; Bt.destello = 0.4; Bt.congelado = 0.1; sfx('slash'); }
     else {
       if (r.efecto === 'campanada') Bt.fx.push({ tipo: 'onda', x: u.x, y: FBASE - 70, t: 0, dur: 0.75, m: 1 });
       else if (r.efecto === 'caida') { golpePixel('golpe', u); golpePixel('critico', u); } else golpePixel('barrido', u);
@@ -1316,7 +1316,7 @@ function mostrarEvento(e) {
   }
   if (e.tipo === 'antorcha') { P.fuel = Math.max(0, P.fuel - e.valor); updateHUD(); }
   if (e.tipo === 'invoca') { for (const n of e.nuevos) { n.x = Bt.lugares[n.i]; prepararEnemigo(n); chispas(n.x, FBASE - 24, 18, MARCO.vida, -24); } sfx('encounter'); Bt.temblor = 4; }
-  if (e.tipo === 'fase' && (q.fase.trono || q.fase.caceria)) { q.tronoDesde = Bt.t; q.hojaFija = q.fase.trono || q.fase.caceria; }
+  if (e.tipo === 'fase' && (q.fase.trono || q.fase.caceria || q.fase.veo)) { q.tronoDesde = Bt.t; q.hojaFija = q.fase.trono || q.fase.caceria || q.fase.veo; }
   if (e.tipo === 'fase' && q.fase.caceria) Bt.penumbra = 0.6;
   if (e.tipo === 'texto' && e.clave === 'penumbra') { Bt.msg = 'Golpe al humo. Pegale justo después de que ataque.'; sfx('miss'); }
   if (e.tipo === 'desesperado') { q.tronoDesde = Bt.t; q.hojaFija = q.ultimo.hoja; Bt.msg = tr(q.ultimo.mensaje, q.nombre); Bt.temblor = 8; Bt.destello = 0.5; sfx('encounter'); }
