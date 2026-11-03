@@ -2,7 +2,7 @@
 
 El camino del juego es la expedición de grupo. El plan del juego anterior está en `juego_viejo/ROADMAP.md`.
 
-**Versión actual: 0.4.21.** Lo próximo: 0.5.0.
+**Versión actual: 0.4.22.** Lo próximo: 0.5.0.
 
 ## Cómo se numeran las versiones
 
@@ -111,6 +111,10 @@ La idea que une todo es una regla de las Guardianas: "quien le pida algo va a re
 - **Título:** el logo "The Last Flame" no cambia con el idioma.
 
 ## Historial
+
+### 0.4.22
+
+- Dificultad más alta: los enemigos tienen 30% más de vida y pegan 25% más.
 
 ### 0.4.21
 
