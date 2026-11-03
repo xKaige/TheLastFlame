@@ -1437,9 +1437,11 @@ function numero(x, y, text, kind) {
 // La explicación de la acción elegida: se abre y se cierra con el botón del inventario y queda así entre turnos
 let ayudaBatalla = false;
 function pintarAyuda(ver) {
-  const a = $('bAyuda'), o = ver && ayudaBatalla && Bt.ops[Bt.sel], efectos = ver && ayudaBatalla ? Bt.b.aliados.flatMap(q => listaEstados(q).map(e => [q.nombre, ...e])) : [];
+  const a = $('bAyuda'), o = ver && ayudaBatalla && Bt.ops[Bt.sel], vistos = new Set();
+  // una línea por efecto, aunque lo tengan varios
+  const efectos = (ver && ayudaBatalla ? Bt.b.aliados.flatMap(listaEstados) : []).filter(e => !vistos.has(e[2]) && vistos.add(e[2]));
   $('bEfectos').classList.toggle('hidden', !efectos.length);
-  $('bEfectos').innerHTML = efectos.slice(0, 8).map(([n, cl, ic, nom, txt]) => `<div class="${cl}"><i>${ic}</i><span><b>${n} · ${tr(nom)}</b>${tr(txt)}</span></div>`).join('');
+  $('bEfectos').innerHTML = efectos.map(([cl, ic, nom, txt]) => `<div class="${cl}"><i>${ic}</i><span><b>${tr(nom)}</b>${tr(txt)}</span></div>`).join('');
   a.classList.toggle('hidden', !o);
   if (!o) return;
   const costo = o.costo ? tr('Cuesta {0} de Ímpetu.', o.costo) : '', falta = o.apagada && o.costo ? ` ${tr('Te falta Ímpetu: atacá o defendé para juntarlo.')}` : '';
