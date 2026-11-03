@@ -144,6 +144,28 @@ function iniciarAtaqueAnimado(e) {
   if (e.poses) e.atacaDesde = Bt.t;
 }
 
+// Una pose que se queda no puede estar muerta: la ropa ondula más cuanto más abajo, y el cuerpo respira
+const MECIDAS = {};
+function poseMecida(r, q) {
+  if (MECIDAS[r.imagen]) return MECIDAS[r.imagen];
+  const t = q.size, m = r.margen;
+  MECIDAS[r.imagen] = Array.from({ length: POSES.reposo }, (_, i) => {
+    const f = i / POSES.reposo * Math.PI * 2, sube = Math.round(Math.sin(f) * 1.2);
+    const lum = new Float32Array(t * t), a = new Uint8Array(t * t), borde = new Uint8Array(t * t);
+    for (let y = 0; y < t; y++) {
+      const peso = clamp((y - m) / (t - m * 1.5), 0, 1), dx = Math.round(Math.sin(f + y / 22) * r.mece * peso * peso), Y = clamp(y + sube, 0, t - 1);
+      for (let x = 0; x < t; x++) {
+        const X = x - dx;
+        if (X < 0 || X >= t) continue;
+        const o = Y * t + X, n = y * t + x;
+        lum[n] = q.lum[o]; a[n] = q.a[o]; borde[n] = q.borde[o];
+      }
+    }
+    return { size: t, margen: m, lum, a, borde };
+  });
+  return MECIDAS[r.imagen];
+}
+
 // Elige la pose de este momento: mientras ataca sigue la secuencia y después vuelve a respirar
 function posar(e) {
   if (e.especialDesde !== undefined) {
@@ -161,7 +183,7 @@ function posar(e) {
   // una hoja que termina en una pose que se queda: el trono armado, o el Cazador oculto mientras no ataca
   if (e.tronoDesde !== undefined && !e.expuesto) {
     const r = e.hojaFija, c = cuadrosEspeciales(e, r), i = r.tiempos.findIndex(v => Bt.t - e.tronoDesde < v);
-    if (c) { e.gris = c[i < 0 ? c.length - 1 : i]; return; }
+    if (c) { e.gris = i < 0 ? poseMecida(r, c[c.length - 1])[Math.floor(Bt.t * POSES.velReposo) % POSES.reposo] : c[i]; return; }
   }
   if (!e.poses) return;
   const n = e.poses.ataque.length, t = e.atacaDesde === undefined ? -1 : Bt.t - e.atacaDesde, mitad = Math.floor(n / 2);
