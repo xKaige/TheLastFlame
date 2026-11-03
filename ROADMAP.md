@@ -20,23 +20,32 @@ Cada parche sube la versión en `package.json` y en `index.html`, y se anota ac�
 - Música de exploración.
 - Reescribir el final: Aldemar pasa a ser el jefe del acto I, y al vencerlo se abre el suelo hacia la zona 4.
 
-### 0.6.0: Runas
+### 0.6.0: Habilidades
+
+- Cada habilidad es de una clase: unas 6 u 8 para elegir, y se llevan hasta 4.
+- Las habilidades suben de nivel con el uso, del 1 al 5, y en el 5 se transforman.
+- Cada habilidad escala con su atributo.
+- Guerrero: más pasivas y pocas activas, pero devastadoras. Provocar da chance de contraatacar al recibir golpes.
+- Pícaro: Puñalada deja de ser crítico seguro; pega más fuerte a quien sangra o está envenenado.
+- Hace falta antes que las runas, porque se apoyan en este sistema.
+
+### 0.7.0: Runas
 
 - Traer al grupo las runas del juego anterior (`juego_viejo/js/runes.js`: 8 runas, 2 ranuras y una tercera tras vencer a un jefe).
 - Son la base de la rejugabilidad: entran antes que las zonas nuevas para que cada una pueda sumar las suyas.
 
-### 0.7.0 a 0.12.0: Zonas 4 a 9
+### 0.8.0 a 0.13.0: Zonas 4 a 9
 
 - Una zona por versión, con arte y música propios, hechos como los anteriores.
 - La historia de cada zona está en "Historia", más abajo.
 - La zona 9 suma los tres finales.
 
-### 0.13.0: Idiomas
+### 0.14.0: Idiomas
 
 - Completar el inglés (`node tools/textos_faltantes.js en`).
 - Sumar los demás idiomas que se elijan.
 
-### 0.14.0: Pulido final
+### 0.15.0: Pulido final
 
 - Quitar del motor lo que quedó sin uso (combate, creación de personaje, partidas del juego anterior).
 - Balance de toda la expedición, de punta a punta.
