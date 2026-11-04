@@ -3,7 +3,7 @@
 // Steam Cloud); en el navegador, localStorage. El resto del juego usa siempre STORE.get/set/remove.
 
 // Modo prueba (`npm run prueba`, o ?prueba en la dirección del navegador): el menú Pruebas del título,
-// y nada se escribe de verdad: partidas, perfil y opciones quedan en memoria; Steam no se entera.
+// y lo guardado va aparte de la partida de verdad (ver abajo); Steam no se entera.
 const PRUEBA = /[?&]prueba(=|&|$)/.test(location.search);
 
 const STORE = (() => {
@@ -29,12 +29,13 @@ const STORE = (() => {
   };
 })();
 
-// En modo prueba se lee lo guardado pero se escribe sólo en memoria (se pierde al cerrar)
+// En modo prueba se guarda aparte (claves "prueba_…"): queda entre sesiones sin tocar la partida de verdad.
+// Mientras no se guardó nada de prueba, se lee lo de verdad; lo borrado en prueba queda marcado.
 if (PRUEBA) {
-  const real = { get: STORE.get, set: STORE.set, remove: STORE.remove }, mem = new Map();
-  STORE.get = k => (mem.has(k) ? mem.get(k) : real.get(k));
-  STORE.set = (k, v) => { mem.set(k, v); return true; };
-  STORE.remove = k => { mem.set(k, null); };
+  const real = { get: STORE.get, set: STORE.set, remove: STORE.remove }, BORRADO = '__borrado__', clave = k => 'prueba_' + k;
+  STORE.get = k => { const v = real.get(clave(k)); return v === BORRADO ? null : v !== null ? v : real.get(k); };
+  STORE.set = (k, v) => real.set(clave(k), v);
+  STORE.remove = k => { real.set(clave(k), BORRADO); };
 }
 
 // Steam (si el juego corre en Electron con steamworks.js): logros y tablas. Si no, no hace nada.

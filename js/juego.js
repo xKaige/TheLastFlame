@@ -312,8 +312,8 @@ window.openTitleMenu = () => {
   else if (hay) items.push({ label: 'Continuar', sub: tr('{0} de Ceniza · {1} en el plantel · {2} expedicion{3}', X.ceniza, X.plantel.length, X.corridas, X.corridas === 1 ? '' : 'es'), fn: abrirHogar });
   items.push({ label: 'Nueva partida', fn: () => (hay ? confirmMenu('¿Empezar de nuevo? Se borra todo el progreso.', nuevaPartida) : nuevaPartida()) });
   items.push({ label: 'Opciones', fn: openOptionsMenu });
-  if (PRUEBA) items.push({ label: 'Explorar de prueba', sub: 'Va directo a cualquier piso. No se guarda nada.', fn: abrirPisosDePrueba });
-  if (PRUEBA) items.push({ label: 'Peleas de prueba', sub: 'Va directo a una pelea. No se guarda nada.', fn: abrirPeleasDePrueba });
+  if (PRUEBA) items.push({ label: 'Explorar de prueba', sub: 'Va directo a cualquier piso. Reemplaza la partida de prueba.', fn: abrirPisosDePrueba });
+  if (PRUEBA) items.push({ label: 'Peleas de prueba', sub: 'Va directo a una pelea. Reemplaza la partida de prueba.', fn: abrirPeleasDePrueba });
   if (/Electron/i.test(navigator.userAgent)) items.push({ label: 'Salir', fn: () => window.close() });
   openMenu({ back: false, cls: 'compact', items }, 'title');
 };

@@ -206,7 +206,7 @@ function openTitleMenu() {
   items.push({ label: tr('Expedición diaria'), get sub() { return dailySummary(); }, fn: openDailyMenu });
   items.push({ label: tr('Códice'), sub: tr('Bestiario, runas, reliquias, logros, finales y récords'), fn: openCodexMenu });
   items.push({ label: tr('Opciones'), fn: openOptionsMenu });
-  if (PRUEBA) items.push({ label: 'Pruebas', sub: 'Ver los finales o saltar al final. No se guarda nada.', fn: openTestMenu });
+  if (PRUEBA) items.push({ label: 'Pruebas', sub: 'Ver los finales o saltar al final.', fn: openTestMenu });
   if (/Electron/i.test(navigator.userAgent)) items.push({ label: tr('Salir'), fn: () => window.close() });
   openMenu({ items, back: false, cls: 'compact' }, 'title');
 }
