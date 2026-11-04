@@ -3423,19 +3423,37 @@
     "jefe": true,
     "especial": {
       "cada": 3,
-      "nombre": "cobra la cuota a todo el grupo",
+      "nombre": "cobra la cuota",
       "dano": [
-        14,
-        20
-      ]
+        10,
+        14
+      ],
+      "por_deuda": 3
     },
     "tam_batalla": 150,
     "fase": {
       "umbral": 0.5,
-      "escudos": 6,
+      "escudos": 4,
+      "escudo_oro": true,
       "velocidad": 1.1,
       "dano": 1.15,
-      "mensaje": "{0} abre su libro y empieza a anotar."
+      "mensaje": "{0}: la veta lo reclama. Su oro sólo se rompe con magia o golpes críticos.",
+      "reclama": {
+        "imagen": "capataz_veta",
+        "lado": 260,
+        "margen": 55,
+        "cuadros": 6,
+        "tiempos": [
+          0.35,
+          0.7,
+          1.05,
+          1.45,
+          1.85,
+          2.2
+        ],
+        "efecto": "veta",
+        "mece": 1.5
+      }
     },
     "escala_mapa": 1.6,
     "habilidades": [
@@ -3443,7 +3461,46 @@
         "nombre": "anota tu nombre en el libro",
         "prob": 0.35,
         "mult": 0,
-        "debilita": 3
+        "anota": 3,
+        "hoja": {
+          "imagen": "capataz_anota",
+          "lado": 260,
+          "margen": 55,
+          "cuadros": 6,
+          "tiempos": [
+            0.3,
+            0.6,
+            0.9,
+            1.3,
+            1.7,
+            2.0
+          ],
+          "efecto": "anota",
+          "impacto": 1.4
+        }
+      },
+      {
+        "nombre": "te descuenta el salario",
+        "prob": 0.35,
+        "mult": 0,
+        "blanco": "impetu",
+        "quita_impetu": 2,
+        "hoja": {
+          "imagen": "capataz_descuento",
+          "lado": 260,
+          "margen": 55,
+          "cuadros": 6,
+          "tiempos": [
+            0.3,
+            0.6,
+            0.9,
+            1.2,
+            1.5,
+            1.9
+          ],
+          "efecto": "descuento",
+          "impacto": 1.1
+        }
       },
       {
         "nombre": "cobra con la vara de hierro",
@@ -3545,6 +3602,46 @@
           }
         }
       ]
+    },
+    "golpe_especial": {
+      "imagen": "capataz_cuota",
+      "lado": 260,
+      "margen": 55,
+      "cuadros": 6,
+      "tiempos": [
+        0.3,
+        0.65,
+        1.05,
+        1.35,
+        1.6,
+        2.0
+      ],
+      "efecto": "cuota",
+      "impacto": 1.4
+    },
+    "deuda": true,
+    "ultimo": {
+      "umbral": 0.15,
+      "dano": 1,
+      "recibe": 1.5,
+      "saldada": 3,
+      "mensaje": "{0} se arrodilla con el libro. Ahora anota a uno por turno.",
+      "hoja": {
+        "imagen": "capataz_saldada",
+        "lado": 260,
+        "margen": 55,
+        "cuadros": 6,
+        "tiempos": [
+          0.35,
+          0.7,
+          1.05,
+          1.45,
+          1.85,
+          2.2
+        ],
+        "efecto": "saldada",
+        "mece": 2
+      }
     }
   },
   "minero": {

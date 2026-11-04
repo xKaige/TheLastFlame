@@ -121,7 +121,7 @@ function prepararPoses(e) {
 
 // El golpe especial dibujado cuadro por cuadro (campo "golpe_especial" de enemigos.json): una hoja con un cuadro al lado del otro
 const HOJAS_ESPECIAL = {}, CUADROS_ESPECIAL = {};
-for (const d of Object.values(D.enemigos)) for (const r of [d.golpe_especial, d.fase && d.fase.trono, d.fase && d.fase.caceria, d.fase && d.fase.veo, d.fase && d.fase.gancho && d.fase.gancho.hoja, d.ultimo && d.ultimo.hoja, ...(d.habilidades || []).map(h => h.hoja)]) if (r) HOJAS_ESPECIAL[r.imagen] = Object.assign(new Image(), { src: `interfaz/enemigos/${r.imagen}.png` });
+for (const d of Object.values(D.enemigos)) for (const r of [d.golpe_especial, d.fase && d.fase.trono, d.fase && d.fase.caceria, d.fase && d.fase.veo, d.fase && d.fase.reclama, d.fase && d.fase.gancho && d.fase.gancho.hoja, d.ultimo && d.ultimo.hoja, ...(d.habilidades || []).map(h => h.hoja)]) if (r) HOJAS_ESPECIAL[r.imagen] = Object.assign(new Image(), { src: `interfaz/enemigos/${r.imagen}.png` });
 
 function cuadrosEspeciales(e, r = D.enemigos[e.tipo].golpe_especial) {
   const hoja = r && HOJAS_ESPECIAL[r.imagen];

@@ -2,7 +2,7 @@
 
 El camino del juego es la expedición de grupo. El plan del juego anterior está en `juego_viejo/ROADMAP.md`.
 
-**Versión actual: 0.4.37.** Lo próximo: 0.5.0.
+**Versión actual: 0.4.38.** Lo próximo: 0.5.0.
 
 ## Cómo se numeran las versiones
 
@@ -113,6 +113,11 @@ La idea que une todo es una regla de las Guardianas: "quien le pida algo va a re
 - **Título:** el logo "The Last Flame" no cambia con el idioma.
 
 ## Historial
+
+### 0.4.38
+
+- El Capataz: la deuda. Cada habilidad o poción del grupo suma, y La Cuota pega más cuanto más se debe.
+- Anotar el nombre (la deuda del anotado cuenta doble), Descuento de salario (quita 2 de Ímpetu), La Veta Lo Reclama (escudos de oro que sólo rompen la magia y los críticos, y sueltan Ceniza) y Cuenta Saldada (bajo 15% de vida anota a uno por turno: a las 3 marcas cae). Todo dibujado cuadro por cuadro.
 
 ### 0.4.37
 

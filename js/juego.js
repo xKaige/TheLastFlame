@@ -1301,10 +1301,10 @@ function golpeImponente(u, r) {
   later(r.impacto * 1000, () => {
     if (!Bt) return;
     mostrar(NUCLEO.turnoEnemigo(D, Bt.b, u, azarX));
-    if (['gancho', 'mirada', 'ceniza', 'llamado'].includes(r.efecto)) { Bt.temblor = 6; Bt.destello = 0.4; Bt.congelado = 0.1; sfx('slash'); }
+    if (['gancho', 'mirada', 'ceniza', 'llamado', 'anota', 'descuento'].includes(r.efecto)) { Bt.temblor = 6; Bt.destello = 0.4; Bt.congelado = 0.1; sfx('slash'); }
     else {
       if (r.efecto === 'campanada') Bt.fx.push({ tipo: 'onda', x: u.x, y: FBASE - 70, t: 0, dur: 0.75, m: 1 });
-      else if (r.efecto === 'caida') { golpePixel('golpe', u); golpePixel('critico', u); } else golpePixel('barrido', u);
+      else if (r.efecto === 'caida' || r.efecto === 'cuota') { golpePixel('golpe', u); golpePixel('critico', u); } else golpePixel('barrido', u);
       for (let x = 50; x <= 430; x += 38) chispas(x, FBASE, 4, coloresFx(), -46, 60);
       Bt.temblor = 13; Bt.destello = 0.9; Bt.congelado = 0.16; sfx('slash');
     }
@@ -1332,7 +1332,10 @@ function mostrarEvento(e) {
   }
   if (e.tipo === 'antorcha') { P.fuel = Math.max(0, P.fuel - e.valor); updateHUD(); }
   if (e.tipo === 'invoca') { for (const n of e.nuevos) { n.x = Bt.lugares[n.i]; prepararEnemigo(n); chispas(n.x, FBASE - 24, 18, MARCO.vida, -24); } sfx('encounter'); Bt.temblor = 4; }
-  if (e.tipo === 'fase' && (q.fase.trono || q.fase.caceria || q.fase.veo)) { q.tronoDesde = Bt.t; q.hojaFija = q.fase.trono || q.fase.caceria || q.fase.veo; }
+  if (e.tipo === 'fase' && (q.fase.trono || q.fase.caceria || q.fase.veo || q.fase.reclama)) { q.tronoDesde = Bt.t; q.hojaFija = q.fase.trono || q.fase.caceria || q.fase.veo || q.fase.reclama; }
+  if (e.tipo === 'pepita') { X.ceniza += 1; q.golpeado = 0.15; sfx('chest'); chispas(q.x, FBASE - q.tam * 0.5, 8, ['#f4d68a', '#c99a3a', '#86601f'], -50, 60); Bt.msg = tr('El golpe rebota en el oro. Cae una pepita: +1 de Ceniza.'); }
+  if (e.tipo === 'texto' && e.clave === 'anotado') Bt.msg = tr('{0} queda anotado: sus habilidades suman el doble de deuda.', q.nombre);
+  if (e.tipo === 'texto' && e.clave === 'cuenta') { Bt.msg = tr('{0} queda con {1} de {2} marcas.', q.nombre, e.valor, e.tope); Bt.temblor = 4; sfx('hurt'); }
   if (e.tipo === 'fase' && q.fase.caceria) Bt.penumbra = 0.6;
   if (e.tipo === 'texto' && e.clave === 'penumbra') { Bt.msg = 'Golpe al humo. Pegale justo después de que ataque.'; sfx('miss'); }
   if (e.tipo === 'desesperado') { q.tronoDesde = Bt.t; q.hojaFija = q.ultimo.hoja; Bt.msg = tr(q.ultimo.mensaje, q.nombre); Bt.temblor = 8; Bt.destello = 0.5; sfx('encounter'); }
@@ -1435,7 +1438,7 @@ function dibujarFx(c) {
 
 function actualizarFx(dt) {
   Bt.temblor = Math.max(0, Bt.temblor - dt * 22);
-  const prepara = Bt.b.enemigos.some(e => e.especialDesde !== undefined && !['gancho', 'mirada'].includes(e.hojaActiva.efecto) && Bt.t - e.especialDesde < e.hojaActiva.impacto);
+  const prepara = Bt.b.enemigos.some(e => e.especialDesde !== undefined && !['gancho', 'mirada', 'anota', 'descuento'].includes(e.hojaActiva.efecto) && Bt.t - e.especialDesde < e.hojaActiva.impacto);
   Bt.oscuro = clamp(Bt.oscuro + (prepara ? dt * 1.5 : -dt * 3), 0, 1);
   Bt.destello = Math.max(0, Bt.destello - dt * 2.2);
   for (const f of Bt.fx) f.t += dt;
@@ -1517,6 +1520,7 @@ function ejecutar(o, t) {
   if (o.id === 'atk') ev = NUCLEO.atacar(D, u, t, azarX);
   else if (o.id === 'def') ev = NUCLEO.defender(D, u);
   else if (o.id === 'pot') {
+    if (Bt.b.enemigos.some(e => e.vida > 0 && e.deuda)) Bt.b.deuda++;      // la poción también se anota
     const h = NUCLEO.vivos(b.aliados).sort((x, y) => x.vida / x.vidaMax - y.vida / y.vidaMax)[0], v = Math.round(h.vidaMax * 0.4);
     P.potions--; h.vida = Math.min(h.vidaMax, h.vida + v); ev = [{ tipo: 'cura', quien: h, valor: v }];
   } else ev = NUCLEO.usarHabilidad(D, b, u, o.id, t, azarX);
@@ -1752,6 +1756,8 @@ function listaEstados(q) {
     q.marcado && ['marca', icon('ash'), 'Marcado', 'Volvió de la muerte con menos vida.'],
     q.presa > 0 && ['presa', iconoEstado('presa'), 'Presa', 'Atrae los ataques y recibe 50% más de daño.'],
     q.mirado && ['ojo', iconoEstado('ojo'), 'Bajo su mirada', 'Si ataca a quien le clavó la mirada, recibe la mitad del daño.'],
+    q.anotado > 0 && ['marca', '✎', 'Anotado', 'Sus habilidades suman el doble de deuda.'],
+    q.cuenta > 0 && ['ira', String(q.cuenta), 'Marcas en el libro', 'A las 3 marcas cae.'],
     q.enganchado && ['aturdido', iconoEstado('aturdido'), 'Enganchado', 'Pierde su próximo turno.'],
     q.hechizado && ['ira', icon('cross'), 'Hechizado', 'En su próximo turno ataca a su propio grupo.'],
     q.debil > 0 && ['debil', iconoEstado('debil'), 'Debilitado', 'Pega 30% menos.'],
@@ -2047,6 +2053,8 @@ function dibujarBatalla(c) {
     if (e.vida <= 0 || aparicion(e) < 1) continue;
     dibujarOjos(c, e);
     dibujarVidaEnemigo(c, e);
+    // lo que el grupo le debe al Capataz, al lado de su vida
+    if (e.deuda) { const n = capaNitida(); n.font = '8px "New Rocker", serif'; n.textAlign = 'left'; n.fillStyle = '#000'; n.fillText(tr('Deuda {0}', b.deuda), e.x + 25.5, FBASE + 8.5); n.fillStyle = '#f4d68a'; n.fillText(tr('Deuda {0}', b.deuda), e.x + 25, FBASE + 8); }
     if ((Bt.fase === 'objetivo' && Bt.lista[Bt.tsel] === e) || b.actual === e) {
       // la flecha va sobre la cabeza real del sprite y el nombre arriba de ella
       const y = Math.max(15, FBASE - e.tam + topeVisible(e) - 9);
