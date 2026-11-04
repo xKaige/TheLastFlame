@@ -1,4 +1,14 @@
 'use strict';
+// Los lienzos que el juego dibuja una vez y guarda (retratos, sprites, íconos) van en memoria común, no en la placa de video:
+// si la placa se reinicia o le falta memoria, el navegador vacía los lienzos acelerados y la interfaz quedaba en negro.
+// La pantalla de 480×270 también (se arma casi toda a mano); sólo la capa nítida, que se escala, sigue acelerada.
+{
+  const original = HTMLCanvasElement.prototype.getContext;
+  HTMLCanvasElement.prototype.getContext = function (tipo, opciones) {
+    if (tipo === '2d' && this.id !== 'nitido') opciones = { willReadFrequently: true, ...opciones };
+    return original.call(this, tipo, opciones);
+  };
+}
 // Resolución interna (16:9, escala entera a 1080p x4 y 4K x8)
 const W = 480, H = 270;
 // Ventana 3D

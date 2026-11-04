@@ -41,8 +41,11 @@ function capaNitida() {
 }
 function ajustarCapa() {
   const lienzo = $('nitido'), ancho = Math.max(480, Math.round($('stage').getBoundingClientRect().width * (window.devicePixelRatio || 1)));
-  if (!NITIDO.g) NITIDO.g = lienzo.getContext('2d');
-  if (ancho === NITIDO.ancho) return;
+  if (!NITIDO.g) {
+    NITIDO.g = lienzo.getContext('2d');
+    lienzo.addEventListener('contextrestored', () => { NITIDO.ancho = 0; });     // vuelve sin escala: hay que rearmarla
+  }
+  if (ancho === NITIDO.ancho && NITIDO.g.getTransform().a === ancho / 480) return;
   NITIDO.ancho = ancho;
   lienzo.width = ancho; lienzo.height = Math.round(ancho * 270 / 480);
   NITIDO.g.setTransform(ancho / 480, 0, 0, ancho / 480, 0, 0);
