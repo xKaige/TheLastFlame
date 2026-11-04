@@ -2046,6 +2046,9 @@ function dibujarBatalla(c) {
   const R = RAMPS[S.env], b = Bt.b, tm = SETTINGS.shake ? Bt.temblor : 0;
   const ex = Math.round((azarX() - 0.5) * tm), ey = Math.round((azarX() - 0.5) * tm);
   dibujarEscena(c, ex, ey);
+  // sombra al pie de la escena: en las zonas claras el menú y las tarjetas no se confunden con el fondo
+  const pie = c.createLinearGradient(0, 166, 0, 270); pie.addColorStop(0, 'rgba(0,0,0,0)'); pie.addColorStop(0.25, 'rgba(0,0,0,0.6)'); pie.addColorStop(0.6, 'rgba(0,0,0,0.85)'); pie.addColorStop(1, 'rgba(0,0,0,0.9)');
+  c.fillStyle = pie; c.fillRect(0, 166, 480, 104);
   // lo que da luz o informa va por encima de la oscuridad: llamas, brasas, vida y marca de turno
   if (!Bt.penumbra) for (const [x, y] of ANTORCHAS[S.env] || ANTORCHAS.crypt) drawFlame(c, x, y, 18, 26, Bt.t, 0.75 * clamp(Bt.ini / (Bt.entrada * 0.5), 0, 1), 'fuegoX');
   dibujarParticulas(c);
