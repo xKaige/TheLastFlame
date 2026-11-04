@@ -3,103 +3,79 @@
     "nombre": "Guerrero",
     "rol": "Aguanta y protege",
     "arte": "guerrero",
-    "vida": 46,
-    "ataque": 8,
-    "defensa": 4,
-    "velocidad": 8,
-    "critico": 0.08,
-    "esquiva": 0.03,
     "habilidades": [
       "golpe_brutal",
       "provocar"
     ],
     "atributos": {
-      "fue": 14,
-      "des": 9,
-      "vit": 14,
-      "int": 6,
-      "per": 8,
-      "fe": 8,
-      "ard": 6
+      "fue": 16,
+      "des": 10,
+      "vit": 16,
+      "int": 7,
+      "fe": 9,
+      "ard": 7,
+      "per": 10
     },
-    "crecimiento": {
-      "fue": 1,
-      "vit": 1
-    },
-    "bloqueo": 2,
-    "impetu_al_recibir": 1
+    "rasgo": "contraataque",
+    "libres_sugeridos": [
+      "fue",
+      "vit"
+    ],
+    "arma_inicial": "espada_oxidada"
   },
   "picaro": {
     "nombre": "Pícaro",
     "rol": "Daño veloz y críticos",
     "arte": "picaro",
-    "vida": 34,
-    "ataque": 8,
-    "defensa": 2,
-    "velocidad": 13,
-    "critico": 0.2,
-    "esquiva": 0.15,
     "doble_golpe": 0.2,
     "habilidades": [
       "punalada",
       "hoja_envenenada"
     ],
     "atributos": {
-      "fue": 10,
-      "des": 15,
-      "vit": 8,
-      "int": 8,
-      "per": 13,
-      "fe": 7,
-      "ard": 7
+      "fue": 11,
+      "des": 17,
+      "vit": 9,
+      "int": 9,
+      "fe": 8,
+      "ard": 7,
+      "per": 14
     },
-    "crecimiento": {
-      "fue": 1,
-      "des": 1
-    }
+    "rasgo": "doble",
+    "libres_sugeridos": [
+      "fue",
+      "des"
+    ],
+    "arma_inicial": "daga_fina"
   },
   "mago": {
     "nombre": "Mago",
-    "impetu_inicial": 2,
-    "concentra": 2,
     "rol": "Fuego contra todos",
     "arte": "hechicero",
-    "vida": 30,
-    "ataque": 4,
-    "defensa": 1,
-    "velocidad": 10,
-    "critico": 0.08,
-    "esquiva": 0.05,
     "habilidades": [
       "llama_arcana",
       "tormenta"
     ],
     "atributos": {
-      "fue": 6,
-      "des": 10,
-      "vit": 7,
-      "int": 15,
-      "per": 11,
+      "fue": 7,
+      "des": 11,
+      "vit": 8,
+      "int": 16,
       "fe": 6,
-      "ard": 14
+      "ard": 15,
+      "per": 12
     },
-    "crecimiento": {
-      "int": 1,
-      "ard": 1
-    }
+    "rasgo": "critico_impetu",
+    "libres_sugeridos": [
+      "int",
+      "ard"
+    ],
+    "arma_inicial": "baston_brasa"
   },
   "sanador": {
     "nombre": "Sanador",
-    "impetu_inicial": 2,
-    "concentra": 2,
     "rol": "Cura y sostiene",
     "arte": "hechicero",
-    "vida": 32,
-    "ataque": 4,
-    "defensa": 2,
-    "velocidad": 9,
-    "critico": 0.05,
-    "esquiva": 0.05,
     "habilidades": [
       "sanar",
       "bendicion"
@@ -107,15 +83,17 @@
     "atributos": {
       "fue": 7,
       "des": 9,
-      "vit": 10,
-      "int": 14,
-      "per": 12,
+      "vit": 11,
+      "int": 15,
       "fe": 14,
-      "ard": 6
+      "ard": 6,
+      "per": 13
     },
-    "crecimiento": {
-      "fe": 1,
-      "vit": 1
-    }
+    "rasgo": "cura_impetu",
+    "libres_sugeridos": [
+      "fe",
+      "vit"
+    ],
+    "arma_inicial": "vara_fresno"
   }
 }

@@ -20,18 +20,43 @@
     "prob": 0.5
   },
   "dificultad": {
-    "vida": 1.3,
-    "dano": 1.25,
-    "vida_jefe": 1.5
+    "vida": 2,
+    "dano": 2,
+    "vida_jefe": 1,
+    "defensa_por_piso": 1,
+    "vida_por_piso": [
+      1.23,
+      2.47,
+      0.69,
+      2.04,
+      2.32,
+      0.81,
+      2.28,
+      2.92,
+      1.54,
+      1.81,
+      1.97,
+      1.26
+    ],
+    "dano_por_piso": [
+      1.56,
+      2.5,
+      2.5,
+      2.5,
+      2.5,
+      2.5,
+      2.5,
+      2.5,
+      2.4,
+      2.5,
+      2.5,
+      2.5
+    ]
   },
   "exp_por_nivel": 10,
   "zonas": {
     "pisos": 1,
     "nivel_maximo": 10
-  },
-  "mejora_nivel": {
-    "vida": 4,
-    "ataque": 0
   },
   "ceniza": {
     "por_grupo": 3,
@@ -499,41 +524,15 @@
       "fe": "Fe",
       "ard": "Arcano"
     },
-    "por_punto": {
-      "fue": {
-        "ataque": 1
-      },
-      "des": {
-        "velocidad": 0.5,
-        "esquiva": 0.01
-      },
-      "vit": {
-        "vida": 3,
-        "defensa": 0.34
-      },
-      "int": {
-        "magia": 0.03
-      },
-      "per": {
-        "critico": 0.015
-      },
-      "fe": {
-        "cura": 0.05
-      },
-      "ard": {
-        "fuego": 0.03
-      }
-    },
     "descripciones": {
-      "fue": "Cada punto suma 1 de Ataque. Las armas pesadas la piden.",
-      "des": "Cada punto suma 0,5 de Velocidad y 1% de Esquiva. Las armas livianas la piden.",
-      "vit": "Cada punto suma 3 de Vida y 1 de Defensa cada 3 puntos.",
-      "int": "Cada punto suma 3% a toda la magia, curas y fuego. Las armas mágicas lo suman al ataque básico.",
-      "fe": "Cada punto suma 5% a las curas. Hace falta para aprender las curas más fuertes.",
-      "ard": "Cada punto suma 3% al daño de fuego y a las quemaduras. Hace falta para aprender el fuego más fuerte.",
-      "per": "Cada punto suma 1,5% de Crítico. Algunos eventos la piden."
+      "fue": "Suma al golpe de las armas de Fuerza.",
+      "des": "Velocidad (4 + la mitad) y 1% de esquiva por punto.",
+      "vit": "Vida (3 por punto) y defensa (un tercio).",
+      "int": "Suma al golpe de las armas de Intelecto (bastones y varas).",
+      "fe": "Cada punto suma 5% a las curas. Hace falta para las curas más fuertes.",
+      "ard": "Suma su valor al daño de las habilidades ofensivas, al fuego y a los estados.",
+      "per": "Por encima de 10, cada punto suma 1,5% de crítico."
     },
-    "crece_cada": 3,
     "tramos": [
       {
         "hasta": 20,
@@ -546,7 +545,9 @@
       {
         "vale": 0.25
       }
-    ]
+    ],
+    "automaticos": 5,
+    "libres": 2
   },
   "botin": {
     "objeto": 0.45,
@@ -555,5 +556,20 @@
     "rara": 0.2,
     "rara_jefe": 0.7,
     "aceite": 0.15
+  },
+  "combate": {
+    "vida_base": 10,
+    "vida_por_vit": 3,
+    "vida_por_nivel": 4,
+    "defensa_por_vit": 0.34,
+    "velocidad_base": 4,
+    "velocidad_por_des": 0.5,
+    "esquiva_por_des": 0.01,
+    "critico_por_per": 0.015,
+    "critico_sin_arma": 0.05,
+    "cura_por_fe": 0.05,
+    "impetu_inicial": 1,
+    "contraataque": 1.5,
+    "segundo_golpe": 0.5
   }
 }

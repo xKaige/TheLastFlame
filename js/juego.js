@@ -341,7 +341,7 @@ function grupoDePrueba(piso) {
   X.plantel = NUCLEO.sortearCandidatos(D, azarX).filter((p, i, l) => l.findIndex(q => q.clase === p.clase) === i).slice(0, MAX_GRUPO);
   for (const p of X.plantel) {
     while (p.nivel < tope) { p.exp = 0; NUCLEO.ganarExp(D, p, p.nivel * D.mazmorra.exp_por_nivel, tope); }
-    const propios = Object.keys(D.clases[p.clase].crecimiento);
+    const propios = D.clases[p.clase].libres_sugeridos;
     for (let i = 0; p.puntos; i++) NUCLEO.subirAtributo(D, p, propios[i % propios.length]);
     p.vida = p.vidaMax;
     for (const id of Object.keys(D.habilidades)) if (D.habilidades[id].clase === p.clase) NUCLEO.maestria(p, id).nivel = NUCLEO.topeMaestria(piso);
@@ -630,7 +630,7 @@ function abrirReclutas(hogar) {
 
 function contratar(p, costo) {
   if (p.caido) {
-    NUCLEO.aplicarCondicion(p);
+    NUCLEO.aplicarCondicion(D, p);
     X.caidos = X.caidos.filter(c => c.id !== p.id);
     delete p.caido; delete p.condicion;
   }
@@ -693,7 +693,8 @@ function continuarExpedicion() {
   // quien ya no está en el plantel murió después de este guardado: cerrar el juego no lo revive
   X.grupo = d.grupo.map(g => {
     const q = X.plantel.find(p => p.id === g.id);
-    return q ? Object.assign(q, g) : { ...g, vida: 0, cayo: g.cayo || d.snap.level };
+    if (q && g.v !== 2) delete q.v;          // guardado con las reglas viejas: se rehace con lo que traía la expedición
+    return q ? NUCLEO.asegurarPersonaje(D, Object.assign(q, g)) : NUCLEO.asegurarPersonaje(D, { ...g, vida: 0, cayo: g.cayo || d.snap.level });
   });
   X.perdidos = X.grupo.filter(p => p.vida <= 0); X.sel = []; X.ganada = 0;
   closeAllMenus();
@@ -1239,8 +1240,11 @@ function prepararEnemigo(e) {
   e.tam = tam; e.img = lista ? propia : spriteCanvas(SPRITES[e.sprite].p, tam, S.env, 1); e.golpeado = 0; e.luz = luzDeEnemigo(e); e.gris = grisDeEnemigo(e); e.icono = spriteCanvas(e.gris, e.tam, S.env, 1); prepararPoses(e);
 }
 
+// El número de piso contando desde la entrada: tres por zona
+const pisoGlobal = () => (S.floor - 1) * D.mazmorra.niveles.length + Math.max(1, D.mazmorra.niveles.indexOf(S.level) + 1);
+
 function iniciarPelea(ent, ids, entrada = 0.95, emboscada = false) {
-  const b = NUCLEO.iniciarBatalla(D, X.grupo, ids, emboscada);
+  const b = NUCLEO.iniciarBatalla(D, X.grupo, ids, emboscada, pisoGlobal());
   b.antorcha = P.fuel; b.piso = S.floor;
   if (S.flags.impetu) { for (const u of b.aliados) u.impetu = Math.min(NUCLEO.IMP_TOPE, u.impetu + S.flags.impetu); delete S.flags.impetu; }
   const fx = ids.length === 1 ? [240] : ids.length === 2 ? [190, 290] : ids.some(id => D.enemigos[id].tam_batalla) ? [92, 240, 388] : FX3;   // un jefe grande necesita lugar
@@ -1272,8 +1276,8 @@ function siguiente() {
     iniciarAtaqueAnimado(u);
     later(600, () => { if (Bt) { mostrar(NUCLEO.turnoEnemigo(D, Bt.b, u, azarX)); later(450, () => { if (Bt) Bt.fase = 'cambio'; }); later(800, siguiente); } });
   } else {
-    Bt.ops = [{ id: 'atk', nombre: tr('Atacar'), descripcion: tr(D.clases[u.clase].doble_golpe ? 'Dos golpes: el segundo, más flojo. +1 Ímpetu.' : 'Golpe común. +1 Ímpetu.'), objetivo: 'enemigo' },
-      D.clases[u.clase].concentra ? { id: 'def', nombre: tr('Concentrar'), descripcion: tr('Mitad de daño hasta tu próximo turno. +{0} Ímpetu.', D.clases[u.clase].concentra) } : { id: 'def', nombre: tr('Defender'), descripcion: tr('Mitad de daño hasta tu próximo turno. +{0} Ímpetu.', D.clases[u.clase].bloqueo || 1) },
+    Bt.ops = [{ id: 'atk', nombre: tr('Atacar'), descripcion: tr(D.clases[u.clase].doble_golpe ? 'Golpe común; a veces pega otra vez. +1 Ímpetu.' : 'Golpe común. +1 Ímpetu.'), objetivo: 'enemigo' },
+      { id: 'def', nombre: tr('Defender'), descripcion: tr(D.clases[u.clase].rasgo === 'contraataque' ? 'Mitad de daño hasta tu próximo turno y devolvés cada golpe. +1 Ímpetu.' : 'Mitad de daño hasta tu próximo turno. +1 Ímpetu.') },
       { id: 'pot', nombre: tr('Poción'), descripcion: tr('Cura un 40% al aliado más herido. Quedan {0}.', P.potions), apagada: !P.potions },
       ...NUCLEO.opciones(D, u)];
     Bt.sel = 0; Bt.fase = 'menu'; Bt.msg = ''; pintarBatalla();

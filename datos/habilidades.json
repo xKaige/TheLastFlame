@@ -1,7 +1,7 @@
 {
   "golpe_brutal": {
     "nombre": "Golpe Brutal",
-    "costo": 2,
+    "costo": 1,
     "objetivo": "enemigo",
     "efectos": [
       {
@@ -28,14 +28,14 @@
         "turnos": 2
       }
     ],
-    "descripcion": "Atraés los ataques 2 turnos, con 30% de contraatacar cada golpe. Cada golpe recibido te carga Ímpetu.",
+    "descripcion": "Atraés los ataques 2 turnos, con 30% de contraatacar cada golpe.",
     "clase": "guerrero",
     "acumula": "contraataques",
     "meta": 10
   },
   "punalada": {
     "nombre": "Puñalada",
-    "costo": 2,
+    "costo": 1,
     "objetivo": "enemigo",
     "efectos": [
       {
@@ -79,7 +79,7 @@
   },
   "llama_arcana": {
     "nombre": "Llama Arcana",
-    "costo": 2,
+    "costo": 1,
     "objetivo": "enemigo",
     "efectos": [
       {
@@ -101,7 +101,7 @@
   },
   "tormenta": {
     "nombre": "Tormenta de Fuego",
-    "costo": 3,
+    "costo": 1,
     "objetivo": "enemigos",
     "efectos": [
       {
@@ -123,7 +123,7 @@
   },
   "sanar": {
     "nombre": "Sanar",
-    "costo": 2,
+    "costo": 1,
     "objetivo": "aliado",
     "efectos": [
       {
@@ -138,7 +138,7 @@
   },
   "bendicion": {
     "nombre": "Bendición",
-    "costo": 3,
+    "costo": 1,
     "objetivo": "aliados",
     "efectos": [
       {

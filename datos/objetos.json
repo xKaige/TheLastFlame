@@ -2,9 +2,7 @@
   "espada_oxidada": {
     "nombre": "Espada Oxidada",
     "tipo": "arma",
-    "bonos": {
-      "fue": 2
-    },
+    "bonos": {},
     "descripcion": "Pesada y mellada, todavía corta.",
     "clases": [
       "guerrero"
@@ -12,29 +10,30 @@
     "requisito": {
       "fue": 12,
       "vit": 10
-    }
+    },
+    "rango": 1,
+    "ataque_con": "fue",
+    "critico": 0.1
   },
   "daga_fina": {
     "nombre": "Daga Fina",
     "tipo": "arma",
-    "bonos": {
-      "des": 2
-    },
+    "bonos": {},
     "descripcion": "Rápida en la mano.",
     "clases": [
       "picaro"
     ],
     "requisito": {
       "des": 12
-    }
+    },
+    "rango": 1,
+    "ataque_con": "fue",
+    "critico": 0.2
   },
   "baston_brasa": {
     "nombre": "Bastón de Brasa",
     "tipo": "arma",
-    "bonos": {
-      "int": 1,
-      "ard": 1
-    },
+    "bonos": {},
     "descripcion": "La punta nunca se enfría del todo.",
     "clases": [
       "mago"
@@ -43,7 +42,9 @@
       "int": 14,
       "ard": 13
     },
-    "magico": 0.3
+    "rango": 1,
+    "ataque_con": "int",
+    "critico": 0.15
   },
   "cota_malla": {
     "nombre": "Cota de Malla",
@@ -51,7 +52,13 @@
     "bonos": {
       "vit": 2
     },
-    "descripcion": "De un caballero que ya no la necesita."
+    "descripcion": "De un caballero que ya no la necesita.",
+    "clases": [
+      "guerrero"
+    ],
+    "penalizacion": {
+      "velocidad": -2
+    }
   },
   "capa_raida": {
     "nombre": "Capa Raída",
@@ -60,7 +67,13 @@
       "des": 1,
       "per": 1
     },
-    "descripcion": "No abriga, pero no hace ruido."
+    "descripcion": "No abriga, pero no hace ruido.",
+    "clases": [
+      "picaro"
+    ],
+    "penalizacion": {
+      "vit": -2
+    }
   },
   "anillo_plata": {
     "nombre": "Anillo de Plata",
@@ -82,10 +95,7 @@
   "maza_osario": {
     "nombre": "Maza del Osario",
     "tipo": "arma",
-    "bonos": {
-      "fue": 1,
-      "vit": 1
-    },
+    "bonos": {},
     "descripcion": "Le quedó un diente clavado.",
     "clases": [
       "guerrero"
@@ -93,15 +103,15 @@
     "requisito": {
       "fue": 14,
       "vit": 14
-    }
+    },
+    "rango": 2,
+    "ataque_con": "fue",
+    "critico": 0.1
   },
   "cuchillo_caza": {
     "nombre": "Cuchillo de Caza",
     "tipo": "arma",
-    "bonos": {
-      "des": 1,
-      "per": 1
-    },
+    "bonos": {},
     "descripcion": "Sirve para todo lo que respira.",
     "clases": [
       "picaro"
@@ -109,15 +119,15 @@
     "requisito": {
       "des": 14,
       "per": 12
-    }
+    },
+    "rango": 2,
+    "ataque_con": "fue",
+    "critico": 0.2
   },
   "vara_fresno": {
     "nombre": "Vara de Fresno",
     "tipo": "arma",
-    "bonos": {
-      "int": 1,
-      "fe": 1
-    },
+    "bonos": {},
     "descripcion": "Viene de un bosque que ya no existe.",
     "clases": [
       "sanador"
@@ -126,15 +136,14 @@
       "int": 12,
       "fe": 13
     },
-    "magico": 0.25
+    "rango": 1,
+    "ataque_con": "int",
+    "critico": 0.1
   },
   "hacha_verdugo": {
     "nombre": "Hacha del Verdugo",
     "tipo": "arma",
-    "bonos": {
-      "fue": 4,
-      "des": -1
-    },
+    "bonos": {},
     "descripcion": "Hecha para un solo golpe. Pesa como una condena.",
     "rareza": "rara",
     "clases": [
@@ -144,15 +153,15 @@
       "fue": 22,
       "vit": 20
     },
-    "zona": 2
+    "zona": 2,
+    "rango": 3,
+    "ataque_con": "fue",
+    "critico": 0.12
   },
   "estoque_negro": {
     "nombre": "Estoque Negro",
     "tipo": "arma",
-    "bonos": {
-      "des": 3,
-      "per": 1
-    },
+    "bonos": {},
     "descripcion": "No refleja la luz de la antorcha.",
     "rareza": "rara",
     "clases": [
@@ -162,15 +171,15 @@
       "des": 22,
       "per": 18
     },
-    "zona": 2
+    "zona": 2,
+    "rango": 3,
+    "ataque_con": "fue",
+    "critico": 0.22
   },
   "cetro_agrietado": {
     "nombre": "Cetro Agrietado",
     "tipo": "arma",
-    "bonos": {
-      "int": 4,
-      "vit": -1
-    },
+    "bonos": {},
     "descripcion": "Por la grieta se le escapa algo de quien lo sostiene.",
     "rareza": "rara",
     "clases": [
@@ -180,8 +189,10 @@
       "int": 22,
       "ard": 20
     },
-    "magico": 0.45,
-    "zona": 2
+    "zona": 2,
+    "rango": 3,
+    "ataque_con": "int",
+    "critico": 0.17
   },
   "jubon_cuero": {
     "nombre": "Jubón de Cuero",
@@ -190,7 +201,13 @@
       "vit": 1,
       "des": 1
     },
-    "descripcion": "Remendado muchas veces, por muchas manos."
+    "descripcion": "Remendado muchas veces, por muchas manos.",
+    "clases": [
+      "picaro"
+    ],
+    "penalizacion": {
+      "vit": -2
+    }
   },
   "habito_gris": {
     "nombre": "Hábito Gris",
@@ -199,18 +216,29 @@
       "fe": 1,
       "vit": 1
     },
-    "descripcion": "Huele a incienso y a encierro."
+    "descripcion": "Huele a incienso y a encierro.",
+    "clases": [
+      "sanador"
+    ],
+    "penalizacion": {
+      "ard": -2
+    }
   },
   "peto_placas": {
     "nombre": "Peto de Placas",
     "tipo": "armadura",
     "bonos": {
-      "vit": 4,
-      "des": -2
+      "vit": 4
     },
     "descripcion": "Lo que no te mata te hace más lento.",
     "rareza": "rara",
-    "zona": 2
+    "zona": 2,
+    "clases": [
+      "guerrero"
+    ],
+    "penalizacion": {
+      "velocidad": -2
+    }
   },
   "manto_ceniza": {
     "nombre": "Manto de Ceniza",
@@ -221,7 +249,13 @@
     },
     "descripcion": "Se deshace un poco con cada paso, y nunca se termina.",
     "rareza": "rara",
-    "zona": 2
+    "zona": 2,
+    "clases": [
+      "mago"
+    ],
+    "penalizacion": {
+      "fe": -2
+    }
   },
   "diente_rata": {
     "nombre": "Collar de Dientes",
@@ -264,10 +298,7 @@
   "baculo_guardiana": {
     "nombre": "Báculo de la Guardiana",
     "tipo": "arma",
-    "bonos": {
-      "fe": 4,
-      "vit": -1
-    },
+    "bonos": {},
     "descripcion": "Nadie lo pidió. Estaba acá, esperando.",
     "rareza": "rara",
     "clases": [
@@ -277,7 +308,58 @@
       "int": 20,
       "fe": 22
     },
-    "magico": 0.4,
+    "zona": 2,
+    "rango": 3,
+    "ataque_con": "int",
+    "critico": 0.12
+  },
+  "baston_ascua": {
+    "nombre": "Bastón de Ascua",
+    "tipo": "arma",
+    "bonos": {},
+    "descripcion": "Más pesado que el de brasa. Tarda en enfriarse.",
+    "clases": [
+      "mago"
+    ],
+    "requisito": {
+      "int": 18,
+      "ard": 16
+    },
+    "rango": 2,
+    "ataque_con": "int",
+    "critico": 0.15,
     "zona": 2
+  },
+  "vara_sauce": {
+    "nombre": "Vara de Sauce",
+    "tipo": "arma",
+    "bonos": {},
+    "descripcion": "Se dobla y no se rompe.",
+    "clases": [
+      "sanador"
+    ],
+    "requisito": {
+      "int": 16,
+      "fe": 17
+    },
+    "rango": 2,
+    "ataque_con": "int",
+    "critico": 0.1,
+    "zona": 2
+  },
+  "tunica_brasa": {
+    "nombre": "Túnica de Brasa",
+    "tipo": "armadura",
+    "bonos": {
+      "int": 1,
+      "ard": 1
+    },
+    "descripcion": "Huele a humo. Nunca termina de secarse.",
+    "clases": [
+      "mago"
+    ],
+    "penalizacion": {
+      "fe": -2
+    }
   }
 }

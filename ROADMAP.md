@@ -2,7 +2,7 @@
 
 El camino del juego es la expedición de grupo. El plan del juego anterior está en `juego_viejo/ROADMAP.md`.
 
-**Versión actual: 0.4.40.** Lo próximo: 0.5.0.
+**Versión actual: 0.4.41.** Lo próximo: 0.5.0.
 
 ## Cómo se numeran las versiones
 
@@ -113,6 +113,17 @@ La idea que une todo es una regla de las Guardianas: "quien le pida algo va a re
 - **Título:** el logo "The Last Flame" no cambia con el idioma.
 
 ## Historial
+
+### 0.4.41 (prueba)
+
+- Balance nuevo según la guía: todas las clases salen de 75 puntos de atributo; cada nivel da 5 automáticos (en la proporción de la clase) y 2 libres.
+- Una sola cuenta para los números de pelea: vida, defensa, velocidad, esquiva y crítico salen de los atributos con rendimiento decreciente sobre el total.
+- Armas sin bonos de atributo: pegan con dados según su rango (1d6, 2d6, 3d6) más Fuerza o Intelecto, y cada una tiene su crítico base. Nuevas: Bastón de Ascua, Vara de Sauce. Armaduras por clase con penalizaciones; nueva Túnica de Brasa.
+- Arcano suma a las habilidades ofensivas, los hechizos y los estados. Fe suma 5% a las curas por punto efectivo.
+- Ímpetu: todos empiezan con 1; atacar, esquivar y defender dan 1. Rasgos: el Guerrero cubierto devuelve cada golpe al 150%; el Pícaro tiene 20% de un segundo golpe a la mitad; el Mago recupera Ímpetu con los críticos; el Sanador al curar a otro.
+- Enemigos: vida y daño ×2, +1 de defensa por piso, y una tabla por piso medida para que las peleas duren unas 2 / 2,6 / 4,7 rondas (entrada, segundo descenso, jefe). La defensa del grupo resta entera.
+- Las partidas viejas se rehacen desde el nivel y devuelven los puntos libres para repartir.
+- Herramientas: tools/medir.js (los tres encuentros de cada zona) y tools/calibrar.js (ajusta la tabla por piso).
 
 ### 0.4.40
 

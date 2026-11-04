@@ -6,7 +6,7 @@ const D = {};
 // Como un jugador: gasta cada punto en lo propio de su clase
 function subir(u, exp, piso) {
   N.ganarExp(D, u, exp, N.topeNivel(D, piso));
-  const propios = Object.keys(D.clases[u.clase].crecimiento);
+  const propios = D.clases[u.clase].libres_sugeridos;
   for (let i = u.nivel; u.puntos; i++) N.subirAtributo(D, u, propios[i % propios.length]);
 }
 

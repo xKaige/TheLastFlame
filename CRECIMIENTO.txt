@@ -1,134 +1,130 @@
 LA ÚLTIMA LLAMA · VALORES Y CÁLCULOS DE CRECIMIENTO
-Generado desde los datos del juego (versión 0.4.34). Para rehacerlo: node tools/crecimiento.js
+Generado desde los datos del juego (versión 0.4.40). Para rehacerlo: node tools/crecimiento.js
 
 1. NIVELES
 ==========
 - Experiencia para subir: nivel actual × 10. De 1 a 2 hacen falta 10, de 10 a 11 hacen falta 100.
 - Tope de nivel: 10 por zona (zona 1: 10, zona 3: 30, zona 9: 90). En una zona ya superada no se gana experiencia.
-- Cada nivel: +4 de vida base, +0 de ataque base y 1 punto de atributo para repartir.
-- Cada 3 niveles, los atributos propios de la clase suben solos (ver "crecimiento" en cada clase).
+- Todas las clases empiezan con 75 puntos de atributo, repartidos distinto.
+- Cada nivel: 5 puntos automáticos en la proporción de los iniciales de la clase (a los 15 niveles cada atributo se duplicó) y 2 libres.
+  El punto automático número k va al atributo que maximiza k × inicial − 75 × automáticos ya recibidos (empates: en el orden de la lista).
+- Las partidas viejas se rehacen desde el nivel y devuelven 2 libres por nivel para repartir.
 
 2. ATRIBUTOS
 ============
-Lo que suma cada punto por encima del valor inicial de la clase:
-- Fuerza       ataque +1
-- Destreza     velocidad +0.5, esquiva +0.01
-- Vitalidad    vida +3, defensa +0.34
-- Intelecto    magia +0.03
-- Fe           cura +0.05
-- Arcano       fuego +0.03
-- Perspicacia  critico +0.015
+- Fuerza       Suma al golpe de las armas de Fuerza.
+- Destreza     Velocidad (4 + la mitad) y 1% de esquiva por punto.
+- Vitalidad    Vida (3 por punto) y defensa (un tercio).
+- Intelecto    Suma al golpe de las armas de Intelecto (bastones y varas).
+- Fe           Cada punto suma 5% a las curas. Hace falta para las curas más fuertes.
+- Arcano       Suma su valor al daño de las habilidades ofensivas, al fuego y a los estados.
+- Perspicacia  Por encima de 10, cada punto suma 1,5% de crítico.
 
-Rendimiento decreciente (puntos por encima del inicial de la clase):
-- de +1 a +20: cada punto vale 1
-- de +21 a +50: cada punto vale 0.5
-- más de +50: cada punto vale 0.25
-Ejemplo: +30 puntos de Fuerza valen 20 + 10×0,5 = 25 → +25 de ataque.
-
-Magia: "magia" sube toda la magia (fuego y curas), "cura" sólo las curas y "fuego" sólo el fuego y las quemaduras.
-El valor final multiplica: daño de fuego × (1 + magia + fuego), curas × (1 + magia + cura).
+Rendimiento decreciente sobre el TOTAL del atributo (E = valor efectivo):
+- de 1 a 20: cada punto vale 1
+- de 21 a 50: cada punto vale 0.5
+- más de 50: cada punto vale 0.25
+Ejemplo: Fuerza 30 vale E = 20 + 10 × 0,5 = 25.
+Las penalizaciones de armadura restan atributos (o velocidad) sólo mientras se lleva puesta, antes de hacer las cuentas.
 
 3. FÓRMULAS DE COMBATE
 ======================
-- Golpe físico: (1d6 + ataque + ataque mágico del arma) × multiplicador − defensa del blanco. Mínimo 1.
-- Crítico: daño × 2. Probabilidad = crítico del personaje (+5% por nivel de Sangre Fría contra enemigos con estado).
-- Ataque mágico del arma: % del Intelecto total (ver armas).
-- Fuego (dano_fijo): azar entre min y max × (1 + magia + fuego) × poder de la habilidad.
-- Curas: vida máxima del curado × porcentaje × (1 + magia + cura) × poder de la habilidad.
+- Vida = 10 + 3 × E(Vitalidad) + 4 × (nivel − 1).
+- Defensa = redondeo(0.34 × E(Vitalidad)).
+- Velocidad = 4 + 0.5 × E(Destreza) + equipo. Esquiva = 1% × E(Destreza).
+- Crítico = base del arma (sin arma 5%) + 1.5% por punto de Percepción por encima de 10. Entre 0 y 100%.
+- Golpe básico: rango del arma en d6 + E(atributo del arma) − defensa del blanco. Mínimo 1. Crítico: ×2.
+- Habilidades físicas: (dados + E(atributo) + E(Arcano)) × multiplicador − defensa.
+- Hechizos de daño: (tirada del hechizo + E(Arcano)) × poder. Pueden ser crítico.
+- Veneno y quemadura: el Arcano se reparte entero entre los pulsos del estado.
+- Curas: vida máxima del curado × porcentaje × (1 + 5% × E(Fe)) × poder. Sólo cuenta lo que de verdad repone.
 - Poder de la habilidad: 1 + 0,1 × (nivel de la habilidad − 1). Nivel 4 = ×1,3.
-- Pícaro: sus habilidades con "atributo" suman 0,5% por punto de Destreza por encima del inicial.
-- Guardia (Defender o Concentrar): recibe la mitad del daño hasta su próximo turno.
-- Debilitado: pega 30% menos. Presa: recibe 50% más.
-- Ímpetu: máximo 4. Atacar +1, esquivar +1, Defender +1 (Guerrero +2), Concentrar +2 (Mago y Sanador).
-  El Guerrero gana además +1 por cada golpe que recibe.
+- Defender: mitad de daño hasta el próximo turno y +1 Ímpetu, una sola vez.
+- Ímpetu: todos empiezan con 1, máximo 4. Atacar +1, esquivar +1, Defender +1. Las reacciones no dan Ímpetu.
+- Enemigos contra el grupo: daño bruto − defensa completa del personaje; si está cubierto, después la mitad.
 
 4. CLASES
 =========
 
 GUERRERO · Aguanta y protege
-- Base: vida 46, ataque 8, defensa 4, velocidad 8, crítico 8%, esquiva 3%
-- Atributos iniciales: Fuerza 14, Destreza 9, Vitalidad 14, Intelecto 6, Fe 8, Arcano 6, Perspicacia 8
-- Crecimiento cada 3 niveles: Fuerza +1, Vitalidad +1
-- Ímpetu inicial: 0 · Defender da 2 · +1 por golpe recibido
+- Atributos iniciales: Fuerza 16, Destreza 10, Vitalidad 16, Intelecto 7, Fe 9, Arcano 7, Perspicacia 10
+- Rasgo: Cubierto, devuelve cada golpe al 150% de su básico (una vez por impacto). No se suma al contraataque de Provocar.
+- Arma inicial: Espada Oxidada. Libres sugeridos: Fuerza y Vitalidad.
 - Empieza con: Golpe Brutal, Provocar
 
 PÍCARO · Daño veloz y críticos
-- Base: vida 34, ataque 8, defensa 2, velocidad 13, crítico 20%, esquiva 15%, doble golpe 20% (el segundo pega ×0.2)
-- Atributos iniciales: Fuerza 10, Destreza 15, Vitalidad 8, Intelecto 8, Fe 7, Arcano 7, Perspicacia 13
-- Crecimiento cada 3 niveles: Fuerza +1, Destreza +1
-- Ímpetu inicial: 0 · Defender da 1
+- Atributos iniciales: Fuerza 11, Destreza 17, Vitalidad 9, Intelecto 9, Fe 8, Arcano 7, Perspicacia 14
+- Rasgo: 20% de pegar otra vez con el básico: 50% del daño ya hecho, sin otro crítico ni Ímpetu.
+- Arma inicial: Daga Fina. Libres sugeridos: Fuerza y Destreza.
 - Empieza con: Puñalada, Hoja Envenenada
 
 MAGO · Fuego contra todos
-- Base: vida 30, ataque 4, defensa 1, velocidad 10, crítico 8%, esquiva 5%
-- Atributos iniciales: Fuerza 6, Destreza 10, Vitalidad 7, Intelecto 15, Fe 6, Arcano 14, Perspicacia 11
-- Crecimiento cada 3 niveles: Intelecto +1, Arcano +1
-- Ímpetu inicial: 2 · Defender da 2 (se llama Concentrar)
+- Atributos iniciales: Fuerza 7, Destreza 11, Vitalidad 8, Intelecto 16, Fe 6, Arcano 15, Perspicacia 12
+- Rasgo: +1 Ímpetu al acertar un crítico (básico o hechizo directo), una vez por acción.
+- Arma inicial: Bastón de Brasa. Libres sugeridos: Intelecto y Arcano.
 - Empieza con: Llama Arcana, Tormenta de Fuego
 
 SANADOR · Cura y sostiene
-- Base: vida 32, ataque 4, defensa 2, velocidad 9, crítico 5%, esquiva 5%
-- Atributos iniciales: Fuerza 7, Destreza 9, Vitalidad 10, Intelecto 14, Fe 14, Arcano 6, Perspicacia 12
-- Crecimiento cada 3 niveles: Fe +1, Vitalidad +1
-- Ímpetu inicial: 2 · Defender da 2 (se llama Concentrar)
+- Atributos iniciales: Fuerza 7, Destreza 9, Vitalidad 11, Intelecto 15, Fe 14, Arcano 6, Perspicacia 13
+- Rasgo: +1 Ímpetu cuando su acción le repone vida a otro aliado, una vez por acción.
+- Arma inicial: Vara de Fresno. Libres sugeridos: Fe y Vitalidad.
 - Empieza con: Sanar, Bendición
 
-5. CRECIMIENTO POR NIVEL (PUNTOS REPARTIDOS EN LO PROPIO DE LA CLASE, SIN EQUIPO)
-=================================================================================
-Los puntos libres se reparten en partes iguales entre los atributos de "crecimiento" de la clase. Sin arma: el Mago y el Sanador suman ataque mágico recién al equipar una.
+5. CRECIMIENTO POR NIVEL (ARMA INICIAL, LIBRES EN LOS SUGERIDOS DE LA CLASE)
+============================================================================
 
 Guerrero
-Nivel Vida  Atq  Def  Vel   Crít   Esq    Magia    Cura     Fuego    Atributos
-1     50    8    4    8     8%     3%     +0%      +0%      +0%      Fue 14 Des 9 Vit 14 Int 6 Fe 8 Arc 6 Per 8
-5     75    11   5    8     8%     3%     +0%      +0%      +0%      Fue 17 Des 9 Vit 17 Int 6 Fe 8 Arc 6 Per 8
-10    107   16   6    8     8%     3%     +0%      +0%      +0%      Fue 22 Des 9 Vit 21 Int 6 Fe 8 Arc 6 Per 8
-20    171   24   9    8     8%     3%     +0%      +0%      +0%      Fue 30 Des 9 Vit 29 Int 6 Fe 8 Arc 6 Per 8
-30    232   31   11   8     8%     3%     +0%      +0%      +0%      Fue 39 Des 9 Vit 38 Int 6 Fe 8 Arc 6 Per 8
-45    312   37   14   8     8%     3%     +0%      +0%      +0%      Fue 51 Des 9 Vit 51 Int 6 Fe 8 Arc 6 Per 8
-60    390   43   16   8     8%     3%     +0%      +0%      +0%      Fue 64 Des 9 Vit 63 Int 6 Fe 8 Arc 6 Per 8
-90    529   49   18   8     8%     3%     +0%      +0%      +0%      Fue 89 Des 9 Vit 88 Int 6 Fe 8 Arc 6 Per 8
+Nivel Vida  Golpe     Arc  Def  Vel   Crít   Esq    Cura     Atributos
+1     62    1d6+16    7    5    9     10%    10%    +45%     fue 16 · des 10 · vit 16 · int 7 · fe 9 · ard 7 · per 10
+5     96    1d6+22    9    7    10.5  14.5%  13%    +55%     fue 24 · des 13 · vit 24 · int 9 · fe 11 · ard 9 · per 13
+10    133   1d6+28    11   9    12    19%    16%    +70%     fue 35 · des 16 · vit 35 · int 11 · fe 14 · ard 11 · per 16
+20    199   1d6+36    16   12   14.8  29.5%  21.5%  +100%    fue 55 · des 23 · vit 55 · int 16 · fe 20 · ard 16 · per 23
+30    255   1d6+42    21   14   16.3  38.5%  24.5%  +115%    fue 76 · des 29 · vit 76 · int 21 · fe 26 · ard 21 · per 29
+45    338   1d6+49    24   17   18.8  53.5%  29.5%  +137.5%  fue 107 · des 39 · vit 107 · int 28 · fe 35 · ard 28 · per 39
+60    421   1d6+57    28   19   21.3  68.5%  34.5%  +160%    fue 138 · des 49 · vit 138 · int 35 · fe 44 · ard 35 · per 49
+90    588   1d6+73    35   25   23.9  98.5%  39.8%  +190%    fue 200 · des 69 · vit 200 · int 49 · fe 62 · ard 49 · per 69
 
 Pícaro
-Nivel Vida  Atq  Def  Vel   Crít   Esq    Magia    Cura     Fuego    Atributos
-1     34    8    2    13    20%    21%    +0%      +0%      +0%      Fue 10 Des 15 Vit 8 Int 8 Fe 7 Arc 7 Per 13
-5     50    11   2    14.5  20%    24%    +0%      +0%      +0%      Fue 13 Des 18 Vit 8 Int 8 Fe 7 Arc 7 Per 13
-10    70    16   2    16.5  20%    28%    +0%      +0%      +0%      Fue 18 Des 22 Vit 8 Int 8 Fe 7 Arc 7 Per 13
-20    110   24   2    20.5  20%    36%    +0%      +0%      +0%      Fue 26 Des 30 Vit 8 Int 8 Fe 7 Arc 7 Per 13
-30    150   31   2    24    20%    43%    +0%      +0%      +0%      Fue 35 Des 39 Vit 8 Int 8 Fe 7 Arc 7 Per 13
-45    210   37   2    27.3  20%    49.5%  +0%      +0%      +0%      Fue 47 Des 52 Vit 8 Int 8 Fe 7 Arc 7 Per 13
-60    270   43   2    30.3  20%    55.5%  +0%      +0%      +0%      Fue 60 Des 64 Vit 8 Int 8 Fe 7 Arc 7 Per 13
-90    390   49   2    33.5  20%    62%    +0%      +0%      +0%      Fue 85 Des 89 Vit 8 Int 8 Fe 7 Arc 7 Per 13
+Nivel Vida  Golpe     Arc  Def  Vel   Crít   Esq    Cura     Atributos
+1     37    1d6+11    7    3    12.5  26%    23%    +40%     fue 11 · des 17 · vit 9 · int 9 · fe 8 · ard 7 · per 14
+5     59    1d6+18    9    4    15.5  32%    29%    +50%     fue 18 · des 26 · vit 11 · int 11 · fe 10 · ard 9 · per 18
+10    91    1d6+24    11   5    18    38%    34%    +65%     fue 27 · des 36 · vit 15 · int 14 · fe 13 · ard 11 · per 22
+20    146   1d6+32    16   7    22.5  53%    43%    +90%     fue 44 · des 58 · vit 20 · int 20 · fe 18 · ard 16 · per 32
+30    195   1d6+38    21   8    25.1  66.5%  48.3%  +110%    fue 61 · des 79 · vit 26 · int 26 · fe 24 · ard 21 · per 41
+45    269   1d6+44    24   9    29.1  87.5%  56.3%  +130%    fue 87 · des 111 · vit 35 · int 35 · fe 32 · ard 28 · per 55
+60    342   1d6+51    28   11   33.1  100%   64.3%  +150%    fue 113 · des 143 · vit 44 · int 44 · fe 40 · ard 35 · per 69
+90    480   1d6+64    35   13   41.1  100%   80.3%  +182.5%  fue 165 · des 207 · vit 62 · int 62 · fe 56 · ard 49 · per 97
 
 Mago
-Nivel Vida  Atq  Def  Vel   Crít   Esq    Magia    Cura     Fuego    Atributos
-1     38    4    1    9     8%     5%     +0%      +0%      +0%      Fue 6 Des 10 Vit 7 Int 15 Fe 6 Arc 14 Per 11
-5     54    4    1    9     8%     5%     +9%      +0%      +9%      Fue 6 Des 10 Vit 7 Int 18 Fe 6 Arc 17 Per 11
-10    74    4    1    9     8%     5%     +24%     +0%      +21%     Fue 6 Des 10 Vit 7 Int 23 Fe 6 Arc 21 Per 11
-20    114   4    1    9     8%     5%     +48%     +0%      +45%     Fue 6 Des 10 Vit 7 Int 31 Fe 6 Arc 29 Per 11
-30    154   4    1    9     8%     5%     +67.5%   +0%      +66%     Fue 6 Des 10 Vit 7 Int 40 Fe 6 Arc 38 Per 11
-45    214   4    1    9     8%     5%     +85.5%   +0%      +85.5%   Fue 6 Des 10 Vit 7 Int 52 Fe 6 Arc 51 Per 11
-60    274   4    1    9     8%     5%     +105%    +0%      +103.5%  Fue 6 Des 10 Vit 7 Int 65 Fe 6 Arc 63 Per 11
-90    394   4    1    9     8%     5%     +123.8%  +0%      +123%    Fue 6 Des 10 Vit 7 Int 90 Fe 6 Arc 88 Per 11
+Nivel Vida  Golpe     Arc  Def  Vel   Crít   Esq    Cura     Atributos
+1     42    1d6+16    15   3    8.5   18%    11%    +30%     fue 7 · des 11 · vit 8 · int 16 · fe 6 · ard 15 · per 12
+5     64    1d6+22    22   3    10    22.5%  14%    +40%     fue 9 · des 14 · vit 10 · int 24 · fe 8 · ard 23 · per 15
+10    93    1d6+27    27   4    12    28.5%  18%    +50%     fue 11 · des 18 · vit 13 · int 34 · fe 10 · ard 33 · per 19
+20    148   1d6+36    36   6    14.3  40.5%  22.5%  +70%     fue 16 · des 25 · vit 18 · int 55 · fe 14 · ard 53 · per 27
+30    199   1d6+42    41   7    16    52.5%  26%    +90%     fue 21 · des 32 · vit 23 · int 76 · fe 18 · ard 73 · per 35
+45    271   1d6+49    48   9    18.8  70.5%  31.5%  +110%    fue 28 · des 43 · vit 31 · int 107 · fe 24 · ard 103 · per 47
+60    343   1d6+57    56   10   21    88.5%  36%    +125%    fue 35 · des 54 · vit 39 · int 138 · fe 30 · ard 133 · per 59
+90    483   1d6+73    71   12   23.8  100%   41.5%  +155%    fue 49 · des 76 · vit 55 · int 200 · fe 42 · ard 193 · per 83
 
 Sanador
-Nivel Vida  Atq  Def  Vel   Crít   Esq    Magia    Cura     Fuego    Atributos
-1     32    4    2    9     10%    5%     +0%      +0%      +0%      Fue 7 Des 9 Vit 10 Int 14 Fe 14 Arc 6 Per 12
-5     57    4    3    9     10%    5%     +0%      +15%     +0%      Fue 7 Des 9 Vit 13 Int 14 Fe 17 Arc 6 Per 12
-10    89    4    4    9     10%    5%     +0%      +40%     +0%      Fue 7 Des 9 Vit 17 Int 14 Fe 22 Arc 6 Per 12
-20    153   4    7    9     10%    5%     +0%      +80%     +0%      Fue 7 Des 9 Vit 25 Int 14 Fe 30 Arc 6 Per 12
-30    214   4    9    9     10%    5%     +0%      +112.5%  +0%      Fue 7 Des 9 Vit 34 Int 14 Fe 39 Arc 6 Per 12
-45    294   4    12   9     10%    5%     +0%      +142.5%  +0%      Fue 7 Des 9 Vit 47 Int 14 Fe 51 Arc 6 Per 12
-60    372   4    14   9     10%    5%     +0%      +175%    +0%      Fue 7 Des 9 Vit 59 Int 14 Fe 64 Arc 6 Per 12
-90    511   4    16   9     10%    5%     +0%      +206.3%  +0%      Fue 7 Des 9 Vit 84 Int 14 Fe 89 Arc 6 Per 12
+Nivel Vida  Golpe     Arc  Def  Vel   Crít   Esq    Cura     Atributos
+1     43    1d6+15    6    4    8.5   19.5%  9%     +70%     fue 7 · des 9 · vit 11 · int 15 · fe 14 · ard 6 · per 13
+5     80    1d6+19    8    6    9.5   24%    11%    +105%    fue 9 · des 11 · vit 18 · int 19 · fe 22 · ard 8 · per 16
+10    117   1d6+22    10   8    11    31.5%  14%    +127.5%  fue 11 · des 14 · vit 27 · int 24 · fe 31 · ard 10 · per 21
+20    182   1d6+27    14   11   14    43.5%  20%    +176.3%  fue 16 · des 20 · vit 44 · int 34 · fe 51 · ard 14 · per 29
+30    239   1d6+32    18   13   15.5  57%    23%    +200%    fue 21 · des 26 · vit 61 · int 44 · fe 70 · ard 18 · per 38
+45    319   1d6+37    22   15   17.8  76.5%  27.5%  +236.3%  fue 28 · des 35 · vit 87 · int 59 · fe 99 · ard 24 · per 51
+60    398   1d6+41    25   17   20    96%    32%    +272.5%  fue 35 · des 44 · vit 113 · int 74 · fe 128 · ard 30 · per 64
+90    557   1d6+49    31   22   23    100%   38%    +345%    fue 49 · des 62 · vit 165 · int 104 · fe 186 · ard 42 · per 90
 
 6. HABILIDADES
 ==============
 Suben de nivel con lo que acumulan. Meta para pasar del nivel N al siguiente: meta base × N². Tope: zona + 1 (máximo 10).
 
 Guerrero
-- Golpe Brutal · ◆◆ · Daño doble que hace sangrar.
+- Golpe Brutal · ◆ · Daño doble que hace sangrar.
     acumula "usos", metas a nv 2/3/4/5: 10 / 40 / 90 / 160 · efectos: [{"tipo":"dano","mult":2},{"tipo":"sangrado","estallido":0.15}]
-- Provocar · ◆ · Atraés los ataques 2 turnos, con 30% de contraatacar cada golpe. Cada golpe recibido te carga Ímpetu.
+- Provocar · ◆ · Atraés los ataques 2 turnos, con 30% de contraatacar cada golpe.
     acumula "contraataques", metas a nv 2/3/4/5: 10 / 40 / 90 / 160 · efectos: [{"tipo":"provocar","turnos":2}]
 - Último Aliento · pasiva · Pasiva. Tus golpes pegan hasta 75% más cuanta menos vida te quede.
     Requiere Fuerza 12 · acumula "golpes_heridos", metas a nv 2/3/4/5: 15 / 60 / 135 / 240
@@ -146,7 +142,7 @@ Guerrero
     Requiere Vitalidad 18 · acumula "evitado", metas a nv 2/3/4/5: 100 / 400 / 900 / 1600
 
 Pícaro
-- Puñalada · ◆◆ · Ignora la defensa y pega 60% más a quien sangra o está envenenado.
+- Puñalada · ◆ · Ignora la defensa y pega 60% más a quien sangra o está envenenado.
     acumula "usos", metas a nv 2/3/4/5: 10 / 40 / 90 / 160 · efectos: [{"tipo":"dano","mult":1.5,"ignora_defensa":true,"con_estado":1.6},{"tipo":"sangrado","estallido":0.2}]
 - Hoja Envenenada · ◆ · Corta y envenena unos turnos.
     acumula "veneno", metas a nv 2/3/4/5: 60 / 240 / 540 / 960 · efectos: [{"tipo":"dano","mult":0.5},{"tipo":"veneno","por_turno":4,"min":3,"max":5}]
@@ -164,9 +160,9 @@ Pícaro
     Requiere Perspicacia 15 · acumula "extra", metas a nv 2/3/4/5: 100 / 400 / 900 / 1600
 
 Mago
-- Llama Arcana · ◆◆ · Fuego puro que deja al enemigo ardiendo.
+- Llama Arcana · ◆ · Fuego puro que deja al enemigo ardiendo.
     acumula "dano", metas a nv 2/3/4/5: 120 / 480 / 1080 / 1920 · efectos: [{"tipo":"dano_fijo","min":14,"max":20},{"tipo":"quemadura","por_turno":3,"min":2,"max":4}]
-- Tormenta de Fuego · ◆◆◆ · Fuego sobre todos los enemigos.
+- Tormenta de Fuego · ◆ · Fuego sobre todos los enemigos.
     acumula "dano", metas a nv 2/3/4/5: 150 / 600 / 1350 / 2400 · efectos: [{"tipo":"dano_fijo","min":9,"max":14},{"tipo":"quemadura","por_turno":2,"min":2,"max":3}]
 - Brasa Ávida · ◆ · Enciende al enemigo. Si ya ardía, recuperás 1 de Ímpetu.
     Requiere Arcano 12 · acumula "usos", metas a nv 2/3/4/5: 12 / 48 / 108 / 192 · efectos: [{"tipo":"brasa","por_turno":2,"min":2,"max":3}]
@@ -182,9 +178,9 @@ Mago
     Requiere Arcano 16 · acumula "quemadura", metas a nv 2/3/4/5: 120 / 480 / 1080 / 1920
 
 Sanador
-- Sanar · ◆◆ · Devuelve el 30% de la vida a un aliado.
+- Sanar · ◆ · Devuelve el 30% de la vida a un aliado.
     acumula "cura", metas a nv 2/3/4/5: 150 / 600 / 1350 / 2400 · efectos: [{"tipo":"cura","porcentaje":0.3}]
-- Bendición · ◆◆◆ · Cura un poco a todos y les da +2 de defensa en esta pelea.
+- Bendición · ◆ · Cura un poco a todos y les da +2 de defensa en esta pelea.
     acumula "cura", metas a nv 2/3/4/5: 200 / 800 / 1800 / 3200 · efectos: [{"tipo":"cura","porcentaje":0.15},{"tipo":"defensa","valor":2}]
 - Muro de Escudos · ◆◆ · Todo el grupo gana +3 de defensa en esta pelea.
     Requiere Vitalidad 12 · acumula "usos", metas a nv 2/3/4/5: 12 / 48 / 108 / 192 · efectos: [{"tipo":"defensa","valor":3}]
@@ -201,18 +197,42 @@ Sanador
 
 7. ARMAS
 ========
-- Espada Oxidada           Guerrero  bonos {"fue":2}              requiere {"fue":12,"vit":10}       
-- Daga Fina                Pícaro    bonos {"des":2}              requiere {"des":12}                
-- Bastón de Brasa          Mago      bonos {"int":1,"ard":1}      requiere {"int":14,"ard":13}        ataque mágico 30% del Intelecto
-- Maza del Osario          Guerrero  bonos {"fue":1,"vit":1}      requiere {"fue":14,"vit":14}       
-- Cuchillo de Caza         Pícaro    bonos {"des":1,"per":1}      requiere {"des":14,"per":12}       
-- Vara de Fresno           Sanador   bonos {"int":1,"fe":1}       requiere {"int":12,"fe":13}         ataque mágico 25% del Intelecto
-- Hacha del Verdugo        Guerrero  bonos {"fue":4,"des":-1}     requiere {"fue":22,"vit":20}        · rara
-- Estoque Negro            Pícaro    bonos {"des":3,"per":1}      requiere {"des":22,"per":18}        · rara
-- Cetro Agrietado          Mago      bonos {"int":4,"vit":-1}     requiere {"int":22,"ard":20}        ataque mágico 45% del Intelecto · rara
-- Báculo de la Guardiana   Sanador   bonos {"fe":4,"vit":-1}      requiere {"int":20,"fe":22}         ataque mágico 40% del Intelecto · rara
+- Espada Oxidada           Guerrero  1d6 + Fuerza     crítico 10%    requiere {"fue":12,"vit":10} · zona 1
+- Daga Fina                Pícaro    1d6 + Fuerza     crítico 20%    requiere {"des":12} · zona 1
+- Bastón de Brasa          Mago      1d6 + Intelecto  crítico 15%    requiere {"int":14,"ard":13} · zona 1
+- Maza del Osario          Guerrero  2d6 + Fuerza     crítico 10%    requiere {"fue":14,"vit":14} · zona 1
+- Cuchillo de Caza         Pícaro    2d6 + Fuerza     crítico 20%    requiere {"des":14,"per":12} · zona 1
+- Vara de Fresno           Sanador   1d6 + Intelecto  crítico 10%    requiere {"int":12,"fe":13} · zona 1
+- Hacha del Verdugo        Guerrero  3d6 + Fuerza     crítico 12%    requiere {"fue":22,"vit":20} · zona 2
+- Estoque Negro            Pícaro    3d6 + Fuerza     crítico 22%    requiere {"des":22,"per":18} · zona 2
+- Cetro Agrietado          Mago      3d6 + Intelecto  crítico 17%    requiere {"int":22,"ard":20} · zona 2
+- Báculo de la Guardiana   Sanador   3d6 + Intelecto  crítico 12%    requiere {"int":20,"fe":22} · zona 2
+- Bastón de Ascua          Mago      2d6 + Intelecto  crítico 15%    requiere {"int":18,"ard":16} · zona 2
+- Vara de Sauce            Sanador   2d6 + Intelecto  crítico 10%    requiere {"int":16,"fe":17} · zona 2
+
+Armaduras:
+- Cota de Malla            Guerrero  bonos {"vit":2}              penalización {"velocidad":-2}
+- Capa Raída               Pícaro    bonos {"des":1,"per":1}      penalización {"vit":-2}
+- Jubón de Cuero           Pícaro    bonos {"vit":1,"des":1}      penalización {"vit":-2}
+- Hábito Gris              Sanador   bonos {"fe":1,"vit":1}       penalización {"ard":-2}
+- Peto de Placas           Guerrero  bonos {"vit":4}              penalización {"velocidad":-2}
+- Manto de Ceniza          Mago      bonos {"int":2,"ard":2}      penalización {"fe":-2}
+- Túnica de Brasa          Mago      bonos {"int":1,"ard":1}      penalización {"fe":-2}
 
 8. ENEMIGOS
 ===========
-- Todos los enemigos: vida ×1.3, daño ×1.25. Jefes: vida ×1.5 además.
+- Todos: vida ×2, daño bruto ×2, +1 de defensa por piso (3 pisos por zona).
+- Además, cada piso multiplica vida y daño según la tabla (medida con node tools/medir.js, ajustada con node tools/calibrar.js):
+  piso 1   vida ×1.23   daño ×1.56
+  piso 2   vida ×2.47   daño ×2.5
+  piso 3   vida ×0.69   daño ×2.5
+  piso 4   vida ×2.04   daño ×2.5
+  piso 5   vida ×2.32   daño ×2.5
+  piso 6   vida ×0.81   daño ×2.5
+  piso 7   vida ×2.28   daño ×2.5
+  piso 8   vida ×2.92   daño ×2.5
+  piso 9   vida ×1.54   daño ×2.4
+  piso 10  vida ×1.81   daño ×2.5
+  piso 11  vida ×1.97   daño ×2.5
+  piso 12  vida ×1.26   daño ×2.5
 - Fuerza según el tamaño del grupo (vida enemiga, 1 a 4 personajes): 0.22 / 0.42 / 0.72 / 1

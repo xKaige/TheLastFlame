@@ -43,7 +43,8 @@ function cerrarPersonajes() {
   if (MENU.stack.length) renderMenu();
 }
 
-const textoBonos = o => [...Object.entries(o.bonos).map(([k, v]) => `${v > 0 ? '+' : '−'}${Math.abs(v)} ${(REGLAS_ATR.nombres[k] || k).toUpperCase().slice(0, 3)}`), ...(o.magico ? [tr('ATQ +{0}% INT', Math.round(o.magico * 100))] : [])].join(' · ');
+const corto = k => k === 'velocidad' ? 'VEL' : (REGLAS_ATR.nombres[k] || k).toUpperCase().slice(0, 3);
+const textoBonos = o => [...(o.rango ? [tr('{0}d6 + {1}', o.rango, corto(o.ataque_con)), tr('CRÍT {0}%', Math.round(o.critico * 100))] : []), ...Object.entries({ ...o.bonos, ...o.penalizacion }).map(([k, v]) => `${v > 0 ? '+' : '−'}${Math.abs(v)} ${corto(k)}`)].join(' · ');
 const nombreObjeto = o => `${o.rareza === 'rara' ? '✦ ' : ''}${o.nombre}`;
 const COMO_SUBE = { usos: 'Sube al usarla', dano: 'Sube con el daño hecho', cura: 'Sube con la vida curada', impetu: 'Sube con el Ímpetu gastado', recibido: 'Sube con el daño recibido', golpes_recibidos: 'Sube con los golpes recibidos', golpes_heridos: 'Sube pegando con poca vida', evitado: 'Sube con el daño evitado', contraataques: 'Sube al contraatacar', veneno: 'Sube con el daño de veneno', esquivas: 'Sube al esquivar', criticos: 'Sube con los críticos', extra: 'Sube con el daño extra', quemadura: 'Sube con el daño de quemaduras', curaciones: 'Sube al curar' };
 function textoMaestria(p, id) {
@@ -59,8 +60,8 @@ const CONSUMIBLES = {
 };
 // Lo que cambia en un personaje si se pone o se saca un objeto, escrito con todas las letras
 const TIPOS_OBJETO = { arma: 'Armas', armadura: 'Armaduras', accesorio: 'Accesorios' };
-const bonosLargos = o => [...Object.entries(o.bonos).map(([k, v]) => `<div class="pbono ${v > 0 ? 'sube' : 'baja'}">${v > 0 ? '+' : '−'}${Math.abs(v)} ${REGLAS_ATR.nombres[k] || k}</div>`), ...(o.magico ? [`<div class="pbono sube">${tr('+{0}% del Intelecto al ataque', Math.round(o.magico * 100))}</div>`] : [])].join('');
-function valoresDe(p) { return { Vida: p.vidaMax, Ataque: p.ataque + (p.ataqueMagico || 0), Defensa: p.defensa, Velocidad: p.velocidad, Crítico: Math.round(p.critico * 100), Esquiva: Math.round(p.esquiva * 100) }; }
+const bonosLargos = o => [...(o.rango ? [`<div class="pbono sube">${tr('Golpe: {0}d6 + {1}', o.rango, REGLAS_ATR.nombres[o.ataque_con])}</div>`, `<div class="pbono sube">${tr('Crítico base {0}%', Math.round(o.critico * 100))}</div>`] : []), ...Object.entries({ ...o.bonos, ...o.penalizacion }).map(([k, v]) => `<div class="pbono ${v > 0 ? 'sube' : 'baja'}">${v > 0 ? '+' : '−'}${Math.abs(v)} ${k === 'velocidad' ? tr('Velocidad') : REGLAS_ATR.nombres[k] || k}</div>`)].join('');
+function valoresDe(p) { return { Vida: p.vidaMax, Ataque: p.ataque, Defensa: p.defensa, Velocidad: p.velocidad, Crítico: Math.round(p.critico * 100), Esquiva: Math.round(p.esquiva * 100) }; }
 const habilidadesConocidas = p => [...D.clases[p.clase].habilidades, ...X.grimorio.filter(id => D.habilidades[id].clase === p.clase && !D.clases[p.clase].habilidades.includes(id))];
 
 // Tres columnas: los atributos (siempre a la izquierda), el centro y la derecha de la pestaña abierta
