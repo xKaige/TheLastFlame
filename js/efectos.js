@@ -132,8 +132,11 @@ function golpePixel(id, q) {
 }
 
 // El fuego y la luz de las curas conservan su color en todas las zonas
+// Algunos efectos de pixelfx traen un personaje de muestra y dibujan su silueta: se les da uno vacío, del tamaño del de muestra
+const SIN_PERSONAJE = { mask: { w: 24, h: 38, data: new Uint8Array(24 * 38) }, pixels: new Uint32Array(24 * 38), x: -12, y: -38, w: 24, h: 38, k: 2, head: [0, -38], chest: [0, -26] };
+
 function efectoPixel(fx, x, y) {
-  const f = PIXELFX.createFx(PIXELFX.EFECTOS[fx.pixel], { x, y, seed: 1 + Math.floor(azarX() * 9999), ...fx.opciones });
+  const f = PIXELFX.createFx(PIXELFX.EFECTOS[fx.pixel], { x, y, seed: 1 + Math.floor(azarX() * 9999), actor: SIN_PERSONAJE, ...fx.opciones });
   f.corta = fx.corta;
   if (fx.adelanto) f.update(fx.adelanto);
   Bt.fxPixel.push(f);
