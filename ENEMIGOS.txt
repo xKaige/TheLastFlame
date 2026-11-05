@@ -1,0 +1,326 @@
+LA ÚLTIMA LLAMA · ENEMIGOS Y JEFES
+Generado desde los datos del juego (versión 0.4.44). Para rehacerlo: node tools/enemigos.js
+
+1. CÓMO ESCALAN
+===============
+- Vida = base × 2 × tabla de vida del piso × fuerza por tamaño del grupo.
+- Golpe = base × 2 × tabla de daño del piso. Se le resta la defensa ENTERA del personaje; si está cubierto, después se parte a la mitad. Mínimo 1.
+- Defensa = base + 1 por piso (pisos 1 a 12, 3 por zona).
+- Lo que NO escala (queda en los números del dato): el especial de los jefes, el daño al morir, el gancho del Cazador y los daños fijos de habilidades.
+- Fuerza por tamaño del grupo (sólo vida), con 1 / 2 / 3 / 4 personajes: 22% / 42% / 72% / 100%. Las tablas de abajo son con 4.
+- La columna "Contra Def 10" muestra cuánto le saca un golpe a un personaje con 10 de defensa, y entre paréntesis si está cubierto.
+
+Tabla por piso (calibrada con tools/calibrar.js para unas 2 / 2,6 / 4,7 rondas en entrada, segundo descenso y guarida):
+  Piso  Lugar                            Vida ×   Daño ×   Def +  Total vida / daño
+  1     La Cripta · entrada              1.23     1.56     1      ×2.46 / ×3.12
+  2     La Cripta · segundo descenso     2.47     2.5      2      ×4.94 / ×5
+  3     La Cripta · guarida              0.69     2.5      3      ×1.38 / ×5
+  4     Los Salones · entrada            2.04     2.5      4      ×4.08 / ×5
+  5     Los Salones · segundo descenso   2.32     2.5      5      ×4.64 / ×5
+  6     Los Salones · guarida            0.81     2.5      6      ×1.62 / ×5
+  7     El Fondo · entrada               2.28     2.5      7      ×4.56 / ×5
+  8     El Fondo · segundo descenso      2.92     2.5      8      ×5.84 / ×5
+  9     El Fondo · guarida               1.54     2.4      9      ×3.08 / ×4.8
+  10    La Veta · entrada                1.81     2.5      10     ×3.62 / ×5
+  11    La Veta · segundo descenso       1.97     2.5      11     ×3.94 / ×5
+  12    La Veta · guarida                1.26     2.5      12     ×2.52 / ×5
+
+2. JEFES
+========
+- Guarida de la zona 1: Kobold No-Muerto + El Rey del Osario + Kobold No-Muerto
+- Guarida de la zona 2: Sombra Susurrante + El Cazador Gris + Sombra Susurrante
+- Guarida de la zona 3: El Apagado + El Que Habita la Oscuridad + El Apagado
+- Guarida de la zona 4: Minero Dorado + El Capataz + Minero Dorado
+
+EL REY DEL OSARIO · JEFE  (reyOsario)
+- Base: vida 240, golpe 10-15, defensa 3, velocidad 10, exp 30. Crítico 5%, esquiva 0.
+- Especial cada 3 turnos: "descarga su pico sobre todo el grupo", 8-12 a todo el grupo. NO escala con la dificultad.
+- Segunda fase al 50% de vida: 10 escudos, velocidad ×1.25, golpe y especial ×1.1. Mecánicas: trono.
+- Aparece en: zona 1 (La Cripta)
+  Piso  Lugar                            Vida   Golpe     Def  Contra Def 10 (cubierto)
+  3     La Cripta · guarida              331    50-75     6    40-65 (20-32)
+
+EL CAZADOR GRIS · JEFE  (cazador)
+- Base: vida 320, golpe 14-20, defensa 4, velocidad 11, exp 50. Crítico 5%, esquiva 0.
+- Especial cada 3 turnos: "salta desde la penumbra sobre todo el grupo", 10-14 a todo el grupo. NO escala con la dificultad.
+- Segunda fase al 50% de vida: velocidad ×1.2, golpe y especial ×1.1. Mecánicas: ciclo, jauria, gancho, presa, caceria.
+  Gancho: 8-12 (NO escala con la dificultad).
+- Aparece en: zona 2 (Los Salones)
+  Piso  Lugar                            Vida   Golpe     Def  Contra Def 10 (cubierto)
+  6     Los Salones · guarida            518    70-100    10   60-90 (30-45)
+
+EL QUE HABITA LA OSCURIDAD · JEFE  (habitante)
+- Base: vida 500, golpe 16-23, defensa 4, velocidad 11, exp 0. Crítico 5%, esquiva 0.
+- Rasgos: en la oscuridad (antorcha ≤ 40) pega ×1.35
+- Habilidad 30%: "te clava los ojos que nunca cierra" · sin golpe · marca 2 turnos
+- Habilidad 30%: "hunde la luz en su cuenco" · sin golpe · antorcha −15
+- Habilidad 50%: "ordena a los suyos que se levanten" · sin golpe · llama: "apagado"
+- Especial cada 3 turnos: "hace sonar la última campanada", 12-17 a todo el grupo. NO escala con la dificultad.
+- Al 15% de vida: golpe ×2, recibe ×1.5.
+- Segunda fase al 50% de vida: velocidad ×1.15, golpe y especial ×1.1. Mecánicas: veo.
+- Aparece en: zona 3 (El Fondo)
+  Piso  Lugar                            Vida   Golpe     Def  Contra Def 10 (cubierto)
+  9     El Fondo · guarida               1540   77-110    13   67-100 (33-50)
+
+EL CAPATAZ · JEFE  (capataz)
+- Base: vida 520, golpe 20-28, defensa 5, velocidad 10, exp 70. Crítico 5%, esquiva 0.
+- Rasgos: lleva la deuda del grupo
+- Habilidad 35%: "anota tu nombre en el libro" · sin golpe · anota 3
+- Habilidad 35%: "te descuenta el salario" · blanco: impetu · sin golpe · Ímpetu −2
+- Habilidad 30%: "cobra con la vara de hierro" · golpe ×1.4 · ignora defensa
+- Especial cada 3 turnos: "cobra la cuota", 10-14 a todo el grupo (+3 por deuda). NO escala con la dificultad.
+- Al 15% de vida: golpe ×1, recibe ×1.5, anota a uno por turno.
+- Segunda fase al 50% de vida: 4 escudos, velocidad ×1.1, golpe y especial ×1.15. Mecánicas: escudo_oro, reclama.
+- Aparece en: zona 4 (La Veta)
+  Piso  Lugar                            Vida   Golpe     Def  Contra Def 10 (cubierto)
+  12    La Veta · guarida                1310   100-140   17   90-130 (45-65)
+
+3. ENEMIGOS POR ZONA
+====================
+
+--- Zona 1: La Cripta ---
+Grupos: Rata de Osario | Rata de Osario + Kobold No-Muerto | Kobold No-Muerto + Kobold No-Muerto | Kobold No-Muerto + El Soplo
+
+RATA DE OSARIO  (rata)
+- Base: vida 30, golpe 4-7, defensa 0, velocidad 12, exp 2. Crítico 5%, esquiva 0.
+- Habilidad 50%: "clava sus dientes podridos" · veneno 2/turno por 2-3 turnos
+- Aparece en: zona 1 (La Cripta), zona 2 (Los Salones)
+  Piso  Lugar                            Vida   Golpe     Def  Contra Def 10 (cubierto)
+  1     La Cripta · entrada              74     12-22     1    2-12 (1-6)
+  2     La Cripta · segundo descenso     148    20-35     2    10-25 (5-12)
+  3     La Cripta · guarida              41     20-35     3    10-25 (5-12)
+  4     Los Salones · entrada            122    20-35     4    10-25 (5-12)
+  5     Los Salones · segundo descenso   139    20-35     5    10-25 (5-12)
+  6     Los Salones · guarida            49     20-35     6    10-25 (5-12)
+
+KOBOLD NO-MUERTO  (kobold)
+- Base: vida 48, golpe 5-9, defensa 1, velocidad 9, exp 4. Crítico 5%, esquiva 0.
+- Habilidad 50%: "lanza una ráfaga de golpes" · golpe ×0.7 · 2 veces
+- Aparece en: zona 1 (La Cripta) + escolta del jefe, zona 2 (Los Salones)
+  Piso  Lugar                            Vida   Golpe     Def  Contra Def 10 (cubierto)
+  1     La Cripta · entrada              118    16-28     2    6-18 (3-9)
+  2     La Cripta · segundo descenso     237    25-45     3    15-35 (7-17)
+  3     La Cripta · guarida              66     25-45     4    15-35 (7-17)
+  4     Los Salones · entrada            196    25-45     5    15-35 (7-17)
+  5     Los Salones · segundo descenso   223    25-45     6    15-35 (7-17)
+  6     Los Salones · guarida            78     25-45     7    15-35 (7-17)
+
+EL SOPLO  (soplo)
+- Base: vida 33, golpe 4-8, defensa 0, velocidad 14, exp 4. Crítico 5%, esquiva 0.
+- Rasgos: roba Ímpetu
+- Habilidad 50%: "sopla sobre la antorcha" · sin golpe · antorcha −5
+- Aparece en: zona 1 (La Cripta), zona 2 (Los Salones), zona 3 (El Fondo)
+  Piso  Lugar                            Vida   Golpe     Def  Contra Def 10 (cubierto)
+  1     La Cripta · entrada              81     12-25     1    2-15 (1-7)
+  2     La Cripta · segundo descenso     163    20-40     2    10-30 (5-15)
+  3     La Cripta · guarida              46     20-40     3    10-30 (5-15)
+  4     Los Salones · entrada            135    20-40     4    10-30 (5-15)
+  5     Los Salones · segundo descenso   153    20-40     5    10-30 (5-15)
+  6     Los Salones · guarida            53     20-40     6    10-30 (5-15)
+  7     El Fondo · entrada               150    20-40     7    10-30 (5-15)
+  8     El Fondo · segundo descenso      193    20-40     8    10-30 (5-15)
+  9     El Fondo · guarida               102    19-38     9    9-28 (4-14)
+
+--- Zona 2: Los Salones ---
+Grupos: Necrófago + Kobold No-Muerto | Sombra Susurrante + Rata de Osario + Kobold No-Muerto | Centinela del Osario + Sombra Susurrante | El Acechador + El Soplo | El Cebado + Rata de Osario | Armadura Vacía + Sombra Susurrante | Retrato Viviente + Necrófago | Dama de Compañía + Kobold No-Muerto | Copero Hinchado + Rata de Osario | Dama de Compañía + Armadura Vacía | Copero Hinchado + Retrato Viviente + Kobold No-Muerto
+
+CENTINELA DEL OSARIO  (centinela)
+- Base: vida 46, golpe 10-16, defensa 3, velocidad 6, exp 6. Crítico 5%, esquiva 0.
+- Habilidad 25%: "alza su escudo" · sin golpe · se pone en guardia
+- Habilidad 20%: "golpea con el escudo" · golpe ×0.7 · aturde
+- Aparece en: zona 2 (Los Salones)
+  Piso  Lugar                            Vida   Golpe     Def  Contra Def 10 (cubierto)
+  4     Los Salones · entrada            188    50-80     7    40-70 (20-35)
+  5     Los Salones · segundo descenso   213    50-80     8    40-70 (20-35)
+  6     Los Salones · guarida            75     50-80     9    40-70 (20-35)
+
+NECRÓFAGO  (necrofago)
+- Base: vida 48, golpe 9-14, defensa 2, velocidad 9, exp 7. Crítico 5%, esquiva 0.
+- Habilidad 50%: "muerde y se alimenta" · se cura 60% de lo que hace
+- Aparece en: zona 2 (Los Salones), zona 3 (El Fondo)
+  Piso  Lugar                            Vida   Golpe     Def  Contra Def 10 (cubierto)
+  4     Los Salones · entrada            196    45-70     6    35-60 (17-30)
+  5     Los Salones · segundo descenso   223    45-70     7    35-60 (17-30)
+  6     Los Salones · guarida            78     45-70     8    35-60 (17-30)
+  7     El Fondo · entrada               219    45-70     9    35-60 (17-30)
+  8     El Fondo · segundo descenso      280    45-70     10   35-60 (17-30)
+  9     El Fondo · guarida               148    43-67     11   33-57 (16-28)
+
+SOMBRA SUSURRANTE  (sombra)
+- Base: vida 34, golpe 8-12, defensa 2, velocidad 13, exp 7. Crítico 5%, esquiva 0.
+- Rasgos: roba Ímpetu
+- Habilidad 50%: "susurra un nombre olvidado" · sin golpe · debilita 3 turnos
+- Aparece en: zona 2 (Los Salones) + escolta del jefe, zona 3 (El Fondo)
+  Piso  Lugar                            Vida   Golpe     Def  Contra Def 10 (cubierto)
+  4     Los Salones · entrada            139    40-60     6    30-50 (15-25)
+  5     Los Salones · segundo descenso   158    40-60     7    30-50 (15-25)
+  6     Los Salones · guarida            55     40-60     8    30-50 (15-25)
+  7     El Fondo · entrada               155    40-60     9    30-50 (15-25)
+  8     El Fondo · segundo descenso      199    40-60     10   30-50 (15-25)
+  9     El Fondo · guarida               105    38-58     11   28-48 (14-24)
+
+EL ACECHADOR  (acechador)
+- Base: vida 42, golpe 10-15, defensa 1, velocidad 12, exp 8. Crítico 5%, esquiva 0.
+- Habilidad 40%: "salta sobre el más débil" · al más herido · golpe ×1.25
+- Aparece en: zona 2 (Los Salones), zona 3 (El Fondo)
+  Piso  Lugar                            Vida   Golpe     Def  Contra Def 10 (cubierto)
+  4     Los Salones · entrada            171    50-75     5    40-65 (20-32)
+  5     Los Salones · segundo descenso   195    50-75     6    40-65 (20-32)
+  6     Los Salones · guarida            68     50-75     7    40-65 (20-32)
+  7     El Fondo · entrada               192    50-75     8    40-65 (20-32)
+  8     El Fondo · segundo descenso      245    50-75     9    40-65 (20-32)
+  9     El Fondo · guarida               129    48-72     10   38-62 (19-31)
+
+EL CEBADO  (cebado)
+- Base: vida 74, golpe 10-15, defensa 2, velocidad 5, exp 9. Crítico 5%, esquiva 0.
+- Habilidad 30%: "vomita sobre el grupo" · a todo el grupo · sin golpe · veneno 2/turno por 2-3 turnos
+- Aparece en: zona 2 (Los Salones), zona 3 (El Fondo)
+  Piso  Lugar                            Vida   Golpe     Def  Contra Def 10 (cubierto)
+  4     Los Salones · entrada            302    50-75     6    40-65 (20-32)
+  5     Los Salones · segundo descenso   343    50-75     7    40-65 (20-32)
+  6     Los Salones · guarida            120    50-75     8    40-65 (20-32)
+  7     El Fondo · entrada               337    50-75     9    40-65 (20-32)
+  8     El Fondo · segundo descenso      432    50-75     10   40-65 (20-32)
+  9     El Fondo · guarida               228    48-72     11   38-62 (19-31)
+
+ARMADURA VACÍA  (armadura)
+- Base: vida 62, golpe 10-15, defensa 3, velocidad 6, exp 10. Crítico 5%, esquiva 0.
+- Rasgos: resiste 50% del daño físico
+- Habilidad 30%: "barre al grupo con su mandoble" · a todo el grupo · golpe ×0.6
+- Aparece en: zona 2 (Los Salones)
+  Piso  Lugar                            Vida   Golpe     Def  Contra Def 10 (cubierto)
+  4     Los Salones · entrada            253    50-75     7    40-65 (20-32)
+  5     Los Salones · segundo descenso   288    50-75     8    40-65 (20-32)
+  6     Los Salones · guarida            100    50-75     9    40-65 (20-32)
+
+RETRATO VIVIENTE  (retrato)
+- Base: vida 40, golpe 1-1, defensa 0, velocidad 10, exp 8. Crítico 5%, esquiva 0.
+- Habilidad 50%: "clava la mirada" · sin golpe · Ímpetu −2
+- Habilidad 100%: "ordena a los suyos que resistan" · sin golpe · +3 defensa a los suyos
+- Aparece en: zona 2 (Los Salones)
+  Piso  Lugar                            Vida   Golpe     Def  Contra Def 10 (cubierto)
+  4     Los Salones · entrada            163    5-5       4    1-1 (1-1)
+  5     Los Salones · segundo descenso   186    5-5       5    1-1 (1-1)
+  6     Los Salones · guarida            65     5-5       6    1-1 (1-1)
+
+DAMA DE COMPAÑÍA  (dama)
+- Base: vida 42, golpe 8-12, defensa 1, velocidad 12, exp 9. Crítico 5%, esquiva 0.
+- Habilidad 40%: "tiende la mano y susurra una orden" · sin golpe · hechiza (ataca a los suyos)
+- Aparece en: zona 2 (Los Salones)
+  Piso  Lugar                            Vida   Golpe     Def  Contra Def 10 (cubierto)
+  4     Los Salones · entrada            171    40-60     5    30-50 (15-25)
+  5     Los Salones · segundo descenso   195    40-60     6    30-50 (15-25)
+  6     Los Salones · guarida            68     40-60     7    30-50 (15-25)
+
+COPERO HINCHADO  (copero)
+- Base: vida 58, golpe 7-11, defensa 1, velocidad 7, exp 9. Crítico 5%, esquiva 0.
+- Habilidad 50%: "sirve una copa de vino agrio" · golpe ×0.7 · veneno 2/turno por 2-3 turnos
+- Al morir: "revienta y salpica vino sobre el grupo", 4-7 a todo el grupo + veneno 2/turno. NO escala con la dificultad.
+- Aparece en: zona 2 (Los Salones)
+  Piso  Lugar                            Vida   Golpe     Def  Contra Def 10 (cubierto)
+  4     Los Salones · entrada            237    35-55     5    25-45 (12-22)
+  5     Los Salones · segundo descenso   269    35-55     6    25-45 (12-22)
+  6     Los Salones · guarida            94     35-55     7    25-45 (12-22)
+
+--- Zona 3: El Fondo ---
+Grupos: Caballero Hueco + Sombra Susurrante | Necrófago + El Acechador | Caballero Hueco + El Soplo + El Soplo | El Acechador + El Acechador | El Cebado + Necrófago | Portadora Velada + Caballero Hueco | El Tachado + El Apagado | El Apagado + Portadora Velada + El Apagado | Portador Perdido + Necrófago | El Tachado + Portadora Velada | Portador Perdido + El Apagado + Portador Perdido
+
+CABALLERO HUECO  (caballero)
+- Base: vida 68, golpe 11-17, defensa 4, velocidad 7, exp 10. Crítico 5%, esquiva 0.
+- Habilidad 30%: "descarga un tajo que atraviesa la armadura" · ignora defensa · sangrado 12%
+- Aparece en: zona 3 (El Fondo)
+  Piso  Lugar                            Vida   Golpe     Def  Contra Def 10 (cubierto)
+  7     El Fondo · entrada               310    55-85     11   45-75 (22-37)
+  8     El Fondo · segundo descenso      397    55-85     12   45-75 (22-37)
+  9     El Fondo · guarida               209    53-82     13   43-72 (21-36)
+
+PORTADORA VELADA  (portadora)
+- Base: vida 60, golpe 9-13, defensa 2, velocidad 9, exp 12. Crítico 5%, esquiva 0.
+- Habilidad 40%: "alza su antorcha muerta y las llamas tiemblan" · a todo el grupo · golpe ×0.5 · antorcha −8
+- Habilidad 30%: "reza por los que siguen de pie" · sin golpe · +3 defensa a los suyos
+- Aparece en: zona 3 (El Fondo)
+  Piso  Lugar                            Vida   Golpe     Def  Contra Def 10 (cubierto)
+  7     El Fondo · entrada               274    45-65     9    35-55 (17-27)
+  8     El Fondo · segundo descenso      350    45-65     10   35-55 (17-27)
+  9     El Fondo · guarida               185    43-62     11   33-52 (16-26)
+
+EL TACHADO  (tachado)
+- Base: vida 84, golpe 12-18, defensa 5, velocidad 6, exp 12. Crítico 5%, esquiva 0.
+- Rasgos: resiste 30% del daño físico
+- Habilidad 40%: "raya tu nombre con la espada rota" · golpe ×0.8 · debilita 2 turnos
+- Aparece en: zona 3 (El Fondo)
+  Piso  Lugar                            Vida   Golpe     Def  Contra Def 10 (cubierto)
+  7     El Fondo · entrada               383    60-90     12   50-80 (25-40)
+  8     El Fondo · segundo descenso      491    60-90     13   50-80 (25-40)
+  9     El Fondo · guarida               259    58-86     14   48-76 (24-38)
+
+EL APAGADO  (apagado)
+- Base: vida 46, golpe 9-14, defensa 1, velocidad 10, exp 10. Crítico 5%, esquiva 0.
+- Rasgos: apresura ×1.2
+- Habilidad 40%: "te arroja ceniza a los ojos" · golpe ×0.5 · aturde
+- Al morir: "se deshace en una nube de ceniza caliente", 4-7 a todo el grupo + quemadura 2/turno. NO escala con la dificultad.
+- Aparece en: zona 3 (El Fondo) + escolta del jefe
+  Piso  Lugar                            Vida   Golpe     Def  Contra Def 10 (cubierto)
+  7     El Fondo · entrada               210    45-70     8    35-60 (17-30)
+  8     El Fondo · segundo descenso      269    45-70     9    35-60 (17-30)
+  9     El Fondo · guarida               142    43-67     10   33-57 (16-28)
+
+PORTADOR PERDIDO  (perdido)
+- Base: vida 38, golpe 8-12, defensa 0, velocidad 14, exp 9. Crítico 5%, esquiva 0.
+- Rasgos: roba Ímpetu
+- Habilidad 50%: "se te prende y te pide fuego" · golpe ×0.7 · se cura 50% de lo que hace · antorcha −6
+- Aparece en: zona 3 (El Fondo)
+  Piso  Lugar                            Vida   Golpe     Def  Contra Def 10 (cubierto)
+  7     El Fondo · entrada               173    40-60     7    30-50 (15-25)
+  8     El Fondo · segundo descenso      222    40-60     8    30-50 (15-25)
+  9     El Fondo · guarida               117    38-58     9    28-48 (14-24)
+
+--- Zona 4: La Veta ---
+Grupos: Minero Dorado + Buscador | Veta Viva + Minero Dorado | Vagoneta Hambrienta + Buscador + Minero Dorado | Buscador + Buscador | Veta Viva + Vagoneta Hambrienta | Minero Dorado + Minero Dorado + Buscador
+
+MINERO DORADO  (minero)
+- Base: vida 92, golpe 16-22, defensa 4, velocidad 9, exp 14. Crítico 5%, esquiva 0.
+- Habilidad 35%: "descarga el pico con toda su fuerza" · golpe ×1.5 · sangrado 12%
+- Aparece en: zona 4 (La Veta) + escolta del jefe
+  Piso  Lugar                            Vida   Golpe     Def  Contra Def 10 (cubierto)
+  10    La Veta · entrada                333    80-110    14   70-100 (35-50)
+  11    La Veta · segundo descenso       362    80-110    15   70-100 (35-50)
+  12    La Veta · guarida                232    80-110    16   70-100 (35-50)
+
+VETA VIVA  (veta_viva)
+- Base: vida 120, golpe 14-20, defensa 7, velocidad 6, exp 15. Crítico 5%, esquiva 0.
+- Rasgos: resiste 50% del daño físico
+- Habilidad 30%: "se endurece y protege a los suyos" · sin golpe · +4 defensa a los suyos
+- Aparece en: zona 4 (La Veta)
+  Piso  Lugar                            Vida   Golpe     Def  Contra Def 10 (cubierto)
+  10    La Veta · entrada                434    70-100    17   60-90 (30-45)
+  11    La Veta · segundo descenso       473    70-100    18   60-90 (30-45)
+  12    La Veta · guarida                302    70-100    19   60-90 (30-45)
+
+BUSCADOR  (buscador)
+- Base: vida 64, golpe 12-17, defensa 2, velocidad 14, exp 12. Crítico 5%, esquiva 0.
+- Rasgos: roba Ímpetu
+- Habilidad 40%: "te arroja polvo de oro a los ojos" · golpe ×0.6 · aturde
+- Aparece en: zona 4 (La Veta)
+  Piso  Lugar                            Vida   Golpe     Def  Contra Def 10 (cubierto)
+  10    La Veta · entrada                232    60-85     12   50-75 (25-37)
+  11    La Veta · segundo descenso       252    60-85     13   50-75 (25-37)
+  12    La Veta · guarida                161    60-85     14   50-75 (25-37)
+
+VAGONETA HAMBRIENTA  (vagoneta)
+- Base: vida 104, golpe 15-21, defensa 5, velocidad 8, exp 14. Crítico 5%, esquiva 0.
+- Habilidad 40%: "arrastra a uno con sus brazos de oro" · golpe ×1.1 · se cura 50% de lo que hace
+- Al morir: "revienta y despide astillas de oro", 8-12 a todo el grupo + sangrado 2/turno. NO escala con la dificultad.
+- Aparece en: zona 4 (La Veta)
+  Piso  Lugar                            Vida   Golpe     Def  Contra Def 10 (cubierto)
+  10    La Veta · entrada                376    75-105    15   65-95 (32-47)
+  11    La Veta · segundo descenso       410    75-105    16   65-95 (32-47)
+  12    La Veta · guarida                262    75-105    17   65-95 (32-47)
+
+4. SIN USAR EN NINGÚN GRUPO
+===========================
+
+PERRO GRIS  (perro)
+- Base: vida 28, golpe 6-9, defensa 1, velocidad 11, exp 2. Crítico 5%, esquiva 0.
+- Habilidad 50%: "desgarra con los colmillos" · sangrado 12%
+- No aparece en ningún grupo.
