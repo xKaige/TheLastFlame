@@ -45,13 +45,15 @@ function ajustarCapa() {
     NITIDO.g = lienzo.getContext('2d');
     lienzo.addEventListener('contextrestored', () => { NITIDO.ancho = 0; });     // vuelve sin escala: hay que rearmarla
   }
-  if (ancho === NITIDO.ancho && NITIDO.g.getTransform().a === ancho / 480) return;
+  if (ancho === NITIDO.ancho) return;
   NITIDO.ancho = ancho;
   lienzo.width = ancho; lienzo.height = Math.round(ancho * 270 / 480);
   NITIDO.g.setTransform(ancho / 480, 0, 0, ancho / 480, 0, 0);
   NITIDO.g.imageSmoothingQuality = 'high';
 }
 function limpiarCapa() {
+  // una vez por cuadro, antes de dibujar: si la capa perdió la escala (placa de video reiniciada), se la devuelve sin borrarla
+  if (NITIDO.g && Math.abs(NITIDO.g.getTransform().a - NITIDO.ancho / 480) > 0.001) { NITIDO.g.setTransform(NITIDO.ancho / 480, 0, 0, NITIDO.ancho / 480, 0, 0); NITIDO.sucio = true; }
   if (NITIDO.sucio) NITIDO.g.clearRect(0, 0, 480, 270);
   NITIDO.sucio = false;
 }
