@@ -1,0 +1,108 @@
+LA ÚLTIMA LLAMA
+Guía de balance e implementación para combates de cuatro personajes
+Referencia de partida: CRECIMIENTO.txt, versión 0.4.34
+
+DECISIÓN DE DISEÑO
+
+Cada personaje empieza con 75 puntos y gana el mismo presupuesto por nivel. La distribución inicial, las elecciones del jugador y las habilidades distinguen a las clases. Una misma Fuerza, con la misma arma y las mismas condiciones, debe producir el mismo golpe básico en manos de cualquier personaje.
+
+En las pruebas, el nuevo grupo de nivel 10 venció al primer jefe en 4,71 rondas de media. El Guerrero atrajo el 80% de los ataques, el Pícaro encabezó el daño contra ese blanco y el Sanador restauró 185 PV. El piso anterior, con tres enemigos, favoreció al Mago y provocó más bajas que el propio jefe. El resultado respalda la diferenciación de roles y señala dónde ajustar la dificultad.
+
+1. CREACIÓN DEL PERSONAJE Y SUBIDA DE NIVEL
+
+Distribución propuesta, usada en las pruebas. Los totales excluyen el equipo.
+
+Clase       Fue  Des  Vit  Int  Fe  Arc  Per   Total
+Guerrero     16   10   16    7   9    7   10     75
+Pícaro       11   17    9    9   8    7   14     75
+Mago          7   11    8   16   6   15   12     75
+Sanador       7    9   11   15  14    6   13     75
+
+Por cada nivel ganado después del primero se asignan cinco puntos automáticos, ponderados por los siete valores iniciales, y dos puntos libres. Se retira la antigua entrega automática cada tres niveles. El equipo y los puntos libres nunca alteran las ponderaciones futuras.
+
+                 Iniciales   Automáticos   Libres ganados   Total potencial
+Nivel  1              75             0                0                75
+Nivel  5              75            20                8               103
+Nivel 10              75            45               18               138
+Nivel 16              75            75               30               180
+
+Cómo repartir puntos enteros sin perder fracciones. Guardar la base B de cada atributo y, por separado, los automáticos A ya adjudicados. Para el siguiente punto automático, numerado k desde 1 a lo largo de toda la progresión, elegir el atributo con mayor (k × B − 75 × A). Sumarle uno y repetir cinco veces por subida. Resolver empates siguiendo el orden de columnas de la tabla. Cada 15 subidas se completa un ciclo de 75 adjudicaciones. Al llegar al nivel 16 cada atributo tiene exactamente el doble de su base, más los libres que haya colocado el jugador. El Guerrero con 16 de Fuerza alcanza 32 automáticamente, o 47 si dedica a Fuerza un libre en cada subida.
+
+2. CÁLCULO ÚNICO DE ESTADÍSTICAS Y EQUIPO
+
+Reemplazar las bases de ataque, velocidad, crítico y demás estadísticas por clase por un cálculo compartido. Sumar base, crecimiento, puntos libres y bonos de equipo. Aplicar después la curva y los efectos pertinentes. Exponer estos componentes en la ficha. En 0.4.34, por ejemplo, la ficha del Mago indica 30 PV y velocidad 10, mientras que la tabla de nivel 1 da 38 y 9. La ficha, el combate y el informe deben llamar a la misma función.
+
+Calibración usada en la simulación, ajustable tras probar el juego:
+  • Para atributos efectivos E(x), los primeros 20 puntos totales valen 1 cada uno, los siguientes 30 valen 0,5 y los posteriores valen 0,25. Las clases comparten los umbrales.
+  • PV máximos = 10 + 3 × E(Vitalidad) + 4 × (nivel − 1).
+  • Defensa = 0,34 × E(Vitalidad), redondeada al entero más cercano.
+  • Velocidad = 4 + 0,5 × E(Destreza), más los modificadores directos de equipo. En estas pruebas ordena la iniciativa dentro de cada ronda.
+  • Esquiva = E(Destreza) en puntos porcentuales. Para el crítico, la prueba añadió 1,5 puntos porcentuales por punto de Perspicacia total por encima de 10 al crítico base del arma. Acotar probabilidades al intervalo 0–100% en el juego.
+  • Curación = PV máximos del destinatario × porcentaje de la habilidad × (1 + 0,05 × E(Fe)) en rango de habilidad 1. Registrar como curación efectiva solo los PV realmente repuestos.
+
+Armas. Cada arma declara rango, atributo de ataque (Fuerza o Intelecto) y crítico base. Usar un único atributo por arma y la misma curva para ambos. Retirar del básico el antiguo bono separado del 25–45% del Intelecto del bastón o vara. Los dados base son 1d6, 2d6 y 3d6 para los rangos 1, 2 y 3. Sin arma, el crítico base es 5%. Para reproducir la prueba, usar espada 10%, daga 20%, bastón 15% y vara 10%. Estos cuatro porcentajes son valores de ensayo.
+
+Golpe básico ordinario = máximo entre 1 y (suma de dados + E(atributo del arma) − defensa del blanco). Un crítico duplica el resultado. Por ejemplo, con atributo efectivo 16, tirada total 7 y defensa 3, una espada de rango 2 y un bastón del mismo rango hacen 20 de daño normal o 40 crítico. El rango mejora la tirada, sin introducir una segunda escala para las armas mágicas.
+
+Arcano. Aplicar a las habilidades ofensivas y al daño especial el mismo valor por punto efectivo que usan Fuerza e Intelecto. Cada habilidad debe declarar qué componentes reciben el bono. En la prueba, un impacto físico de habilidad sumó Arcano antes de su multiplicador. Un hechizo de fuego sumó Arcano a su tirada propia. Veneno y quemadura repartieron un bono entero de Arcano entre todos sus pulsos: con Arcano efectivo 12 y tres pulsos, cada pulso gana 4. En una habilidad con impacto y estado, ambos componentes recibieron su bono. Con daño de área, la prueba principal aplicó el bono de impacto completo por blanco. Esto explica parte de la ventaja del Mago. Revisar los multiplicadores al incorporar rangos de habilidad superiores.
+
+Armaduras. Cada pieza de armadura lleva una penalización explícita, aplicada solo mientras está equipada. Para probar se usó una por personaje: pesada −2 Velocidad, liviana de Pícaro −2 Vitalidad, vestimenta de Sanador −2 Arcano y túnica de Mago −2 Fe. Las magnitudes son ajustables. Restar Velocidad directamente a la iniciativa, y los atributos antes de calcular sus derivados. Las dos túnicas penalizan principalmente estrategias híbridas. Comprobar su coste real al equilibrar las bonificaciones defensivas de las prendas.
+
+3. ÍMPETU Y FUNCIONES DE CLASE
+
+Todos empiezan cada combate con 1 de Ímpetu y el tope sigue siendo 4. Las dos habilidades iniciales de cada clase cuestan 1 cada una. El ataque básico, una esquiva exitosa y la acción de cubrirse dan 1. Cubrirse reduce a la mitad el daño recibido hasta el próximo turno propio. Acreditar ese punto al ejecutar la acción una sola vez, aunque lleguen varios golpes. Esto sustituye las ganancias especiales antiguas al defender, concentrarse o recibir impactos.
+
+Guerrero | Controlar a quién atacan los enemigos.
+Provocar dirige ataques al Guerrero. Mientras está cubierto, responde a quien le aseste un golpe con un contraataque al 150% del básico. La simulación aplicó el multiplicador antes de la defensa y permitió una respuesta por impacto recibido mientras siguiera vivo. Si también se activa la represalia propia de Provocar, resolver una única respuesta al mismo impacto. Distinguir la reacción del ataque básico voluntario para evitar que cada respuesta cargue la barra.
+
+Pícaro | Concentrar daño sobre un blanco prioritario.
+Conservar el 20% de probabilidad de segundo ataque básico. El golpe adicional inflige 50% del daño ya resuelto del primero. Si el primero hizo 8 tras armadura, el segundo hace 4. Aplicar defensa dos veces vuelve a anular el beneficio contra enemigos acorazados. En la prueba, el segundo impacto afectó al mismo blanco si seguía vivo, sin otra tirada de crítico ni otra ganancia de Ímpetu. Veneno y Puñalada siguen premiando insistir sobre un objetivo.
+
+Mago | Castigar grupos y aprovechar críticos.
+Solo él recupera 1 de Ímpetu al asestar un crítico. En la prueba se admitieron críticos de básicos y de impactos directos de hechizos, con una devolución máxima por acción aunque Tormenta consiga varios críticos. Un básico crítico concede 2 en total antes del tope. La quemadura aporta daño posterior. El rasgo puede usarse en cualquier encuentro con independencia del inventario.
+
+Sanador | Sostener a los aliados bajo presión.
+Recupera 1 de Ímpetu cuando su acción restaura vida efectiva a otro aliado. Una cura grupal puede conceder como máximo 1. Probar una cura a un aliado herido, una autocura aislada y una cura sobre un aliado a vida completa: solo la primera devuelve el punto. Así, gastar 1 para sostener a un aliado herido permite encadenar curas mientras siga siendo necesario. Su coste táctico es el turno que el Sanador deja de dedicar a otra acción.
+
+4. ENEMIGOS Y RITMO DE COMBATE
+
+Añadir +1 de defensa por piso a todos los enemigos del piso, incluido el jefe. El primer jefe, en el piso 3, recibe +3. En los encuentros de referencia la defensa previa era cero. Duplicar los PV finales del enemigo respecto del encuentro anterior y duplicar su tirada completa de daño bruto antes de descontar la defensa del jugador y aplicar la guardia. Ejemplo: un golpe de 17 contra defensa 4 pasa a 34 − 4 = 30, o 15 contra un personaje cubierto. Aplicar el factor una sola vez, después de resolver los modificadores preexistentes de grupo o jefe.
+
+5. RESULTADOS Y LECTURA DE LA DIFICULTAD
+
+Se simularon 1.500 combates por encuentro y variante, con el mismo conjunto de semillas, cuatro personajes, armas de rango 1 y habilidades de rango 1. La comparación controlada separa el aumento enemigo del cambio de progresión. “Anterior” en el cuadro es el prototipo previo de 70 puntos, que ya tenía los nuevos roles. El archivo original 0.4.34 es una referencia distinta.
+
+Rondas medias                       Anterior     Solo enemigos ×2    75 y enemigos ×2
+Piso 1 | grupo Nv. 1 | 2 × 68 PV        1,00                 2,03                2,00
+Piso 2 | grupo Nv. 5 | 3 × 102 PV       2,00                 3,79                2,56
+Piso 3 | grupo Nv.10 | jefe 664 PV      3,45                 7,26                4,71
+
+Las vidas indicadas corresponden al enemigo duplicado. En el sistema final se ganaron las 1.500 pruebas de cada piso. Terminaron los cuatro en pie el 98,6%, 77,1% y 100% de las veces, respectivamente. En el piso 2, con enemigos duplicados y crecimiento anterior, se ganaba el 84,4% y solo el 32,3% de todos los intentos terminaba con los cuatro en pie. Ahí se ve qué aporta ganar atributos entre los niveles 1 y 5.
+
+Con el mismo jefe de 664 PV, pasar del nivel 10 al 16 redujo la duración media de 4,71 a 3,79 rondas. Al mantener nivel 10 y mejorar únicamente el rango del arma de los cuatro personajes, el jefe duró 4,71 / 4,40 / 4,16 rondas con 1d6 / 2d6 / 3d6. La progresión de nivel y de equipo se siente aun frente a un blanco idéntico.
+
+Aporte por clase               Piso 2, tres enemigos        Piso 3, un jefe
+Guerrero, ataques atraídos                       51%                    80%
+Pícaro, daño efectivo                      52 de 306             273 de 664
+Mago, daño efectivo                       236 de 306             260 de 664
+Sanador, PV efectivos restaurados                 78                    185
+
+La curva esperada se cumple en duración: apertura corta, grupo intermedio y jefe más prolongado. En peligro de bajas, el pico está en el piso 2. Tres enemigos pueden concentrar impactos antes de la siguiente cura. Contra un solo jefe, Provocar y la cura sostenible son particularmente eficaces. Si el objetivo es que el jefe también represente el mayor peligro, ensayar por separado un ataque grupal anunciado cada tres rondas y medir de nuevo. Esa mecánica todavía requiere prueba.
+
+Dos decisiones de ajuste apoyadas por ensayos:
+  • Al repartir solo el bono directo de Arcano de Tormenta entre los blancos, la porción del daño del Mago en piso 2 bajó del 77% al 66%. La pelea pasó de 2,56 a 3,22 rondas y terminar con los cuatro vivos bajó del 77,1% al 72,0%. Elegir esta variante si se busca más espacio para los compañeros y se acepta revisar el daño del grupo enemigo.
+  • Contra un jefe de resistencia de 1.992 PV y ataque base elevado otro 45%, recuperar Ímpetu al curar llevó la victoria del 14,7% al 93,5% respecto de desactivar solo esa recuperación. El rasgo del Sanador decide la viabilidad de los encuentros largos. Medirlo también con el repertorio real del jefe antes de modificar su coste.
+
+6. ORDEN DE IMPLEMENTACIÓN Y COMPROBACIONES
+
+1) Crear los datos de clases, armas y armaduras. Centralizar la función que calcula estadísticas para que se use al equipar, desequipar, subir de nivel, iniciar un combate y mostrar la ficha. Recalcular requisitos de equipo y habilidades usando los nuevos totales.
+
+2) Guardar por separado base de clase, puntos automáticos, libres invertidos, libres pendientes y equipo. Para partidas anteriores, recalcular desde el nivel y la nueva base. Si el guardado no distingue libres antiguos de incrementos automáticos, ofrecer reasignación de los 2 × (nivel − 1) libres. Versionar la conversión y comprobar que cargar dos veces conserva el mismo total y el mismo equipo.
+
+3) Implementar dados, defensa, críticos y rasgos en el orden indicado. Identificar acción, impacto y reacción para distinguir un crítico de área, un segundo golpe, un pulso periódico y una cura efectiva. Verificar que el Ímpetu siempre quede entre 0 y 4. Comprobar el comportamiento de cada habilidad inicial desde el primer turno.
+
+4) Ajustar enemigos y regenerar el informe con node tools/crecimiento.js. Verificar una ficha por clase a niveles 1, 5, 10 y 16. Comprobar totales, doble exacto de cada atributo base a nivel 16 y daño idéntico de dos armas equivalentes con igual valor de Fuerza o Intelecto. Equipar y quitar una armadura debe restaurar exactamente los valores anteriores.
+
+5) Repetir los tres encuentros con fichas reales. Registrar rondas, victorias, bajas, objetivo de los ataques, daño por fuente, curación efectiva e Ímpetu desperdiciado al llegar al tope. Comparar un cambio por vez y conservar las mismas semillas y decisiones tácticas.
+
+Alcance de las cifras. Los enemigos y los niveles de grupo usados son escenarios de ensayo. El simulador utilizó decisiones automáticas y dedicó los libres a Fuerza/Vitalidad, Fuerza/Destreza, Intelecto/Arcano y Fe/Vitalidad respectivamente. La progresión de habilidades por uso, las técnicas posteriores y la resolución completa del sangrado requieren la versión actualizada del juego. Las pruebas muestran la dirección del cambio y qué encuentros revisar primero.

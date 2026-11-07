@@ -1,0 +1,211 @@
+LA ÚLTIMA LLAMA (THE LAST FLAME) · HISTORIA Y PERSONAJES
+Documento de trabajo para escribir la historia de la party fija. Resume todo lo que ya existe en el juego.
+
+==================================================
+0. QUÉ JUEGO ES (contexto para quien escriba)
+==================================================
+- Dungeon crawler de fantasía oscura en pixel art, en primera persona, con peleas por turnos.
+- Un grupo de 4 personajes, uno de cada clase: Guerrero, Pícaro, Mago y Sanador.
+- 9 zonas, cada una con varios pisos y un jefe. Partida completa de 3 a 4 horas.
+- El grupo comparte UNA sola antorcha: si se apaga, todo se vuelve más peligroso. La luz es el recurso central.
+- Cambio en curso: se saca el reclutamiento y la muerte permanente. La party pasa a ser FIJA, con nombre, historia
+  y diálogos entre ellos. Si caen los cuatro, vuelven a la última hoguera.
+- Entre pisos hay hogueras o santuarios para descansar. Ahí van las charlas entre personajes.
+- Tono: sobrio, seco, melancólico, con humor negro. Frases cortas. Nada épico ni grandilocuente.
+- Idioma: español rioplatense, con voseo ("vos tenés", "mirá", "bajá"). Sin modismos de España.
+  Los personajes hablan poco y dicen mucho.
+
+==================================================
+1. EL MUNDO
+==================================================
+Vel'Ombra fue el reino más luminoso del continente. Su riqueza no venía del oro: venía de la Llama Primera,
+que ardía bajo la montaña. Mientras ardiera, la noche no podía entrar del todo.
+
+La Llama la cuidaban las GUARDIANAS, una orden de hermanas. Su regla:
+  "La Llama no se toma. Se cuida. Nadie la toca, nadie la mueve, nadie le pide nada."
+  Y debajo, muy gastado: "Quien le pida algo va a recibirlo."
+
+Esa regla es la idea que une todo: cada zona es un pedido que la Llama concedió y salió horrible.
+
+El último rey, ALDEMAR EL INSOMNE, tenía miedo a morir. Le juraron que quien poseyera la Llama no conocería la
+oscuridad, ni siquiera la de la tumba. Bajó a robarla con cuarenta caballeros y el Cazador Gris.
+Cuando el rey tocó la Llama, se apagó. Sin explosión ni grito. Toda la sombra que el fuego mantenía a raya entró
+de golpe. Desde entonces no amanece.
+Lo que quedó del rey sigue abajo, en el lugar del fuego, y tiene hambre de luz.
+
+Se dice que la Llama no murió: quedó una chispa en cada antorcha. Si alguien lleva una hasta el fondo, el fuego
+va a recordar lo que fue. Queda una sola antorcha. La del grupo.
+
+==================================================
+2. LA SOMBRA (la voz que acompaña todo el viaje)
+==================================================
+- Una voz burlona que recibe al grupo en la cripta y los comenta todo el camino.
+  Los llama "lucecitas". Primera frase: "Otra lucecita bajando a mi cripta..."
+- Es una GUARDIANA. Fue la primera en llegar al fondo. Vio a Aldemar llorar de miedo y le ofreció la Llama
+  por piedad, para que dejara de sufrir. Él la tocó y se apagó. Ella es "la que lo dejó solo con el fuego".
+- Bajó con los caballeros sin figurar en ninguna lista: "conoce los escalones sin mirar".
+- Le dijo al rey que quien tuviera la Llama no conocería la oscuridad. Era cierto; sólo no le dijo qué se siente.
+- Sus burlas se las dice a sí misma. Al final les pide: "Elijan mejor que yo." y les advierte en una nota:
+  "Cuando llegues, no le ofrezcas nada. Y no le pidas nada."
+- Revelación gradual: "Yo también bajé una vez, con una antorcha igual a esa." → "Conozco cada escalón."
+  → "Fui la primera. Le ofrecí la Llama a Aldemar." → "Ahora saben quién soy."
+- En la zona 6 (El Claustro) se aclara del todo quién fue y qué pasó con su orden.
+
+==================================================
+3. ESTRUCTURA: TRES ACTOS, NUEVE ZONAS
+==================================================
+ACTO I · EL REY (hecho en el juego)
+ 1. LA CRIPTA. Osarios, velas sobre calaveras. Jefe: EL REY DEL OSARIO, un rey de huesos que alza un trono.
+    "¿Vienen a devolverme la Llama? Entonces arrodíllense."
+    Al morir, bajo el trono hay una escalera.
+ 2. LOS SALONES. El palacio bajo tierra: banquete servido para cuarenta, retratos, armaduras de guardia.
+    Jefe: EL CAZADOR GRIS, el rastreador que guio al rey hasta el fuego. Rastreó "el olor del fuego"
+    y descubrió que no era un olor: era hambre, y lo rastreaba a él. Caza con perros, gancho y cadena.
+ 3. EL FONDO. Cavernas, ceniza, antorchas gastadas con nombres raspados. Jefe: ALDEMAR, EL QUE HABITA LA
+    OSCURIDAD. Ya no duerme, nunca cierra los ojos, guarda ceniza en un cuenco.
+    "No duermo. Hace siglos que no duermo. Fui Aldemar. Cuidaba la Llama."
+    Al morir: "Por fin... oscuro... Gracias."
+    Cierre del acto: sin la Llama, el suelo se abre. Ese fondo no era el fondo.
+    Hay una escalera más vieja que el palacio, más vieja que la Llama.
+
+ACTO II · LOS QUE PIDIERON
+ 4. LA VETA (en desarrollo). Mina infinita, oro que crece como una enfermedad, tonos ocre. Los mineros pidieron
+    riqueza sin fin y siguen cavando, con oro en lugar de carne. Jefe: EL CAPATAZ, que todavía lleva la cuenta
+    en un libro: anota nombres, descuenta salarios, cobra la cuota.
+    "¿Turno de quién? Anoten. Nadie sale de la veta sin pagar la cuota."
+ 5. LA CIUDAD ANEGADA. Pueblo bajo un lago negro, tonos verdosos. Pidieron agua en una sequía y nunca dejó de
+    subir. Jefe: LA AHOGADA, quien hizo el pedido.
+ 6. EL CLAUSTRO. Convento de las Guardianas, tonos blancos. No pidieron nada: su pecado fue permitirlo todo.
+    Se aclara quién fue La Sombra. Las 40 hermanas que murieron en el incendio del claustro hacen eco de los
+    40 caballeros. Jefe y cierre del acto, con fase: LA PRIMERA GUARDIANA.
+
+ACTO III · LO QUE HABÍA ANTES
+ 7. EL BOSQUE SIN SOL. Bosque subterráneo pálido, tonos hueso y musgo. Alguien pidió que nada muriera, y todo
+    crece encima de lo anterior. Jefe: EL PRIMER ÁRBOL.
+ 8. EL CAMPO DE CENIZA. Llanura gris con ejércitos fósiles, tonos rojo y gris. Dos reyes pidieron ganar la misma
+    guerra y todavía pelean. Jefe doble: LOS DOS REYES.
+ 9. LA ÚLTIMA LLAMA. Oscuridad casi total; la única luz es la antorcha del grupo. Jefe final, con fase: LA LLAMA.
+
+FINAL (idea vigente)
+- La Llama nunca fue un fuego: es el hambre que olió el Cazador Gris.
+- La antorcha del grupo es la última que queda. Antes de la pelea, la Llama ofrece lo que quieras.
+- Tres finales: PEDIR, OFRECERTE o NO DECIR NADA. Los dos primeros terminan mal, de maneras distintas.
+  El tercero es el verdadero (eco de la nota de La Sombra: "no le ofrezcas nada, y no le pidas nada").
+- Hoy el juego tiene finales provisorios de la versión vieja: subir con la Llama, ocupar el trono vacío,
+  ofrecer a los caídos, y volver sin perder a nadie. Se van a reemplazar.
+
+==================================================
+4. NOTAS Y EVENTOS YA ESCRITOS (pistas sueltas en la mazmorra)
+==================================================
+Notas:
+- Lista de provisiones: cuarenta caballeros, dos meses. Al margen: el rey ya no come ni duerme; "dice que el
+  sueño es practicar para morirse".
+- Carta de un caballero: bajan a "custodiar el fuego"; una mujer que no figura en ninguna lista baja adelante.
+- Hoja arrancada: "Le dije que quien tuviera la Llama no conocería la oscuridad. Era cierto. Sólo que no le dije
+  qué se siente."
+- Bitácora del Cazador Gris: "No es un olor. Es hambre. Y me está rastreando a mí."
+- Nombres en una pared: cuarenta caballeros tachados. "No los escuché bajar. Los escuché quedarse."
+- Orden del rey: "Que ningún hombre descanse hasta que yo lo haga." La tinta está fresca.
+- Antorcha gastada: "Fui la primera en llegar. Lo vi llorar de miedo. Le ofrecí la Llama. Pensé que era piedad."
+- Lo último que escribió el rey: "La toqué y se apagó. Sigo acá. Veo todo lo que hice, sin poder cerrar los ojos."
+- Nota sin firma: "Cuando llegues, no le ofrezcas nada. Y no le pidas nada."
+Eventos:
+- Zona 1: altar de sangre fresca, un muerto con mochila, inscripción alrededor de una llama tallada, una antorcha
+  que arde sola, La Sombra que ofrece un trato ("Me lo pagás cuando yo diga").
+- Zona 2: banquete servido para cuarenta, retrato de Aldemar con los ojos cortados, armadura de rodillas que
+  sigue cumpliendo la orden, trampa del cazador con un farol de cebo, la silla del rey.
+- Zona 3: cuenco tibio de ceniza que respira, una Guardiana de piedra con la palma gastada, corona y espada en
+  una pila de ceniza, nicho de antorchas con nombres raspados y un lugar libre, una llama tallada partida.
+
+==================================================
+5. CANDIDATOS PARA LA PARTY (hay que elegir UNO por clase)
+==================================================
+Hay 10 retratos hechos. Cada uno tiene un motivo para bajar y frases ya escritas.
+Los nombres son los que el juego sorteaba; para la party fija se elige uno.
+
+GUERRERO (tanque: aguanta, se cubre y devuelve golpes)
+- LA VIUDA · Isolde / Maren / Oda
+  Motivo: su pareja bajó con la última antorcha y nunca volvió.
+  "Si encuentro su antorcha, quiero apagarla yo." / "Ya no busco a nadie. Vine a terminar lo que empezó."
+- EL DESERTOR · Garrick / Tobías / Ulrich
+  Motivo: abandonó su puesto la noche en que cayó la muralla.
+  "Esta vez no pienso correr. Probablemente." / "Toda la vida corrí hacia arriba. Qué raro quedarse."
+- LA MINERA · Dagna / Borin / Hilde
+  Motivo: su gente cavó estos túneles y nadie volvió a subir.
+  "Esta piedra la picó mi abuelo. Sé por dónde se cae." / "Cavamos demasiado hondo. Esto lo arreglo yo."
+  (Encaja fuerte con la zona 4, La Veta.)
+
+PÍCARO (daño rápido, críticos, venenos)
+- LA LADRONA · Pip / Nessa / Rilla
+  Motivo: dicen que el cuenco de la Llama vale un reino.
+  "Yo vine por el cuenco. El resto es su problema." / "Pesa más de lo que pensé. Y no es por el oro."
+- EL GUARDABOSQUE · Fenna / Merek / Ilse
+  Motivo: su bosque se muere sin luz, árbol por árbol.
+  "Hay raíces hasta acá. Vienen de muy arriba." / "Si esto prende, mis árboles lo van a sentir."
+  (Encaja fuerte con la zona 7, El Bosque sin Sol.)
+
+MAGO (fuego y daño a varios)
+- EL PENITENTE · Aldric / Severo / Ansel
+  Motivo: lleva una culpa que no cuenta y cree que el fuego se la quita.
+  "Lo que me pase acá abajo, me lo merezco." / "No vine a ser perdonado. Vine a ser útil."
+  Secreto ya escrito: trabó la puerta del claustro la noche del incendio de las 40 hermanas, porque le dijeron
+  que adentro guardaban una chispa ajena. No había ninguna. (Encaja fuerte con la zona 6, El Claustro.)
+- EL EXILIADO · Sorel / Ilián / Varek
+  Motivo: Vel'Ombra lo echó. Quiere volver con la Llama en la mano.
+  "Que me vean subir con esto." / "No sé si se la quiero devolver."
+  Secreto ya escrito: lo echaron por cantar entera una canción que al rey le quitaba el sueño.
+
+SANADOR (curas, escudos, sostiene al grupo)
+- LA CANTORA · Sabela / Lirien / Aune
+  Motivo: busca la canción que encendió la Llama Primera.
+  "Escuchen. La cripta está en otra tonalidad." / "Era esta nota. Siempre fue esta nota."
+- LA NOVICIA · Caelan / Lucía / Tessa
+  Motivo: su orden (las Guardianas) juró cuidar la Llama. Quedó sola.
+  "Hice un voto. Lo voy a cumplir aunque sea sin fe." / "Era esto lo que juramos cuidar. Es tan chiquita."
+  (Encaja fuerte con La Sombra y la zona 6.)
+- EL BUHONERO · Wim / Bartolo / Eirik
+  Motivo: le debe algo a alguien que ya no está vivo.
+  "Todo se paga. Lo mío, acá abajo." / "Considero esta deuda saldada."
+  (Encaja con la zona 4: deudas, cuotas, el Capataz.)
+
+==================================================
+6. VÍNCULOS YA ESCRITOS ENTRE CANDIDATOS
+==================================================
+Charlas en dos o tres partes que avanzan entre expediciones. Sirven de base si la pareja queda en la party.
+- Viuda + Desertor ("La muralla"): el puesto que él abandonó es el que dejó sola a la pareja de ella.
+  "Esta vez no te voy a dejar correr."
+- Novicia + Penitente ("Cirios"): él trabó la puerta del claustro de la orden de ella.
+  "Voy a terminar este voto. Después hablamos vos y yo."
+- Minera + Guardabosque ("Raíces"): los mineros cortaron la raíz madre del bosque. Ella promete empalmarla.
+- Ladrona + Buhonero ("El mapa"): él le vendió un mapa incompleto a propósito para que no llegara tan rápido.
+- Cantora + Exiliado ("La canción"): él sabe la canción hasta la nota donde le taparon la boca; ella sigue desde ahí.
+- Ladrona + Novicia ("El cáliz"): la ladrona tiene un cáliz de plata de la orden de la novicia.
+- Penitente + Buhonero ("La deuda"): él le debía a una hermana del claustro; descubre quién trabó la puerta.
+- Minera + Desertor ("Túneles"): ella le marca una salida que él no va a usar, pero duerme mejor sabiéndola.
+
+==================================================
+7. LO QUE HACE FALTA ESCRIBIR
+==================================================
+1. Elegir los 4 (uno por clase) y su nombre fijo. Sugerencia: que cada uno tenga una zona "suya" del Acto II/III
+   donde su historia explota (por ejemplo la Minera en La Veta, el Penitente o la Novicia en El Claustro,
+   el Guardabosque en El Bosque sin Sol).
+2. Para cada personaje: quién es, por qué baja, qué esconde, cómo cambia a lo largo de las 9 zonas, y qué
+   hace en cada uno de los tres finales.
+3. Relaciones de a pares (las 6 parejas de la party): roce inicial, qué se revelan, cómo termina.
+4. Charlas de hoguera: 2 o 3 por zona, cortas (4 a 8 líneas), entre dos personajes o los cuatro.
+5. Reacciones cortas (una línea) por personaje: al entrar a cada zona, ante cada jefe, al ganar y al caer.
+6. Cómo reacciona cada uno a La Sombra y a la revelación de quién es.
+7. Los tres finales (pedir / ofrecerse / no decir nada) contados desde esta party.
+
+==================================================
+8. LÍMITES PRÁCTICOS (para que entre en el juego)
+==================================================
+- Líneas de diálogo cortas: idealmente menos de 90 caracteres, máximo 120.
+- Cada charla: 4 a 8 líneas. Las de jefe o de La Sombra: 2 o 3 líneas.
+- Formato cómodo para pasar al juego:
+    [ZONA 2 · HOGUERA · Viuda + Penitente]
+    VIUDA: ...
+    PENITENTE: ...
+- Los retratos tienen expresiones: normal, enojo, risa (y se pueden sumar más). Se puede marcar la cara así:
+    VIUDA (enojo): ...
+- Mantener las frases ya escritas que sirvan; se pueden reescribir las demás.
