@@ -2,7 +2,7 @@
 
 El camino del juego es la expedición de grupo. El plan del juego anterior está en `juego_viejo/ROADMAP.md`.
 
-**Versión actual: 0.4.44.** Lo próximo: 0.5.0.
+**Versión actual: 0.4.45.** Lo próximo: 0.5.0.
 
 ## Cómo se numeran las versiones
 
@@ -113,6 +113,12 @@ La idea que une todo es una regla de las Guardianas: "quien le pida algo va a re
 - **Título:** el logo "The Last Flame" no cambia con el idioma.
 
 ## Historial
+
+### 0.4.45 (prueba)
+
+- Intro nueva en video: ocho ilustraciones con cámara lenta, llamas que titilan, brasas, humo, fundidos a negro, narración en subtítulos y el título al final (`js/video_intro.js`, `interfaz/intro/video_1..8.png`). Enter avanza, Esc salta.
+- Modo prueba: "Ver la intro" en el título.
+- Las voces grabadas se pueden sumar en `assets/voz/voces.js` con las claves `video_<escena>_<frase>`.
 
 ### 0.4.44 (prueba)
 

@@ -249,3 +249,8 @@
 #evento .eop.off { opacity: 0.45; }
 #evento .eres { font-size: 8.5px; line-height: 11px; color: var(--c5); text-align: center; }
 #evento .esig { margin-top: 2px; font-size: 7.5px; line-height: 9px; color: var(--c3); text-align: center; }
+
+/* Intro en video (js/video_intro.js): su propio lienzo de 1920x1080 sobre todo */
+#videoIntro { position: absolute; inset: 0; z-index: 200; background: #000; cursor: pointer; }
+#videoIntro canvas { width: 480px; height: 270px; display: block; }
+#videoIntro .vSaltar { position: absolute; right: 8px; bottom: 4px; font-family: var(--f-body); font-size: 6px; color: rgba(216,198,168,0.45); }

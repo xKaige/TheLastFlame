@@ -317,6 +317,7 @@ window.openTitleMenu = () => {
   else if (hay) items.push({ label: 'Continuar', sub: tr('{0} de Ceniza · {1} en el plantel · {2} expedicion{3}', X.ceniza, X.plantel.length, X.corridas, X.corridas === 1 ? '' : 'es'), fn: abrirHogar });
   items.push({ label: 'Nueva partida', fn: () => (hay ? confirmMenu('¿Empezar de nuevo? Se borra todo el progreso.', nuevaPartida) : nuevaPartida()) });
   items.push({ label: 'Opciones', fn: openOptionsMenu });
+  if (PRUEBA) items.push({ label: 'Ver la intro', sub: 'El video de la introducción, sin empezar partida.', fn: () => verVideoIntro(openTitleMenu) });
   if (PRUEBA) items.push({ label: 'Explorar de prueba', sub: 'Va directo a cualquier piso. Reemplaza la partida de prueba.', fn: abrirPisosDePrueba });
   if (PRUEBA) items.push({ label: 'Peleas de prueba', sub: 'Va directo a una pelea. Reemplaza la partida de prueba.', fn: abrirPeleasDePrueba });
   if (/Electron/i.test(navigator.userAgent)) items.push({ label: 'Salir', fn: () => window.close() });
@@ -458,10 +459,7 @@ const ESCENAS_INTRO = [
 function verIntro() {
   closeAllMenus();
   prepararHogar();
-  if (!CINE.art) CINE.art = buildCineArt();
-  Object.assign(CINE.art, ARTE_INTRO, { hogar: document.createElement('canvas') });
-  const escenas = ESCENAS_INTRO.map((e, i) => ({ ...e, lines: D.historia.intro[i] }));
-  playCine(escenas, () => { X.memoria.introVista = true; guardarX(); abrirHogar(); }, null, 'historia');
+  verVideoIntro(() => { X.memoria.introVista = true; guardarX(); abrirHogar(); });     // js/video_intro.js
 }
 
 // ---------- El Hogar ----------
